@@ -49,7 +49,7 @@ function fmtResp(v) {
   })[v] || v;
 }
 function makeUrl(token, akad) {
-  return `${BASE_URL}/?token=${token}&akad=${akad}`;
+  return `http://${BASE_URL}/?token=${token}&akad=${akad}`;
 }
 function canSync() {
   if (!SPREADSHEET_ID) { console.warn('[Sheets] Skip: SPREADSHEET_ID kosong'); return false; }
@@ -309,6 +309,12 @@ app.post('/api/admin/sync-sheets', adminAuth, async (req, res) => {
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+
+app.post('/api/admin/reset-guests', adminAuth, (req, res) => {
+  save(guestsFile, {});
+  save(rsvpFile, {});
+  res.json({ success: true, message: 'Data direset' });
+});
 
 app.listen(PORT, () => {
   console.log(`\n🌸  http://localhost:${PORT}`);
