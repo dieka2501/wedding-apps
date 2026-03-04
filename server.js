@@ -1,5 +1,9 @@
 require('dotenv').config();
-
+// Tulis credential.json dari environment variable jika ada
+if (process.env.GOOGLE_CREDENTIALS && !require('fs').existsSync('./credential.json')) {
+  require('fs').writeFileSync('./credential.json', process.env.GOOGLE_CREDENTIALS);
+  console.log('[Startup] credential.json ditulis dari environment variable');
+}
 const express    = require('express');
 const path       = require('path');
 const crypto     = require('crypto');
