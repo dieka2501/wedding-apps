@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Panel — Putri & Dikdik</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f8f5f0;color:#333;padding:1.5rem}
+h1{font-size:1.5rem;margin-bottom:.25rem;color:#4a3728}
+.sub{color:#888;font-size:.85rem;margin-bottom:2rem}
+.card{background:#fff;border:1px solid #e8e0d5;border-radius:8px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+h2{font-size:1rem;font-weight:600;color:#4a3728;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #b8972a}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+@media(max-width:500px){.form-row{grid-template-columns:1fr}}
+label{display:block;font-size:.75rem;font-weight:600;color:#666;margin-bottom:.25rem;letter-spacing:.05em;text-transform:uppercase}
+input,select{width:100%;padding:.6rem .875rem;border:1px solid #ddd;border-radius:4px;font-size:.9rem;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:#b8972a}
+.btn{padding:.65rem 1.25rem;background:#4a3728;color:#d4af5a;border:none;border-radius:4px;font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.btn:hover{background:#b8972a;color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-sm{padding:.4rem .875rem;font-size:.72rem}
+.btn-green{background:#1a7a4a;color:#fff}
+.btn-green:hover{background:#15603a;color:#fff}
+.btn-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+.output{margin-top:1rem;padding:1rem;background:#f5ead6;border:1px solid #b8972a;border-radius:4px;font-size:.85rem;word-break:break-all;display:none}
+.output.show{display:block}
+.output a{color:#4a3728;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;padding:.6rem .75rem;background:#f5ead6;color:#4a3728;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border-bottom:2px solid #b8972a}
+td{padding:.6rem .75rem;border-bottom:1px solid #f0e8d6;vertical-align:top}
+tr:hover td{background:#fdf8f0}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:20px;font-size:.7rem;font-weight:600}
+.badge-yes{background:#d4edda;color:#155724}
+.badge-no{background:#f8d7da;color:#721c24}
+.badge-pending{background:#fff3cd;color:#856404}
+.badge-akad{background:#d1ecf1;color:#0c5460}
+.copy-btn{cursor:pointer;background:none;border:none;color:#b8972a;font-size:.75rem;text-decoration:underline;margin-left:.5rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem;margin-bottom:1rem}
+.stat{background:#f5ead6;border-radius:6px;padding:1rem;text-align:center}
+.stat-num{font-size:2rem;font-weight:700;color:#4a3728}
+.stat-lbl{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.08em}
+/* Auth */
+.auth-wrap{max-width:400px;margin:4rem auto}
+.auth-card{background:#fff;border:1px solid #e8e0d5;border-radius:8px;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,.08);text-align:center}
+.auth-card h2{font-family:serif;font-size:2rem;color:#4a3728;margin-bottom:.5rem;border:none;padding:0}
+.auth-card p{color:#888;font-size:.85rem;margin-bottom:1.5rem}
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center;padding:1rem}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:8px;padding:1.5rem;max-width:620px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal-title{font-size:1.1rem;font-weight:600;color:#4a3728;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #b8972a}
+.import-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem}
+.imp-stat{text-align:center;padding:.75rem;border-radius:6px;background:#f5ead6}
+.imp-stat .n{font-size:1.8rem;font-weight:700;color:#4a3728}
+.imp-stat .l{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:#888}
+.imp-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.imp-table th{text-align:left;padding:.5rem .6rem;background:#f5ead6;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:#4a3728;border-bottom:2px solid #b8972a}
+.imp-table td{padding:.5rem .6rem;border-bottom:1px solid #f0e8d6;word-break:break-all}
+.badge-new{background:#d4edda;color:#155724;display:inline-block;padding:.15rem .5rem;border-radius:10px;font-size:.65rem;font-weight:600}
+.badge-skip{background:#e2e3e5;color:#6c757d;display:inline-block;padding:.15rem .5rem;border-radius:10px;font-size:.65rem;font-weight:600}
+.loading{text-align:center;padding:2.5rem;color:#888}
+.spinner{display:inline-block;width:22px;height:22px;border:2px solid #ddd;border-top-color:#b8972a;border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle;margin-right:.5rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- Auth -->
+<div class="auth-wrap" id="auth-gate">
+  <div class="auth-card">
+    <h2>P &amp; D</h2>
+    <p>Admin Panel — Undangan Pernikahan</p>
+    <div style="margin-bottom:1rem;text-align:left">
+      <label>Admin Key</label>
+      <input type="password" id="akey" placeholder="Masukkan admin key" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <button class="btn" onclick="login()" style="width:100%">Masuk</button>
+    <p id="auth-err" style="color:red;font-size:.8rem;margin-top:.75rem;display:none">Key salah. Coba lagi.</p>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="main" style="display:none;max-width:1000px;margin:0 auto">
+  <h1>🌸 Admin Panel</h1>
+  <p class="sub">Undangan Pernikahan Putri &amp; Dikdik — 1 Mei 2026</p>
+
+  <!-- IMPORT CARD -->
+  <div class="card">
+    <h2>📋 Import dari Google Sheets</h2>
+    <p style="font-size:.85rem;color:#666;margin-bottom:1.25rem">
+      Baca daftar tamu dari tab <strong>"tamu"</strong> dan generate token otomatis.<br>
+      Baris yang sudah ada token di kolom C akan <strong>di-skip</strong>.
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-green" id="btn-import" onclick="importTamu()">⬇&nbsp; Import &amp; Generate Token</button>
+      <span id="import-status" style="font-size:.82rem;color:#666"></span>
+    </div>
+  </div>
+
+  <!-- MANUAL CARD -->
+  <div class="card">
+    <h2>✍️ Buat Undangan Manual</h2>
+    <div class="form-row">
+      <div><label>Nama Tamu *</label><input type="text" id="g-name" placeholder="cth: Keluarga Bapak Hendra"></div>
+      <div><label>Email (opsional)</label><input type="email" id="g-email" placeholder="email@example.com"></div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <label>Akses Akad Nikah</label>
+      <select id="g-akad">
+        <option value="false">❌ Tidak — Hanya Resepsi</option>
+        <option value="true">✅ Ya — Akad + Resepsi</option>
+      </select>
+    </div>
+    <button class="btn" onclick="generateToken()">Generate Link Undangan</button>
+    <div class="output" id="token-out">
+      <p style="margin-bottom:.5rem;font-weight:600;color:#4a3728">✅ Link Undangan berhasil dibuat!</p>
+      <p style="margin-bottom:.5rem"><strong>Nama:</strong> <span id="out-name"></span></p>
+      <p style="margin-bottom:.5rem"><strong>Akad:</strong> <span id="out-akad"></span></p>
+      <p style="margin-bottom:.75rem"><strong>Token:</strong> <code id="out-token" style="font-size:.8rem"></code></p>
+      <p><strong>Link:</strong><br>
+        <a id="out-link" href="#" target="_blank"></a>
+        <button class="copy-btn" onclick="copyText(document.getElementById('out-link').textContent)">Salin</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="card">
+    <h2>📊 Statistik</h2>
+    <div class="stats">
+      <div class="stat"><div class="stat-num" id="st-total">0</div><div class="stat-lbl">Total Tamu</div></div>
+      <div class="stat"><div class="stat-num" id="st-rsvp">0</div><div class="stat-lbl">Sudah RSVP</div></div>
+      <div class="stat"><div class="stat-num" id="st-hadir">0</div><div class="stat-lbl">Hadir</div></div>
+      <div class="stat"><div class="stat-num" id="st-tidak">0</div><div class="stat-lbl">Tidak Hadir</div></div>
+    </div>
+  </div>
+
+  <!-- GUEST LIST -->
+  <div class="card">
+    <h2>👥 Daftar Tamu</h2>
+    <div style="margin-bottom:1rem"><button class="btn btn-sm" onclick="loadGuests()">🔄 Refresh</button></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>#</th><th>Nama</th><th>Akad</th><th>RSVP</th><th>WA</th><th>Waktu</th><th>Aksi</th></tr></thead>
+        <tbody id="guest-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Import Result Modal -->
+<div class="overlay" id="imp-modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Hasil Import</div>
+    <div id="modal-body"></div>
+    <div style="margin-top:1.25rem;text-align:right">
+      <button class="btn btn-sm" onclick="document.getElementById('imp-modal').classList.remove('show')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let KEY = '';
+const BASE = location.origin;
+
+function login() {
+  const k = document.getElementById('akey').value.trim();
+  if (!k) return;
+  KEY = k;
+  loadGuests().then(ok => {
+    if (ok) { document.getElementById('auth-gate').style.display='none'; document.getElementById('main').style.display='block'; }
+    else { document.getElementById('auth-err').style.display='block'; KEY=''; }
+  });
+}
+
+async function importTamu() {
+  const btn = document.getElementById('btn-import');
+  const st  = document.getElementById('import-status');
+  btn.disabled = true; st.textContent = '';
+  document.getElementById('modal-body').innerHTML = '<div class="loading"><span class="spinner"></span>Membaca sheet tamu &amp; generate token…</div>';
+  document.getElementById('imp-modal').classList.add('show');
+  try {
+    const r = await fetch('/api/admin/import-tamu', { method:'POST', headers:{'x-admin-key':KEY} });
+    const d = await r.json();
+    if (!d.success) { document.getElementById('modal-body').innerHTML=`<p style="color:red">Error: ${d.error}</p>`; return; }
+
+    const rows = (d.guests||[]).map((g,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td><strong>${esc(g.name)}</strong></td>
+        <td>${g.akad?'<span class="badge badge-akad">Akad+Resepsi</span>':'Resepsi saja'}</td>
+        <td>${g.isNew?'<span class="badge-new">Baru</span>':'<span class="badge-skip">Skip</span>'}</td>
+        <td style="font-size:.75rem">
+          <a href="${g.url}" target="_blank" style="color:#4a3728">${g.url}</a>
+          <button class="copy-btn" onclick="copyText('${g.url}')">Salin</button>
+        </td>
+      </tr>`).join('');
+
+    document.getElementById('modal-body').innerHTML = `
+      <div class="import-summary">
+        <div class="imp-stat"><div class="n">${d.total}</div><div class="l">Total</div></div>
+        <div class="imp-stat"><div class="n" style="color:#1a7a4a">${d.created}</div><div class="l">Token Baru</div></div>
+        <div class="imp-stat"><div class="n" style="color:#888">${d.skipped}</div><div class="l">Di-skip</div></div>
+      </div>
+      <p style="font-size:.8rem;color:#666;margin-bottom:.75rem">✅ Token &amp; link sudah ditulis ke kolom C &amp; D di sheet <strong>tamu</strong>.</p>
+      <div style="overflow-x:auto"><table class="imp-table">
+        <thead><tr><th>#</th><th>Nama</th><th>Akses</th><th>Status</th><th>Link</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
+
+    st.textContent = `✅ ${d.created} token baru, ${d.skipped} di-skip`;
+    loadGuests();
+  } catch(e) {
+    document.getElementById('modal-body').innerHTML = `<p style="color:red">Gagal: ${e.message}</p>`;
+  } finally { btn.disabled = false; }
+}
+
+async function generateToken() {
+  const name = document.getElementById('g-name').value.trim();
+  const email= document.getElementById('g-email').value.trim();
+  const akad = document.getElementById('g-akad').value;
+  if (!name) { alert('Nama tamu wajib diisi'); return; }
+  const r = await fetch('/api/admin/generate-token', {
+    method:'POST', headers:{'Content-Type':'application/json','x-admin-key':KEY},
+    body: JSON.stringify({name,email,akad:akad==='true'})
+  });
+  if (r.status===401) { alert('Admin key salah'); return; }
+  const d = await r.json();
+  document.getElementById('out-name').textContent = d.name;
+  document.getElementById('out-akad').textContent = d.akad ? 'Ya (Akad + Resepsi)' : 'Tidak (Resepsi saja)';
+  document.getElementById('out-token').textContent = d.token;
+  const lnk = document.getElementById('out-link');
+  lnk.textContent = d.url; lnk.href = d.url;
+  document.getElementById('token-out').classList.add('show');
+  loadGuests();
+}
+
+async function loadGuests() {
+  try {
+    const r = await fetch('/api/admin/guests', { headers:{'x-admin-key':KEY} });
+    if (r.status===401) return false;
+    renderGuests(await r.json());
+    return true;
+  } catch(e) { return false; }
+}
+
+function renderGuests(data) {
+  let hadir=0,tidak=0,rsvpN=0;
+  document.getElementById('guest-tbody').innerHTML = data.map((g,i)=>{
+    const url = `${BASE}/?token=${g.token}&akad=${g.akad}`;
+    let badge = '<span class="badge badge-pending">Belum</span>';
+    if (g.rsvp) {
+      rsvpN++;
+      if (g.rsvp.response==='tidak-hadir'){tidak++;badge='<span class="badge badge-no">Tidak Hadir</span>';}
+      else{hadir++;badge=`<span class="badge badge-yes">${fmtR(g.rsvp.response)}</span>`;}
+    }
+    const wa   = g.rsvp&&g.rsvp.whatsapp?`<a href="https://wa.me/${g.rsvp.whatsapp.replace(/\D/g,'')}" target="_blank" style="color:#25d366">${g.rsvp.whatsapp}</a>`:'—';
+    const time = g.rsvp?new Date(g.rsvp.submittedAt).toLocaleString('id-ID'):'—';
+    const akadBadge = g.akad?'<span class="badge badge-akad">Ya</span>':'—';
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${esc(g.name)}</strong>${g.rsvp&&g.rsvp.message?`<br><small style="color:#888">${esc(g.rsvp.message.substring(0,50))}</small>`:''}</td>
+      <td>${akadBadge}</td><td>${badge}</td><td>${wa}</td>
+      <td style="font-size:.72rem;color:#888">${time}</td>
+      <td><button class="copy-btn" onclick="copyText('${url}')">Salin Link</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('st-total').textContent = data.length;
+  document.getElementById('st-rsvp').textContent  = rsvpN;
+  document.getElementById('st-hadir').textContent  = hadir;
+  document.getElementById('st-tidak').textContent  = tidak;
+}
+
+function fmtR(v){return({'hadir':'Hadir','hadir-kampoeng':'Kampoeng Percik','hadir-hotel':'Hotel Wahid','hadir-keduanya':'Keduanya','tidak-hadir':'Tidak Hadir'})[v]||v}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>alert('Link disalin!'))}
+</script>
+</body>
+</html>
