@@ -49,7 +49,7 @@ function fmtResp(v) {
   })[v] || v;
 }
 function makeUrl(token, akad) {
-  return `http://${BASE_URL}/?token=${token}&akad=${akad}`;
+  return `${BASE_URL}/?token=${token}&akad=${akad}`;
 }
 function canSync() {
   if (!SPREADSHEET_ID) { console.warn('[Sheets] Skip: SPREADSHEET_ID kosong'); return false; }
@@ -315,6 +315,8 @@ app.post('/api/admin/reset-guests', adminAuth, (req, res) => {
   save(rsvpFile, {});
   res.json({ success: true, message: 'Data direset' });
 });
+//curl -X POST https://domain-railway.up.railway.app/api/admin/reset-guests -H "x-admin-key: ADMIN_KEY_ANDA"
+  //
 
 app.listen(PORT, () => {
   console.log(`\n🌸  http://localhost:${PORT}`);
