@@ -98,8 +98,10 @@
     .rsvp-form{background:var(--pure);border-radius:6px;padding:2rem;box-shadow:0 2px 20px rgba(22,32,53,.08)}
     .f-group{margin-bottom:1.25rem}
     .f-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);opacity:.5;margin-bottom:.5rem}
-    .f-input,.f-textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--teal);border-radius:3px;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:.9rem;transition:border-color .25s;outline:none}
-    .f-input:focus,.f-textarea:focus{border-color:var(--slate)}
+    .f-input,.f-select,.f-textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--teal);border-radius:3px;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:.9rem;transition:border-color .25s;outline:none}
+    .f-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%23162035' stroke-opacity='.4' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;cursor:pointer}
+    .f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--slate)}
+    .rsvp-chosen{display:inline-block;margin-top:.75rem;padding:.4rem 1rem;background:var(--teal);border-radius:3px;font-size:.82rem;color:var(--ink);opacity:.85}
     .f-textarea{resize:vertical;min-height:80px}
     .rsvp-opts{display:flex;flex-direction:column;gap:.6rem}
     .rsvp-opt{display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;border:1.5px solid var(--teal);border-radius:3px;cursor:pointer;transition:all .2s;background:var(--cream)}
@@ -261,7 +263,9 @@
           </div>
           <div class="f-group">
             <label class="f-label">Konfirmasi Kehadiran</label>
-            <div class="rsvp-opts" id="rsvp-opts"></div>
+            <select id="rsvp-opts" class="f-select">
+              <option value="">— Pilih konfirmasi kehadiran —</option>
+            </select>
           </div>
           <div class="f-group">
             <label class="f-label">Pesan &amp; Ucapan (opsional)</label>
@@ -270,9 +274,11 @@
           <button class="submit-btn" id="rsvp-btn" onclick="submitRsvp()">Kirim Konfirmasi</button>
         </div>
         <div class="rsvp-success" id="rsvp-ok">
+        <div class="rsvp-success" id="rsvp-ok">
           <div class="rsvp-success-icon">💌</div>
           <h3>Terima Kasih!</h3>
           <p style="color:var(--ink-lt);font-size:.9rem;margin-top:.5rem">Konfirmasi kehadiran Anda telah kami terima.<br>Kami menantikan kehadiran Anda.</p>
+          <div class="rsvp-chosen" id="rsvp-chosen-label"></div>
         </div>
       </div>
     </div>
@@ -344,34 +350,35 @@ function buildRsvpOpts(akad) {
     {v:'hadir',        l:'🎉 Hadir'},
     {v:'tidak-hadir', l:'🙁 Tidak Dapat Hadir'},
   ];
-  document.getElementById('rsvp-opts').innerHTML = opts.map(o =>
-    `<label class="rsvp-opt" onclick="selOpt(this)"><input type="radio" name="rr" value="${o.v}" style="display:none"><span>${o.l}</span></label>`
-  ).join('');
-}
-
-function selOpt(el) {
-  document.querySelectorAll('.rsvp-opt').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected'); el.querySelector('input').checked = true;
+  const sel = document.getElementById('rsvp-opts');
+  opts.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.v; opt.textContent = o.l;
+    sel.appendChild(opt);
+  });
 }
 
 async function submitRsvp() {
-  const name = document.getElementById('rsvp-name').value.trim();
-  const wa   = document.getElementById('rsvp-wa').value.trim();
-  const msg  = document.getElementById('rsvp-msg').value.trim();
-  const sel  = document.querySelector('input[name="rr"]:checked');
-  if (!name) { toast('Mohon isi nama Anda'); return; }
-  if (!sel)  { toast('Mohon pilih konfirmasi kehadiran'); return; }
+  const name    = document.getElementById('rsvp-name').value.trim();
+  const wa      = document.getElementById('rsvp-wa').value.trim();
+  const msg     = document.getElementById('rsvp-msg').value.trim();
+  const selEl   = document.getElementById('rsvp-opts');
+  const selVal  = selEl.value;
+  const selText = selEl.options[selEl.selectedIndex]?.text || '';
+  if (!name)   { toast('Mohon isi nama Anda'); return; }
+  if (!selVal) { toast('Mohon pilih konfirmasi kehadiran'); return; }
   const btn = document.getElementById('rsvp-btn');
   btn.disabled = true; btn.textContent = 'Mengirim…';
   try {
     const r = await fetch('/api/rsvp', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({token:TOKEN, response:sel.value, message:msg, whatsapp:wa})
+      body: JSON.stringify({token:TOKEN, response:selVal, message:msg, whatsapp:wa})
     });
     const d = await r.json();
     if (d.success) {
       localStorage.setItem('rsvp_'+TOKEN, '1');
       document.getElementById('rsvp-body').style.display = 'none';
+      document.getElementById('rsvp-chosen-label').textContent = 'Pilihan Anda: ' + selText;
       document.getElementById('rsvp-ok').classList.add('active');
     } else { toast(d.message||'Terjadi kesalahan.'); btn.disabled=false; btn.textContent='Kirim Konfirmasi'; }
   } catch(e) { toast('Gagal mengirim. Periksa koneksi.'); btn.disabled=false; btn.textContent='Kirim Konfirmasi'; }

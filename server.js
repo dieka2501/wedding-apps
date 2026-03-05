@@ -266,14 +266,47 @@ async function importFromTamuSheet() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Validasi token — HMAC dulu, baru lookup nama
-app.get('/api/validate', (req, res) => {
+app.get('/api/validate', async (req, res) => {
   const { token } = req.query;
+
+  // 1. Verifikasi HMAC
   const result = verifyToken(token);
   if (!result.valid) return res.status(403).json({ valid: false });
 
-  // Nama dari guests.json (opsional — token tetap valid meski tidak ada)
-  const guest = load(guestsFile)[token];
-  res.json({ valid: true, name: guest ? guest.name : 'Tamu Undangan', akad: result.akad });
+  // 2. Cari nama di guests.json (cache lokal)
+  let guest = load(guestsFile)[token];
+
+  // 3. Kalau tidak ada di lokal, fallback ke Google Sheets
+  if (!guest && canSync()) {
+    try {
+      const sheets = await getSheetsClient();
+      const col    = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `${SHEET_TAMU}!A:C`,
+      });
+      const rows = col.data.values || [];
+      for (let i = 1; i < rows.length; i++) {
+        if ((rows[i][2] || '').trim() === token) {
+          const name = (rows[i][0] || '').trim();
+          if (name) {
+            // Cache kembali ke guests.json
+            const guests  = load(guestsFile);
+            guests[token] = { name, akad: result.akad };
+            save(guestsFile, guests);
+            guest = guests[token];
+          }
+          break;
+        }
+      }
+    } catch(e) {
+      console.error('[Validate] Sheets fallback gagal:', e.message);
+    }
+  }
+
+  // 4. Tidak ditemukan di mana-mana → UNAUTH
+  if (!guest) return res.status(403).json({ valid: false });
+
+  res.json({ valid: true, name: guest.name, akad: result.akad });
 });
 
 // Submit RSVP — verifikasi HMAC dulu
