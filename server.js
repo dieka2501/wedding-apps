@@ -1,14 +1,16 @@
 require('dotenv').config();
-// Tulis credential.json dari environment variable jika ada
-if (process.env.GOOGLE_CREDENTIALS && !require('fs').existsSync('./credential.json')) {
-  require('fs').writeFileSync('./credential.json', process.env.GOOGLE_CREDENTIALS);
-  console.log('[Startup] credential.json ditulis dari environment variable');
-}
+
 const express    = require('express');
 const path       = require('path');
 const crypto     = require('crypto');
 const fs         = require('fs');
 const { google } = require('googleapis');
+
+// Tulis credential.json dari env variable (untuk Railway/production)
+if (process.env.GOOGLE_CREDENTIALS && !fs.existsSync('./credential.json')) {
+  fs.writeFileSync('./credential.json', process.env.GOOGLE_CREDENTIALS);
+  console.log('[Startup] credential.json ditulis dari GOOGLE_CREDENTIALS env');
+}
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +24,47 @@ const SPREADSHEET_ID  = process.env.SPREADSHEET_ID || '';
 const SHEET_RSVP      = process.env.SHEET_NAME  || 'RSVP';
 const SHEET_TAMU      = process.env.SHEET_TAMU  || 'tamu';
 const BASE_URL        = process.env.BASE_URL    || `http://localhost:${PORT}`;
+const TOKEN_SECRET    = process.env.TOKEN_SECRET || 'ganti-dengan-secret-yang-kuat';
+
+if (TOKEN_SECRET === 'ganti-dengan-secret-yang-kuat') {
+  console.warn('⚠   TOKEN_SECRET belum diset di .env — gunakan nilai acak yang kuat!');
+}
+
+// ─── HMAC Token System ────────────────────────────────────────────────────────
+// Struktur token (33 karakter):
+//   [24 hex nonce][1 akad flag][8 hex signature]
+//
+// Validasi tanpa DB: recompute HMAC(nonce+akadFlag, TOKEN_SECRET)
+// dan bandingkan dengan 8 karakter terakhir token.
+// guests.json hanya dipakai untuk lookup nama tamu.
+
+function makeToken(akad) {
+  const nonce    = crypto.randomBytes(12).toString('hex');       // 24 chars
+  const akadFlag = akad ? '1' : '0';                             // 1 char
+  const payload  = nonce + akadFlag;                             // 25 chars
+  const sig      = crypto.createHmac('sha256', TOKEN_SECRET)
+                         .update(payload).digest('hex')
+                         .substring(0, 8);                       // 8 chars
+  return payload + sig;                                          // 33 chars total
+}
+
+function verifyToken(token) {
+  if (!token || token.length !== 33) return { valid: false };
+  const payload  = token.substring(0, 25);
+  const sig      = token.substring(25);
+  const expected = crypto.createHmac('sha256', TOKEN_SECRET)
+                         .update(payload).digest('hex')
+                         .substring(0, 8);
+  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
+    return { valid: false };
+  }
+  const akad = token[24] === '1';
+  return { valid: true, akad };
+}
+
+function makeUrl(token) {
+  return `${BASE_URL}/?token=${token}`;
+}
 
 // ─── Google Sheets Client ─────────────────────────────────────────────────────
 async function getSheetsClient() {
@@ -31,12 +74,6 @@ async function getSheetsClient() {
   });
   return google.sheets({ version: 'v4', auth: await auth.getClient() });
 }
-
-// ─── Local File Store ─────────────────────────────────────────────────────────
-const guestsFile = path.join(__dirname, 'guests.json');
-const rsvpFile   = path.join(__dirname, 'rsvp.json');
-const load = f      => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
-const save = (f, d) => fs.writeFileSync(f, JSON.stringify(d, null, 2));
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function fmtResp(v) {
@@ -48,9 +85,7 @@ function fmtResp(v) {
     'tidak-hadir':     'Tidak Dapat Hadir',
   })[v] || v;
 }
-function makeUrl(token, akad) {
-  return `${BASE_URL}/?token=${token}&akad=${akad}`;
-}
+
 function canSync() {
   if (!SPREADSHEET_ID) { console.warn('[Sheets] Skip: SPREADSHEET_ID kosong'); return false; }
   if (!fs.existsSync(CREDENTIAL_PATH)) { console.warn('[Sheets] Skip: credential.json tidak ditemukan'); return false; }
@@ -58,6 +93,12 @@ function canSync() {
 }
 
 // ─── FIX 1: Sync RSVP → sheet RSVP (dengan error logging lengkap) ────────────
+// ─── Local File Store ─────────────────────────────────────────────────────────
+const guestsFile = path.join(__dirname, 'guests.json');
+const rsvpFile   = path.join(__dirname, 'rsvp.json');
+const load = f      => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
+const save = (f, d) => fs.writeFileSync(f, JSON.stringify(d, null, 2));
+
 async function syncRsvpToSheets(data) {
   if (!canSync()) return;
   try {
@@ -123,9 +164,7 @@ async function syncRsvpToSheets(data) {
 }
 
 // ─── FIX 2: Sync tamu baru → sheet tamu ──────────────────────────────────────
-
 async function syncTamuToSheets(token, name, akad, url) {
-  console.log('[DEBUG] Akan sync tamu:', name, '| SPREADSHEET_ID:', process.env.SPREADSHEET_ID ? 'ada' : 'KOSONG');
   if (!canSync()) return;
   try {
     const sheets = await getSheetsClient();
@@ -147,7 +186,7 @@ async function syncTamuToSheets(token, name, akad, url) {
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
       range: `${SHEET_TAMU}!A1`,
-      valueInputOption: 'RAW',
+      valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [[name, akad ? 'TRUE' : 'FALSE', token, url]] },
     });
@@ -180,10 +219,10 @@ async function importFromTamuSheet() {
     if (!name) continue;
 
     const isNew = !existing;
-    const token = isNew ? crypto.randomBytes(16).toString('hex') : existing;
+    const token = isNew ? makeToken(akad) : existing;
 
     guests[token] = { name, akad, email: '' };
-    updates.push({ rowNum: i + 2, token, url: makeUrl(token, akad), isNew });
+    updates.push({ rowNum: i + 2, token, url: makeUrl(token), isNew });
   }
 
   // Simpan ke lokal — selesai cepat
@@ -226,28 +265,35 @@ async function importFromTamuSheet() {
 // ROUTES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Validasi token
+// Validasi token — HMAC dulu, baru lookup nama
 app.get('/api/validate', (req, res) => {
-  const guest = load(guestsFile)[req.query.token];
-  if (!guest) return res.status(403).json({ valid: false });
-  res.json({ valid: true, name: guest.name, akad: guest.akad === true || guest.akad === 'true' });
+  const { token } = req.query;
+  const result = verifyToken(token);
+  if (!result.valid) return res.status(403).json({ valid: false });
+
+  // Nama dari guests.json (opsional — token tetap valid meski tidak ada)
+  const guest = load(guestsFile)[token];
+  res.json({ valid: true, name: guest ? guest.name : 'Tamu Undangan', akad: result.akad });
 });
 
-// Submit RSVP — sync ke Sheets secara async
+// Submit RSVP — verifikasi HMAC dulu
 app.post('/api/rsvp', async (req, res) => {
   const { token, response, message, whatsapp } = req.body;
   if (!token || !response) return res.status(400).json({ success: false, message: 'Missing fields' });
-  const guests = load(guestsFile);
-  const guest  = guests[token];
-  if (!guest) return res.status(403).json({ success: false, message: 'Invalid token' });
 
-  // Simpan ke lokal
+  const result = verifyToken(token);
+  if (!result.valid) return res.status(403).json({ success: false, message: 'Invalid token' });
+
+  // Nama dari guests.json jika ada
+  const guests = load(guestsFile);
+  const name   = guests[token] ? guests[token].name : 'Tamu Undangan';
+  const akad   = result.akad;
+
   const rsvp  = load(rsvpFile);
-  rsvp[token] = { name: guest.name, akad: guest.akad, response, message: message || '', whatsapp: whatsapp || '', submittedAt: new Date().toISOString() };
+  rsvp[token] = { name, akad, response, message: message || '', whatsapp: whatsapp || '', submittedAt: new Date().toISOString() };
   save(rsvpFile, rsvp);
 
-  // Sync ke Sheets — tidak block response, tapi error akan terlog
-  syncRsvpToSheets({ token, name: guest.name, akad: guest.akad, response, message, whatsapp })
+  syncRsvpToSheets({ token, name, akad, response, message, whatsapp })
     .catch(e => console.error('[RSVP] Unhandled sync error:', e.message));
 
   res.json({ success: true });
@@ -259,18 +305,17 @@ function adminAuth(req, res, next) {
   next();
 }
 
-// FIX 3: Generate token manual — sekarang juga sync tamu ke sheet tamu
+// FIX 3: Generate token manual — pakai HMAC token
 app.post('/api/admin/generate-token', adminAuth, async (req, res) => {
   const { name, akad, email } = req.body;
   if (!name) return res.status(400).json({ error: 'Name required' });
-  const token   = crypto.randomBytes(16).toString('hex');
   const isAkad  = akad === true || akad === 'true';
+  const token   = makeToken(isAkad);
   const guests  = load(guestsFile);
   guests[token] = { name, akad: isAkad, email: email || '' };
   save(guestsFile, guests);
-  const url = makeUrl(token, isAkad);
+  const url = makeUrl(token);
 
-  // Sync ke sheet tamu secara async
   syncTamuToSheets(token, name, isAkad, url)
     .catch(e => console.error('[Generate] Sync error:', e.message));
 
@@ -308,15 +353,19 @@ app.post('/api/admin/sync-sheets', adminAuth, async (req, res) => {
   res.json({ success: true, synced });
 });
 
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-
-app.post('/api/admin/reset-guests', adminAuth, (req, res) => {
+// Reset semua data lokal (guests.json & rsvp.json)
+app.post('/api/admin/reset', adminAuth, (req, res) => {
+  const { confirm } = req.body;
+  if (confirm !== 'RESET') return res.status(400).json({ error: 'Kirim { "confirm": "RESET" } untuk konfirmasi' });
+  const guestCount = Object.keys(load(guestsFile)).length;
+  const rsvpCount  = Object.keys(load(rsvpFile)).length;
   save(guestsFile, {});
   save(rsvpFile, {});
-  res.json({ success: true, message: 'Data direset' });
+  console.log(`[Reset] guests.json (${guestCount} tamu) dan rsvp.json (${rsvpCount} RSVP) direset`);
+  res.json({ success: true, message: `Reset selesai. ${guestCount} tamu dan ${rsvpCount} RSVP dihapus.` });
 });
-//curl -X POST https://domain-railway.up.railway.app/api/admin/reset-guests -H "x-admin-key: ADMIN_KEY_ANDA"
-  //
+
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 app.listen(PORT, () => {
   console.log(`\n🌸  http://localhost:${PORT}`);
