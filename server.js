@@ -30,22 +30,22 @@ if (TOKEN_SECRET === 'ganti-dengan-secret-yang-kuat') {
   console.warn('⚠   TOKEN_SECRET belum diset di .env — gunakan nilai acak yang kuat!');
 }
 
-// ─── HMAC Token System ────────────────────────────────────────────────────────
-// Struktur token (33 karakter):
-//   [24 hex nonce][1 akad flag][8 hex signature]
-//
-// Validasi tanpa DB: recompute HMAC(nonce+akadFlag, TOKEN_SECRET)
-// dan bandingkan dengan 8 karakter terakhir token.
-// guests.json hanya dipakai untuk lookup nama tamu.
+// ─── Sheet column mapping (A=0, B=1, C=2, D=3, E=4) ─────────────────────────
+// A = Nama
+// B = is_akad (TRUE/FALSE)
+// C = No WA
+// D = Token
+// E = Link
 
+// ─── HMAC Token ───────────────────────────────────────────────────────────────
 function makeToken(akad) {
-  const nonce    = crypto.randomBytes(12).toString('hex');       // 24 chars
-  const akadFlag = akad ? '1' : '0';                             // 1 char
-  const payload  = nonce + akadFlag;                             // 25 chars
+  const nonce    = crypto.randomBytes(12).toString('hex');
+  const akadFlag = akad ? '1' : '0';
+  const payload  = nonce + akadFlag;
   const sig      = crypto.createHmac('sha256', TOKEN_SECRET)
                          .update(payload).digest('hex')
-                         .substring(0, 8);                       // 8 chars
-  return payload + sig;                                          // 33 chars total
+                         .substring(0, 8);
+  return payload + sig; // 33 chars
 }
 
 function verifyToken(token) {
@@ -55,16 +55,26 @@ function verifyToken(token) {
   const expected = crypto.createHmac('sha256', TOKEN_SECRET)
                          .update(payload).digest('hex')
                          .substring(0, 8);
-  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
-    return { valid: false };
-  }
-  const akad = token[24] === '1';
-  return { valid: true, akad };
+  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return { valid: false };
+  return { valid: true, akad: token[24] === '1' };
 }
 
 function makeUrl(token) {
   return `${BASE_URL}/?token=${token}`;
 }
+
+// ─── WA Helper ────────────────────────────────────────────────────────────────
+// Ambil 5 digit terakhir nomor WA (strip semua non-digit dulu)
+function wa5(wa) {
+  const digits = String(wa || '').replace(/\D/g, '');
+  return digits.slice(-5);
+}
+
+// ─── Local File Store ─────────────────────────────────────────────────────────
+const guestsFile = path.join(__dirname, 'guests.json');
+const rsvpFile   = path.join(__dirname, 'rsvp.json');
+const load = f      => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
+const save = (f, d) => fs.writeFileSync(f, JSON.stringify(d, null, 2));
 
 // ─── Google Sheets Client ─────────────────────────────────────────────────────
 async function getSheetsClient() {
@@ -73,6 +83,12 @@ async function getSheetsClient() {
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
   return google.sheets({ version: 'v4', auth: await auth.getClient() });
+}
+
+function canSync() {
+  if (!SPREADSHEET_ID) { console.warn('[Sheets] Skip: SPREADSHEET_ID kosong'); return false; }
+  if (!fs.existsSync(CREDENTIAL_PATH)) { console.warn('[Sheets] Skip: credential.json tidak ditemukan'); return false; }
+  return true;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -86,109 +102,73 @@ function fmtResp(v) {
   })[v] || v;
 }
 
-function canSync() {
-  if (!SPREADSHEET_ID) { console.warn('[Sheets] Skip: SPREADSHEET_ID kosong'); return false; }
-  if (!fs.existsSync(CREDENTIAL_PATH)) { console.warn('[Sheets] Skip: credential.json tidak ditemukan'); return false; }
-  return true;
-}
-
-// ─── FIX 1: Sync RSVP → sheet RSVP (dengan error logging lengkap) ────────────
-// ─── Local File Store ─────────────────────────────────────────────────────────
-const guestsFile = path.join(__dirname, 'guests.json');
-const rsvpFile   = path.join(__dirname, 'rsvp.json');
-const load = f      => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
-const save = (f, d) => fs.writeFileSync(f, JSON.stringify(d, null, 2));
-
+// ─── Sync RSVP → sheet RSVP ──────────────────────────────────────────────────
 async function syncRsvpToSheets(data) {
   if (!canSync()) return;
   try {
     const sheets = await getSheetsClient();
-
-    // Pastikan header ada — cek baris 1
     const hdr = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_RSVP}!A1:G1`,
+      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1:G1`,
     });
-    const hasHeader = hdr.data.values && hdr.data.values.length > 0 && hdr.data.values[0][0] === 'Token';
+    const hasHeader = hdr.data.values?.[0]?.[0] === 'Token';
     if (!hasHeader) {
       await sheets.spreadsheets.values.update({
-        spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_RSVP}!A1`,
+        spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1`,
         valueInputOption: 'RAW',
         requestBody: { values: [['Token','Nama','Akad','Respons','WhatsApp','Pesan','Waktu Submit']] },
       });
-      console.log('[Sheets] Header RSVP dibuat');
     }
-
-    // Cari apakah token sudah ada → update baris tersebut, belum ada → append
     const col    = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A:A` });
     const tokens = col.data.values || [];
     let rowIdx   = -1;
-    for (let i = 1; i < tokens.length; i++) { // mulai i=1, skip header
-      if (tokens[i] && tokens[i][0] === data.token) { rowIdx = i + 1; break; }
+    for (let i = 1; i < tokens.length; i++) {
+      if (tokens[i]?.[0] === data.token) { rowIdx = i + 1; break; }
     }
-
     const row = [
-      data.token,
-      data.name,
-      data.akad ? 'Ya' : 'Tidak',
-      fmtResp(data.response),
-      data.whatsapp || '',
-      data.message  || '',
+      data.token, data.name, data.akad ? 'Ya' : 'Tidak',
+      fmtResp(data.response), data.whatsapp || '', data.message || '',
       new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }),
     ];
-
     if (rowIdx > 0) {
       await sheets.spreadsheets.values.update({
-        spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_RSVP}!A${rowIdx}`,
-        valueInputOption: 'RAW',
-        requestBody: { values: [row] },
+        spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A${rowIdx}`,
+        valueInputOption: 'RAW', requestBody: { values: [row] },
       });
       console.log(`[Sheets] RSVP updated (baris ${rowIdx}): ${data.name}`);
     } else {
       await sheets.spreadsheets.values.append({
-        spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_RSVP}!A1`,
-        valueInputOption: 'RAW',
-        insertDataOption: 'INSERT_ROWS',
+        spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1`,
+        valueInputOption: 'RAW', insertDataOption: 'INSERT_ROWS',
         requestBody: { values: [row] },
       });
       console.log(`[Sheets] RSVP appended: ${data.name}`);
     }
   } catch (e) {
-    // FIX: log error lengkap agar tidak silent
     console.error(`[Sheets] RSVP sync GAGAL untuk ${data.name}:`, e.message);
     if (e.errors) console.error('[Sheets] Detail:', JSON.stringify(e.errors));
   }
 }
 
-// ─── FIX 2: Sync tamu baru → sheet tamu ──────────────────────────────────────
-async function syncTamuToSheets(token, name, akad, url) {
+// ─── Sync tamu baru → sheet tamu (kolom D=token, E=link) ─────────────────────
+async function syncTamuToSheets(token, name, akad, wa, url) {
   if (!canSync()) return;
   try {
     const sheets = await getSheetsClient();
-
-    // Cek apakah token sudah ada di kolom C (skip duplikat)
+    // Cek apakah token sudah ada di kolom D
     const col    = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_TAMU}!C:C`,
+      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_TAMU}!D:D`,
     });
     const tknCol = col.data.values || [];
     for (let i = 0; i < tknCol.length; i++) {
-      if (tknCol[i] && tknCol[i][0] === token) {
-        console.log(`[Sheets] Tamu sudah ada di sheet, skip: ${name}`);
+      if (tknCol[i]?.[0] === token) {
+        console.log(`[Sheets] Tamu sudah ada di sheet col D, skip: ${name}`);
         return;
       }
     }
-
-    // Append baris baru langsung
     await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_TAMU}!A1`,
-      valueInputOption: 'USER_ENTERED',
-      insertDataOption: 'INSERT_ROWS',
-      requestBody: { values: [[name, akad ? 'TRUE' : 'FALSE', token, url]] },
+      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_TAMU}!A1`,
+      valueInputOption: 'USER_ENTERED', insertDataOption: 'INSERT_ROWS',
+      requestBody: { values: [[name, akad ? 'TRUE' : 'FALSE', wa, token, url]] },
     });
     console.log(`[Sheets] Tamu baru ditambahkan: ${name}`);
   } catch (e) {
@@ -196,67 +176,103 @@ async function syncTamuToSheets(token, name, akad, url) {
   }
 }
 
-// ─── Import bulk dari sheet "tamu" ────────────────────────────────────────────
-// Fase 1: baca sheet → generate token → simpan guests.json → respons ke browser
-// Fase 2: tulis balik token & link ke Sheets (background, tidak block response)
+// ─── Import bulk dari sheet tamu ──────────────────────────────────────────────
+// Kolom: A=Nama, B=is_akad, C=No WA, D=Token, E=Link
+//
+// Logic per baris:
+//   - Tidak ada WA           → skip (wajib punya WA)
+//   - Tidak ada token & link → BARU  → generate token, tulis D+E
+//   - Ada token, tidak ada link → UPDATE → update JSON, tulis balik E
+//   - Ada token & link       → EXISTING → load ke cache, skip
 async function importFromTamuSheet() {
   const sheets = await getSheetsClient();
   const res    = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: `${SHEET_TAMU}!A2:D`,
+    range: `${SHEET_TAMU}!A2:E`,
   });
 
   const rows    = res.data.values || [];
   const guests  = load(guestsFile);
-  const updates = [];
+  const updates = []; // { rowNum, token, url, status: 'new'|'updated'|'existing' }
+  const skipped = [];
 
   for (let i = 0; i < rows.length; i++) {
     const name     = (rows[i][0] || '').trim();
     const akadRaw  = (rows[i][1] || '').trim().toUpperCase();
     const akad     = akadRaw === 'TRUE' || akadRaw === 'YA' || akadRaw === '1';
-    const existing = (rows[i][2] || '').trim();
+    const wa       = (rows[i][2] || '').trim();
+    const exToken  = (rows[i][3] || '').trim();
+    const exLink   = (rows[i][4] || '').trim();
+    const rowNum   = i + 2;
 
     if (!name) continue;
 
-    const isNew = !existing;
-    const token = isNew ? makeToken(akad) : existing;
+    // Wajib punya No WA
+    if (!wa) {
+      console.log(`[Import] Skip (no WA): ${name}`);
+      skipped.push({ name, reason: 'no_wa' });
+      continue;
+    }
 
-    guests[token] = { name, akad, email: '' };
-    updates.push({ rowNum: i + 2, token, url: makeUrl(token), isNew });
+    if (!exToken && !exLink) {
+      // BARU — generate token baru
+      const token = makeToken(akad);
+      const url   = makeUrl(token);
+      guests[token] = { name, akad, wa };
+      updates.push({ rowNum, token, url, status: 'new', colD: true, colE: true });
+
+    } else if (exToken && !exLink) {
+      // UPDATE — pertahankan token, update data, tulis ulang link
+      const url = makeUrl(exToken);
+      guests[exToken] = { name, akad, wa };
+      updates.push({ rowNum, token: exToken, url, status: 'updated', colD: false, colE: true });
+
+    } else if (exToken && exLink) {
+      // EXISTING — load ke cache saja
+      if (!guests[exToken]) {
+        guests[exToken] = { name, akad, wa };
+      }
+      updates.push({ rowNum, token: exToken, url: exLink, status: 'existing', colD: false, colE: false });
+    }
   }
 
-  // Simpan ke lokal — selesai cepat
+  // Simpan guests.json
   save(guestsFile, guests);
 
-  // Tulis balik ke Sheets di background (tidak ditunggu)
-  const newUpdates = updates.filter(u => u.isNew);
-  if (newUpdates.length > 0) {
+  // Tulis balik ke Sheets (background)
+  const toWrite = updates.filter(u => u.colD || u.colE);
+  if (toWrite.length > 0) {
+    const batchData = [];
+    toWrite.forEach(u => {
+      if (u.colD && u.colE) {
+        // Baru: tulis D dan E
+        batchData.push({ range: `${SHEET_TAMU}!D${u.rowNum}:E${u.rowNum}`, values: [[u.token, u.url]] });
+      } else if (u.colE) {
+        // Update: tulis E saja
+        batchData.push({ range: `${SHEET_TAMU}!E${u.rowNum}`, values: [[u.url]] });
+      }
+    });
+
     sheets.spreadsheets.values.batchUpdate({
       spreadsheetId: SPREADSHEET_ID,
-      requestBody: {
-        valueInputOption: 'RAW',
-        data: newUpdates.map(u => ({
-          range: `${SHEET_TAMU}!C${u.rowNum}:D${u.rowNum}`,
-          values: [[u.token, u.url]],
-        })),
-      },
+      requestBody: { valueInputOption: 'RAW', data: batchData },
     })
-    .then(() => console.log(`[Sheets] Tulis balik ${newUpdates.length} token ke sheet tamu selesai`))
-    .catch(e => console.error('[Sheets] Tulis balik token GAGAL:', e.message));
+    .then(() => console.log(`[Sheets] Tulis balik ${toWrite.length} baris selesai`))
+    .catch(e  => console.error('[Sheets] Tulis balik GAGAL:', e.message));
   }
 
-  const created = updates.filter(u => u.isNew).length;
-  const skipped = updates.filter(u => !u.isNew).length;
+  const newCount      = updates.filter(u => u.status === 'new').length;
+  const updatedCount  = updates.filter(u => u.status === 'updated').length;
+  const existingCount = updates.filter(u => u.status === 'existing').length;
+
   return {
     total: updates.length,
-    created,
-    skipped,
+    new: newCount, updated: updatedCount, existing: existingCount,
+    skipped: skipped.length,
     guests: updates.map(u => ({
-      token: u.token,
-      name:  guests[u.token].name,
-      akad:  guests[u.token].akad,
-      url:   u.url,
-      isNew: u.isNew,
+      token: u.token, url: u.url, status: u.status,
+      name: guests[u.token]?.name,
+      akad: guests[u.token]?.akad,
     })),
   };
 }
@@ -265,33 +281,82 @@ async function importFromTamuSheet() {
 // ROUTES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Validasi token — HMAC dulu, baru lookup nama
-app.get('/api/validate', async (req, res) => {
+// ── Pre-validate: cek HMAC + ambil nama (untuk tampil di halaman auth) ────────
+// Tidak verifikasi WA — hanya untuk menampilkan nama di overlay auth
+app.get('/api/pre-validate', async (req, res) => {
   const { token } = req.query;
 
-  // 1. Verifikasi HMAC
+  // 1. Cek HMAC
   const result = verifyToken(token);
   if (!result.valid) return res.status(403).json({ valid: false });
 
-  // 2. Cari nama di guests.json (cache lokal)
+  // 2. Cari di guests.json
   let guest = load(guestsFile)[token];
 
-  // 3. Kalau tidak ada di lokal, fallback ke Google Sheets
+  // 3. Fallback ke Sheets jika tidak ada di cache
   if (!guest && canSync()) {
     try {
       const sheets = await getSheetsClient();
       const col    = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_TAMU}!A:C`,
+        range: `${SHEET_TAMU}!A:D`,
       });
       const rows = col.data.values || [];
       for (let i = 1; i < rows.length; i++) {
-        if ((rows[i][2] || '').trim() === token) {
+        if ((rows[i][3] || '').trim() === token) {
           const name = (rows[i][0] || '').trim();
-          if (name) {
-            // Cache kembali ke guests.json
+          const wa   = (rows[i][2] || '').trim();
+          const akadRaw = (rows[i][1] || '').trim().toUpperCase();
+          const akad = akadRaw === 'TRUE' || akadRaw === 'YA' || akadRaw === '1';
+          if (name && wa) {
             const guests  = load(guestsFile);
-            guests[token] = { name, akad: result.akad };
+            guests[token] = { name, akad, wa };
+            save(guestsFile, guests);
+            guest = guests[token];
+          }
+          break;
+        }
+      }
+    } catch(e) {
+      console.error('[PreValidate] Sheets fallback gagal:', e.message);
+    }
+  }
+
+  if (!guest) return res.status(403).json({ valid: false });
+
+  // Kembalikan nama saja — WA tidak dikirim ke client
+  res.json({ valid: true, name: guest.name });
+});
+
+// ── Full validate: HMAC + verifikasi 5 digit WA ───────────────────────────────
+app.post('/api/validate', async (req, res) => {
+  const { token, wa5: inputWa5 } = req.body;
+
+  // 1. Cek HMAC
+  const result = verifyToken(token);
+  if (!result.valid) return res.status(403).json({ valid: false, reason: 'invalid_token' });
+
+  // 2. Cari guest
+  let guest = load(guestsFile)[token];
+
+  // 3. Fallback ke Sheets
+  if (!guest && canSync()) {
+    try {
+      const sheets = await getSheetsClient();
+      const col    = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `${SHEET_TAMU}!A:D`,
+      });
+      const rows = col.data.values || [];
+      for (let i = 1; i < rows.length; i++) {
+        if ((rows[i][3] || '').trim() === token) {
+          const name    = (rows[i][0] || '').trim();
+          const wa      = (rows[i][2] || '').trim();
+          const akadRaw = (rows[i][1] || '').trim().toUpperCase();
+          const akad    = akadRaw === 'TRUE' || akadRaw === 'YA' || akadRaw === '1';
+          if (name && wa) {
+            const guests  = load(guestsFile);
+            guests[token] = { name, akad, wa };
             save(guestsFile, guests);
             guest = guests[token];
           }
@@ -303,13 +368,35 @@ app.get('/api/validate', async (req, res) => {
     }
   }
 
-  // 4. Tidak ditemukan di mana-mana → UNAUTH
-  if (!guest) return res.status(403).json({ valid: false });
+  // 4. Token tidak terdaftar
+  if (!guest) return res.status(403).json({ valid: false, reason: 'not_registered' });
+
+  // 5. Verifikasi 5 digit WA
+  const expected5 = wa5(guest.wa);
+  const input5    = String(inputWa5 || '').replace(/\D/g, '').slice(-5);
+
+  if (!expected5 || input5 !== expected5) {
+    return res.status(403).json({ valid: false, reason: 'wrong_wa' });
+  }
 
   res.json({ valid: true, name: guest.name, akad: result.akad });
 });
 
-// Submit RSVP — verifikasi HMAC dulu
+// ── Cek status RSVP tamu (sudah submit atau belum) ───────────────────────────
+app.get('/api/rsvp-status', (req, res) => {
+  const { token } = req.query;
+  const result = verifyToken(token);
+  if (!result.valid) return res.status(403).json({ valid: false });
+  const rsvp = load(rsvpFile);
+  const entry = rsvp[token];
+  if (entry) {
+    res.json({ submitted: true, response: entry.response });
+  } else {
+    res.json({ submitted: false });
+  }
+});
+
+// ── Submit RSVP ───────────────────────────────────────────────────────────────
 app.post('/api/rsvp', async (req, res) => {
   const { token, response, message, whatsapp } = req.body;
   if (!token || !response) return res.status(400).json({ success: false, message: 'Missing fields' });
@@ -317,9 +404,8 @@ app.post('/api/rsvp', async (req, res) => {
   const result = verifyToken(token);
   if (!result.valid) return res.status(403).json({ success: false, message: 'Invalid token' });
 
-  // Nama dari guests.json jika ada
   const guests = load(guestsFile);
-  const name   = guests[token] ? guests[token].name : 'Tamu Undangan';
+  const name   = guests[token]?.name || 'Tamu Undangan';
   const akad   = result.akad;
 
   const rsvp  = load(rsvpFile);
@@ -332,35 +418,86 @@ app.post('/api/rsvp', async (req, res) => {
   res.json({ success: true });
 });
 
-// Admin auth middleware
+// ── Admin auth middleware ─────────────────────────────────────────────────────
 function adminAuth(req, res, next) {
   if (req.headers['x-admin-key'] !== process.env.ADMIN_KEY) return res.status(401).json({ error: 'Unauthorized' });
   next();
 }
 
-// FIX 3: Generate token manual — pakai HMAC token
+// ── Generate token manual ─────────────────────────────────────────────────────
 app.post('/api/admin/generate-token', adminAuth, async (req, res) => {
-  const { name, akad, email } = req.body;
+  const { name, akad, wa } = req.body;
   if (!name) return res.status(400).json({ error: 'Name required' });
+  if (!wa)   return res.status(400).json({ error: 'No WA required' });
+
   const isAkad  = akad === true || akad === 'true';
   const token   = makeToken(isAkad);
   const guests  = load(guestsFile);
-  guests[token] = { name, akad: isAkad, email: email || '' };
+  guests[token] = { name, akad: isAkad, wa };
   save(guestsFile, guests);
   const url = makeUrl(token);
 
-  syncTamuToSheets(token, name, isAkad, url)
+  syncTamuToSheets(token, name, isAkad, wa, url)
     .catch(e => console.error('[Generate] Sync error:', e.message));
 
-  res.json({ token, url, name, akad: isAkad });
+  res.json({ token, url, name, akad: isAkad, wa });
 });
 
-// Import bulk dari sheet tamu
+// ── Update guest (semua field, token sebagai primary key) ─────────────────────
+app.put('/api/admin/guest/:token', adminAuth, async (req, res) => {
+  const { token } = req.params;
+  const { name, akad, wa } = req.body;
+
+  // Verifikasi token valid secara HMAC
+  const result = verifyToken(token);
+  if (!result.valid) return res.status(400).json({ error: 'Token tidak valid' });
+
+  const guests = load(guestsFile);
+  if (!guests[token]) return res.status(404).json({ error: 'Token tidak ditemukan di guests.json' });
+
+  // Update field yang dikirim
+  if (name !== undefined) guests[token].name = name;
+  if (akad !== undefined) guests[token].akad = akad === true || akad === 'true';
+  if (wa   !== undefined) guests[token].wa   = wa;
+
+  save(guestsFile, guests);
+
+  // Sync update ke Sheets — cari baris berdasarkan token di kolom D
+  if (canSync()) {
+    try {
+      const sheets = await getSheetsClient();
+      const col    = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID, range: `${SHEET_TAMU}!D:D`,
+      });
+      const rows = col.data.values || [];
+      let rowIdx = -1;
+      for (let i = 1; i < rows.length; i++) {
+        if ((rows[i]?.[0] || '') === token) { rowIdx = i + 1; break; }
+      }
+      if (rowIdx > 0) {
+        const g = guests[token];
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID,
+          range: `${SHEET_TAMU}!A${rowIdx}:C${rowIdx}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: [[g.name, g.akad ? 'TRUE' : 'FALSE', g.wa]] },
+        });
+        console.log(`[Update] Tamu diupdate di sheet baris ${rowIdx}: ${g.name}`);
+      }
+    } catch(e) {
+      console.error('[Update] Sync ke Sheets gagal:', e.message);
+    }
+  }
+
+  res.json({ success: true, token, ...guests[token] });
+});
+
+// ── Import bulk dari sheet tamu ───────────────────────────────────────────────
 app.post('/api/admin/import-tamu', adminAuth, async (req, res) => {
   if (!SPREADSHEET_ID) return res.status(400).json({ error: 'SPREADSHEET_ID not set' });
   try {
     const result = await importFromTamuSheet();
-    console.log(`[Import] Selesai: ${result.created} baru, ${result.skipped} di-skip`);
+    console.log(`[Import] Baru: ${result.new}, Update: ${result.updated}, Existing: ${result.existing}, Skip: ${result.skipped}`);
     res.json({ success: true, ...result });
   } catch (e) {
     console.error('[Import] Error:', e.message);
@@ -368,14 +505,16 @@ app.post('/api/admin/import-tamu', adminAuth, async (req, res) => {
   }
 });
 
-// Daftar tamu
+// ── Daftar tamu ───────────────────────────────────────────────────────────────
 app.get('/api/admin/guests', adminAuth, (req, res) => {
   const guests = load(guestsFile);
   const rsvp   = load(rsvpFile);
-  res.json(Object.entries(guests).map(([t, g]) => ({ token: t, ...g, rsvp: rsvp[t] || null })));
+  res.json(Object.entries(guests).map(([t, g]) => ({
+    token: t, ...g, wa5: wa5(g.wa), rsvp: rsvp[t] || null,
+  })));
 });
 
-// Sync semua RSVP lokal ke Sheets
+// ── Sync semua RSVP lokal ke Sheets ──────────────────────────────────────────
 app.post('/api/admin/sync-sheets', adminAuth, async (req, res) => {
   const rsvp = load(rsvpFile);
   let synced = 0;
@@ -386,7 +525,7 @@ app.post('/api/admin/sync-sheets', adminAuth, async (req, res) => {
   res.json({ success: true, synced });
 });
 
-// Reset semua data lokal (guests.json & rsvp.json)
+// ── Reset data lokal ──────────────────────────────────────────────────────────
 app.post('/api/admin/reset', adminAuth, (req, res) => {
   const { confirm } = req.body;
   if (confirm !== 'RESET') return res.status(400).json({ error: 'Kirim { "confirm": "RESET" } untuk konfirmasi' });
@@ -394,7 +533,7 @@ app.post('/api/admin/reset', adminAuth, (req, res) => {
   const rsvpCount  = Object.keys(load(rsvpFile)).length;
   save(guestsFile, {});
   save(rsvpFile, {});
-  console.log(`[Reset] guests.json (${guestCount} tamu) dan rsvp.json (${rsvpCount} RSVP) direset`);
+  console.log(`[Reset] ${guestCount} tamu dan ${rsvpCount} RSVP direset`);
   res.json({ success: true, message: `Reset selesai. ${guestCount} tamu dan ${rsvpCount} RSVP dihapus.` });
 });
 

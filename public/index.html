@@ -122,7 +122,26 @@
     .f-names{font-family:'Great Vibes',cursive;font-size:2.5rem;color:var(--ink);margin-bottom:.5rem}
     footer p{font-size:.65rem;letter-spacing:.15em;color:var(--ink);opacity:.35}
 
-    /* ── TOAST & UTILS ───────────────────────────────────────────────── */
+    /* ── WA AUTH OVERLAY ─────────────────────────────────────────────── */
+    #wa-auth{display:none;position:fixed;inset:0;background:var(--slate);z-index:9990;justify-content:center;align-items:center;padding:2rem}
+    #wa-auth.active{display:flex}
+    .auth-card{background:var(--pure);border-radius:10px;padding:2.5rem 2rem;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(22,32,53,.15);text-align:center}
+    .auth-monogram{font-family:'Great Vibes',cursive;font-size:3rem;color:var(--slate);margin-bottom:1.25rem;line-height:1}
+    .auth-to{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:.3rem}
+    .auth-name{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--ink);font-weight:400;margin-bottom:.25rem;line-height:1.2}
+    .auth-desc{font-size:.82rem;color:var(--ink);opacity:.5;margin-bottom:2rem;line-height:1.7}
+    .auth-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);opacity:.45;margin-bottom:.5rem;text-align:left}
+    .auth-input{width:100%;padding:.85rem 1rem;border:1.5px solid var(--teal);border-radius:4px;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:1.1rem;letter-spacing:.3em;text-align:center;outline:none;transition:border-color .2s}
+    .auth-input:focus{border-color:var(--slate)}
+    .auth-btn{width:100%;margin-top:1rem;padding:.9rem;background:var(--slate);color:var(--ink);border:none;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;transition:background .2s;font-weight:500}
+    .auth-btn:hover{background:var(--lblue)}
+    .auth-btn:disabled{opacity:.45;cursor:not-allowed}
+    .auth-error{display:none;margin-top:1rem;padding:.85rem 1rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:4px;font-size:.82rem;color:#991b1b;line-height:1.6}
+    .auth-error.active{display:block}
+    .auth-divider{height:1px;background:var(--teal);margin:1.5rem 0}
+    .auth-note{font-size:.72rem;color:var(--ink);opacity:.35;line-height:1.7}
+
+    /* ── WA AUTH OVERLAY ─────────────────────────────────────────────── */
     .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:var(--pure);padding:.875rem 1.5rem;border-radius:3px;font-size:.875rem;transition:transform .4s ease;z-index:9000;white-space:nowrap}
     .toast.show{transform:translateX(-50%) translateY(0)}
     @keyframes fi{from{opacity:0}to{opacity:1}}
@@ -134,6 +153,36 @@
   </style>
 </head>
 <body>
+
+<!-- WA AUTH OVERLAY -->
+<div id="wa-auth">
+  <div class="auth-card">
+    <div class="auth-monogram">P &amp; D</div>
+    <p class="auth-to">Undangan Pernikahan untuk</p>
+    <h2 class="auth-name" id="auth-guest-name">—</h2>
+    <p class="auth-desc">
+      Untuk memastikan undangan ini sampai ke tangan yang tepat,<br>
+      mohon masukkan <strong>5 digit terakhir</strong> nomor WhatsApp Anda.
+    </p>
+    <label class="auth-label">5 Digit Terakhir No. WhatsApp</label>
+    <input
+      type="tel" id="auth-wa-input" class="auth-input"
+      maxlength="5" placeholder="_ _ _ _ _"
+      oninput="this.value=this.value.replace(/\D/g,'')"
+      onkeydown="if(event.key==='Enter') submitAuth()"
+    />
+    <button class="auth-btn" id="auth-btn" onclick="submitAuth()">Buka Undangan</button>
+    <div class="auth-error" id="auth-error">
+      <strong>Nomor tidak sesuai.</strong><br>
+      Silakan hubungi pengirim link undangan ini untuk mendapatkan bantuan.
+    </div>
+    <div class="auth-divider"></div>
+    <p class="auth-note">
+      Link undangan ini bersifat personal dan hanya berlaku untuk Anda.<br>
+      Data Anda aman dan tidak akan dibagikan kepada pihak lain.
+    </p>
+  </div>
+</div>
 
 <!-- GATE -->
 <div id="gate">
@@ -208,7 +257,7 @@
           <h3 class="e-title">Prosesi Pernikahan</h3>
           <div class="e-detail"><span class="icon">📅</span><div><strong>Hari &amp; Tanggal</strong>Sabtu, 2 Mei 2026</div></div>
           <div class="e-detail"><span class="icon">🕑</span><div><strong>Waktu</strong>14:00 – 15:30 WIB</div></div>
-          <div class="e-detail"><span class="icon">📍</span><div><strong>Tempat</strong>Kampoeng Percik<br><span style="font-size:.8rem;opacity:.6">Jl. Jend. Sudirman No. 6, Salatiga</span></div></div>
+          <div class="e-detail"><span class="icon">📍</span><div><strong>Tempat</strong>Kampoeng Percik<br><span style="font-size:.8rem;opacity:.6">Kampung Percik Terusan, JL Patimura KM. 1, Salatiga, Sidorejo, Salatiga, Kec. Sidorejo, Kota Salatiga, Jawa Tengah</span></div></div>
           <a class="map-btn" href="https://maps.google.com/?q=Kampoeng+Percik+Salatiga" target="_blank" rel="noopener">🗺 Buka Google Maps</a>
         </div>
         <div class="event-card">
@@ -216,11 +265,11 @@
           <h3 class="e-title">Resepsi Pernikahan</h3>
           <div class="e-detail"><span class="icon">📅</span><div><strong>Hari &amp; Tanggal</strong>Sabtu, 2 Mei 2026</div></div>
           <div class="e-detail"><span class="icon">🕓</span><div><strong>Waktu</strong>16:30 WIB</div></div>
-          <div class="e-detail"><span class="icon">📍</span><div><strong>Tempat</strong>Hotel Wahid Prime<br><span style="font-size:.8rem;opacity:.6">Jl. Jend. Sudirman, Salatiga</span></div></div>
+          <div class="e-detail"><span class="icon">📍</span><div><strong>Tempat</strong>Hotel Wahid Prime<br><span style="font-size:.8rem;opacity:.6">Jl. Jend. Sudirman No.95, Kutowinangun Kidul, Kec. Tingkir, Kota Salatiga, Jawa Tengah</span></div></div>
           <a class="map-btn" href="https://maps.google.com/?q=Hotel+Wahid+Prime+Salatiga" target="_blank" rel="noopener">🗺 Buka Google Maps</a>
         </div>
       </div>
-      <p class="dresscode">Dresscode: Semi Formal — Warna Pastel &amp; Earthy Tone</p>
+      <p class="dresscode">Dresscode: {BELUM ADA KEPUTUSAN!!!!!!!}</p>
     </div>
   </div>
 </div>
@@ -232,9 +281,8 @@
       <p class="s-label">Konfirmasi Kehadiran</p>
       <h2 class="s-title">RSVP</h2>
       <div class="s-rule"></div>
-      <p class="s-body" style="margin-bottom:2rem">Kehadiran Anda adalah kehormatan bagi kami.<br>Mohon konfirmasi sebelum <strong>29 April 2026</strong>.</p>
+      <p class="s-body" id="rsvp-desc" style="margin-bottom:2rem">Kehadiran Anda adalah kehormatan bagi kami.<br>Mohon konfirmasi sebelum <strong>29 April 2026</strong>.</p>
       <div class="rsvp-form">
-        <div class="rsvp-already" id="rsvp-already">✓ Anda telah mengisi RSVP. Terima kasih!</div>
         <div id="rsvp-body">
           <div class="f-group">
             <label class="f-label">Nama Anda</label>
@@ -257,11 +305,9 @@
           <button class="submit-btn" id="rsvp-btn" onclick="submitRsvp()">Kirim Konfirmasi</button>
         </div>
         <div class="rsvp-success" id="rsvp-ok">
-        <div class="rsvp-success" id="rsvp-ok">
-          <div class="rsvp-success-icon">💌</div>
+          <div class="rsvp-success-icon" id="rsvp-ok-icon">💌</div>
           <h3>Terima Kasih!</h3>
-          <p style="color:var(--ink-lt);font-size:.9rem;margin-top:.5rem">Konfirmasi kehadiran Anda telah kami terima.<br>Kami menantikan kehadiran Anda.</p>
-          <div class="rsvp-chosen" id="rsvp-chosen-label"></div>
+          <p id="rsvp-ok-msg" style="color:var(--ink-lt);font-size:.9rem;margin-top:.5rem;line-height:1.8"></p>
         </div>
       </div>
     </div>
@@ -296,33 +342,115 @@
 const P     = new URLSearchParams(location.search);
 const TOKEN = P.get('token');
 let guestName = '';
+let authPassed = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
   setLoading(true);
+
+  // 1. Tidak ada token → gate
   if (!TOKEN) { setLoading(false); showGate(); return; }
+
+  // 2. Pre-validate: cek HMAC + ambil nama untuk ditampilkan di auth overlay
   try {
-    const r = await fetch('/api/validate?token=' + TOKEN);
+    const r = await fetch('/api/pre-validate?token=' + TOKEN);
     const d = await r.json();
     if (!d.valid) { setLoading(false); showGate(); return; }
-    guestName = d.name;
-    const akad = d.akad;
-    document.getElementById('cover-guest').textContent = guestName;
-    document.title = 'Undangan — ' + guestName;
-    if (!akad) document.getElementById('card-akad').style.display = 'none';
-    buildRsvpOpts(akad);
-    if (localStorage.getItem('rsvp_' + TOKEN)) {
-      document.getElementById('rsvp-already').classList.add('active');
-      document.getElementById('rsvp-body').style.display = 'none';
-    }
-    document.getElementById('rsvp-name').value = guestName;
+
+    // Tampilkan nama di halaman auth
+    document.getElementById('auth-guest-name').textContent = d.name;
     setLoading(false);
-    startCountdown();
-    initReveal();
+    showWaAuth();
+
   } catch(e) { setLoading(false); showGate(); }
 });
 
-function showGate()    { document.getElementById('gate').classList.add('active'); }
-function setLoading(v) { document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
+// ── Tampilkan overlay auth WA ─────────────────────────────────────────────────
+function showWaAuth() {
+  document.getElementById('wa-auth').classList.add('active');
+  setTimeout(() => document.getElementById('auth-wa-input').focus(), 300);
+}
+
+function showGate() {
+  document.getElementById('gate').classList.add('active');
+}
+
+function setLoading(v) {
+  document.getElementById('loading').style.display = v ? 'flex' : 'none';
+}
+
+// ── Submit auth WA ────────────────────────────────────────────────────────────
+async function submitAuth() {
+  const input = document.getElementById('auth-wa-input').value.replace(/\D/g, '');
+  if (input.length !== 5) { toast('Masukkan tepat 5 digit'); return; }
+
+  const btn = document.getElementById('auth-btn');
+  const errEl = document.getElementById('auth-error');
+  btn.disabled = true; btn.textContent = 'Memverifikasi…';
+  errEl.classList.remove('active');
+
+  try {
+    const r = await fetch('/api/validate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: TOKEN, wa5: input }),
+    });
+    const d = await r.json();
+
+    if (d.valid) {
+      // Auth berhasil — tutup overlay dan muat undangan
+      authPassed = true;
+      guestName  = d.name;
+      document.getElementById('wa-auth').classList.remove('active');
+      loadInvitation(d.name, d.akad);
+    } else {
+      // Salah WA
+      errEl.classList.add('active');
+      btn.disabled = false; btn.textContent = 'Buka Undangan';
+      document.getElementById('auth-wa-input').value = '';
+      document.getElementById('auth-wa-input').focus();
+    }
+  } catch(e) {
+    toast('Gagal memverifikasi. Periksa koneksi.');
+    btn.disabled = false; btn.textContent = 'Buka Undangan';
+  }
+}
+
+// ── Helper: tampilkan card Terima Kasih dengan pesan personal ─────────────────
+function showSuccess(response) {
+  const tidakHadir = response === 'tidak-hadir';
+  const labelMap = {
+    'hadir':           'Hadir',
+    'hadir-kampoeng':  'Hadir di Kampoeng Percik (Prosesi)',
+    'hadir-hotel':     'Hadir di Hotel Wahid Prime (Resepsi)',
+    'hadir-keduanya':  'Hadir di Kedua Acara',
+    'tidak-hadir':     'Tidak Dapat Hadir',
+  };
+  document.getElementById('rsvp-desc').style.display = 'none';
+  document.getElementById('rsvp-body').style.display = 'none';
+  document.getElementById('rsvp-ok-icon').textContent = tidakHadir ? '🙁' : '💌';
+  document.getElementById('rsvp-ok-msg').innerHTML = tidakHadir
+    ? 'Terima kasih telah melakukan konfirmasi.<br>Sayang sekali Anda tidak dapat hadir di hari spesial kami.<br>Doa dan restu Anda sangat berarti untuk kami.'
+    : `Terima kasih telah melakukan konfirmasi dan memilih untuk<br><strong>${labelMap[response] || response}</strong>.<br>Kami sangat menantikan kehadiran Anda!`;
+  document.getElementById('rsvp-ok').classList.add('active');
+}
+
+// ── Muat konten undangan setelah auth berhasil ────────────────────────────────
+async function loadInvitation(name, akad) {
+  document.getElementById('cover-guest').textContent = name;
+  document.title = 'Undangan — ' + name;
+  if (!akad) document.getElementById('card-akad').style.display = 'none';
+  buildRsvpOpts(akad);
+  document.getElementById('rsvp-name').value = name;
+
+  // Cek status RSVP dari server
+  try {
+    const r = await fetch('/api/rsvp-status?token=' + TOKEN);
+    const d = await r.json();
+    if (d.submitted) showSuccess(d.response);
+  } catch(e) { /* abaikan, tampilkan form seperti biasa */ }
+
+  startCountdown();
+  initReveal();
+}
 
 function startCountdown() {
   const T   = new Date('2026-05-01T14:00:00+07:00').getTime();
@@ -349,6 +477,8 @@ function buildRsvpOpts(akad) {
     {v:'tidak-hadir', l:'🙁 Tidak Dapat Hadir'},
   ];
   const sel = document.getElementById('rsvp-opts');
+  // Clear dulu agar tidak duplikat jika dipanggil ulang
+  sel.innerHTML = '<option value="">— Pilih konfirmasi kehadiran —</option>';
   opts.forEach(o => {
     const opt = document.createElement('option');
     opt.value = o.v; opt.textContent = o.l;
@@ -374,10 +504,7 @@ async function submitRsvp() {
     });
     const d = await r.json();
     if (d.success) {
-      localStorage.setItem('rsvp_'+TOKEN, '1');
-      document.getElementById('rsvp-body').style.display = 'none';
-      document.getElementById('rsvp-chosen-label').textContent = 'Pilihan Anda: ' + selText;
-      document.getElementById('rsvp-ok').classList.add('active');
+      showSuccess(selVal);
     } else { toast(d.message||'Terjadi kesalahan.'); btn.disabled=false; btn.textContent='Kirim Konfirmasi'; }
   } catch(e) { toast('Gagal mengirim. Periksa koneksi.'); btn.disabled=false; btn.textContent='Kirim Konfirmasi'; }
 }

@@ -89,7 +89,7 @@ tr:hover td{background:#fdf8f0}
     <h2>📋 Import dari Google Sheets</h2>
     <p style="font-size:.85rem;color:#666;margin-bottom:1.25rem">
       Baca daftar tamu dari tab <strong>"tamu"</strong> dan generate token otomatis.<br>
-      Baris yang sudah ada token di kolom C akan <strong>di-skip</strong>.
+      Baris yang sudah ada token di kolom D akan <strong>di-skip</strong>. Baris tanpa No WA akan <strong>diabaikan</strong>.
     </p>
     <div class="btn-row">
       <button class="btn btn-green" id="btn-import" onclick="importTamu()">⬇&nbsp; Import &amp; Generate Token</button>
@@ -102,7 +102,7 @@ tr:hover td{background:#fdf8f0}
     <h2>✍️ Buat Undangan Manual</h2>
     <div class="form-row">
       <div><label>Nama Tamu *</label><input type="text" id="g-name" placeholder="cth: Keluarga Bapak Hendra"></div>
-      <div><label>Email (opsional)</label><input type="email" id="g-email" placeholder="email@example.com"></div>
+      <div><label>No. WhatsApp *</label><input type="tel" id="g-wa" placeholder="cth: 08123456789"></div>
     </div>
     <div style="margin-bottom:1rem">
       <label>Akses Akad Nikah</label>
@@ -116,6 +116,7 @@ tr:hover td{background:#fdf8f0}
       <p style="margin-bottom:.5rem;font-weight:600;color:#4a3728">✅ Link Undangan berhasil dibuat!</p>
       <p style="margin-bottom:.5rem"><strong>Nama:</strong> <span id="out-name"></span></p>
       <p style="margin-bottom:.5rem"><strong>Akad:</strong> <span id="out-akad"></span></p>
+      <p style="margin-bottom:.5rem"><strong>No. WA:</strong> <span id="out-wa"></span></p>
       <p style="margin-bottom:.75rem"><strong>Token:</strong> <code id="out-token" style="font-size:.8rem"></code></p>
       <p><strong>Link:</strong><br>
         <a id="out-link" href="#" target="_blank"></a>
@@ -146,16 +147,48 @@ tr:hover td{background:#fdf8f0}
       </table>
     </div>
   </div>
+
+  <!-- DANGER ZONE -->
+  <div class="card" style="border-color:#f5c6cb">
+    <h2 style="color:#721c24;border-bottom-color:#f5c6cb">⚠️ Danger Zone</h2>
+    <p style="font-size:.85rem;color:#666;margin-bottom:1.25rem">
+      Reset menghapus semua data <strong>guests.json</strong> dan <strong>rsvp.json</strong> di server.<br>
+      Data di Google Sheets <strong>tidak</strong> ikut terhapus. Gunakan setelah selesai testing.
+    </p>
+    <div class="btn-row">
+      <button class="btn" style="background:#c82333;color:#fff" onclick="showResetConfirm()">🗑 Reset Semua Data Lokal</button>
+      <span id="reset-status" style="font-size:.82rem;color:#666"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Confirm Modal -->
+<div class="overlay" id="reset-modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title" style="color:#721c24">⚠️ Konfirmasi Reset</div>
+    <p style="font-size:.9rem;margin-bottom:1rem">Tindakan ini akan menghapus:</p>
+    <ul style="font-size:.85rem;color:#555;margin-bottom:1.5rem;padding-left:1.25rem;line-height:2">
+      <li>Semua token tamu di <strong>guests.json</strong></li>
+      <li>Semua data RSVP di <strong>rsvp.json</strong></li>
+    </ul>
+    <p style="font-size:.85rem;color:#888;margin-bottom:1.5rem">Data di Google Sheets tidak ikut terhapus.</p>
+    <p style="font-size:.85rem;font-weight:600;margin-bottom:.5rem">Ketik <code style="background:#f8d7da;padding:.1rem .4rem;border-radius:3px">RESET</code> untuk konfirmasi:</p>
+    <input type="text" id="reset-confirm-input" placeholder="Ketik RESET" style="margin-bottom:1rem;border-color:#f5c6cb">
+    <div style="display:flex;gap:.75rem;justify-content:flex-end">
+      <button class="btn btn-sm" onclick="document.getElementById('reset-modal').classList.remove('show')">Batal</button>
+      <button class="btn btn-sm" style="background:#c82333;color:#fff" onclick="doReset()">Reset Sekarang</button>
+    </div>
+  </div>
 </div>
 
 <!-- Import Result Modal -->
 <div class="overlay" id="imp-modal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal">
-    <div class="modal-title">Hasil Import</div>
-    <div id="modal-body"></div>
-    <div style="margin-top:1.25rem;text-align:right">
-      <button class="btn btn-sm" onclick="document.getElementById('imp-modal').classList.remove('show')">Tutup</button>
+    <div class="modal-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Hasil Import</span>
+      <button onclick="document.getElementById('imp-modal').classList.remove('show')" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#4a3728;opacity:.5;line-height:1;padding:0 .25rem" title="Tutup">&times;</button>
     </div>
+    <div id="modal-body"></div>
   </div>
 </div>
 
@@ -189,7 +222,11 @@ async function importTamu() {
         <td>${i+1}</td>
         <td><strong>${esc(g.name)}</strong></td>
         <td>${g.akad?'<span class="badge badge-akad">Akad+Resepsi</span>':'Resepsi saja'}</td>
-        <td>${g.isNew?'<span class="badge-new">Baru</span>':'<span class="badge-skip">Skip</span>'}</td>
+        <td>${
+          g.status==='new'     ? '<span class="badge-new">Baru</span>'     :
+          g.status==='updated' ? '<span class="badge-new" style="background:#fff3cd;color:#856404">Update</span>' :
+                                 '<span class="badge-skip">Ada</span>'
+        }</td>
         <td style="font-size:.75rem">
           <a href="${g.url}" target="_blank" style="color:#4a3728">${g.url}</a>
           <button class="copy-btn" onclick="copyText('${g.url}')">Salin</button>
@@ -199,16 +236,17 @@ async function importTamu() {
     document.getElementById('modal-body').innerHTML = `
       <div class="import-summary">
         <div class="imp-stat"><div class="n">${d.total}</div><div class="l">Total</div></div>
-        <div class="imp-stat"><div class="n" style="color:#1a7a4a">${d.created}</div><div class="l">Token Baru</div></div>
-        <div class="imp-stat"><div class="n" style="color:#888">${d.skipped}</div><div class="l">Di-skip</div></div>
+        <div class="imp-stat"><div class="n" style="color:#1a7a4a">${d.new}</div><div class="l">Token Baru</div></div>
+        <div class="imp-stat"><div class="n" style="color:#e07b00">${d.updated}</div><div class="l">Diupdate</div></div>
+        <div class="imp-stat"><div class="n" style="color:#888">${d.skipped}</div><div class="l">Di-skip (no WA)</div></div>
       </div>
-      <p style="font-size:.8rem;color:#666;margin-bottom:.75rem">✅ Token &amp; link sudah ditulis ke kolom C &amp; D di sheet <strong>tamu</strong>.</p>
+      <p style="font-size:.8rem;color:#666;margin-bottom:.75rem">✅ Token &amp; link sudah ditulis ke kolom D &amp; E di sheet <strong>tamu</strong>.</p>
       <div style="overflow-x:auto"><table class="imp-table">
         <thead><tr><th>#</th><th>Nama</th><th>Akses</th><th>Status</th><th>Link</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>`;
 
-    st.textContent = `✅ ${d.created} token baru, ${d.skipped} di-skip`;
+    st.textContent = `✅ ${d.new} baru, ${d.updated} diupdate, ${d.skipped} di-skip`;
     loadGuests();
   } catch(e) {
     document.getElementById('modal-body').innerHTML = `<p style="color:red">Gagal: ${e.message}</p>`;
@@ -217,17 +255,20 @@ async function importTamu() {
 
 async function generateToken() {
   const name = document.getElementById('g-name').value.trim();
-  const email= document.getElementById('g-email').value.trim();
+  const wa   = document.getElementById('g-wa').value.trim();
   const akad = document.getElementById('g-akad').value;
   if (!name) { alert('Nama tamu wajib diisi'); return; }
+  if (!wa)   { alert('No. WhatsApp wajib diisi'); return; }
   const r = await fetch('/api/admin/generate-token', {
     method:'POST', headers:{'Content-Type':'application/json','x-admin-key':KEY},
-    body: JSON.stringify({name,email,akad:akad==='true'})
+    body: JSON.stringify({name, wa, akad: akad==='true'})
   });
   if (r.status===401) { alert('Admin key salah'); return; }
   const d = await r.json();
+  if (d.error) { alert('Error: ' + d.error); return; }
   document.getElementById('out-name').textContent = d.name;
   document.getElementById('out-akad').textContent = d.akad ? 'Ya (Akad + Resepsi)' : 'Tidak (Resepsi saja)';
+  document.getElementById('out-wa').textContent   = d.wa;
   document.getElementById('out-token').textContent = d.token;
   const lnk = document.getElementById('out-link');
   lnk.textContent = d.url; lnk.href = d.url;
@@ -247,7 +288,7 @@ async function loadGuests() {
 function renderGuests(data) {
   let hadir=0,tidak=0,rsvpN=0;
   document.getElementById('guest-tbody').innerHTML = data.map((g,i)=>{
-    const url = `${BASE}/?token=${g.token}&akad=${g.akad}`;
+    const url = `${BASE}/?token=${g.token}`;
     let badge = '<span class="badge badge-pending">Belum</span>';
     if (g.rsvp) {
       rsvpN++;
@@ -269,6 +310,33 @@ function renderGuests(data) {
   document.getElementById('st-rsvp').textContent  = rsvpN;
   document.getElementById('st-hadir').textContent  = hadir;
   document.getElementById('st-tidak').textContent  = tidak;
+}
+
+function showResetConfirm() {
+  document.getElementById('reset-confirm-input').value = '';
+  document.getElementById('reset-modal').classList.add('show');
+}
+
+async function doReset() {
+  const val = document.getElementById('reset-confirm-input').value.trim();
+  if (val !== 'RESET') { alert('Ketik RESET untuk konfirmasi'); return; }
+  try {
+    const r = await fetch('/api/admin/reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': KEY },
+      body: JSON.stringify({ confirm: 'RESET' })
+    });
+    const d = await r.json();
+    document.getElementById('reset-modal').classList.remove('show');
+    if (d.success) {
+      document.getElementById('reset-status').textContent = '✅ ' + d.message;
+      loadGuests();
+    } else {
+      document.getElementById('reset-status').textContent = '❌ ' + (d.error || 'Gagal reset');
+    }
+  } catch(e) {
+    document.getElementById('reset-status').textContent = '❌ Gagal: ' + e.message;
+  }
 }
 
 function fmtR(v){return({'hadir':'Hadir','hadir-kampoeng':'Kampoeng Percik','hadir-hotel':'Hotel Wahid','hadir-keduanya':'Keduanya','tidak-hadir':'Tidak Hadir'})[v]||v}
