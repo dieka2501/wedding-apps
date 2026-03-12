@@ -304,11 +304,12 @@ app.get('/api/pre-validate', async (req, res) => {
       const rows = col.data.values || [];
       for (let i = 1; i < rows.length; i++) {
         if ((rows[i][3] || '').trim() === token) {
-          const name = (rows[i][0] || '').trim();
-          const wa   = (rows[i][2] || '').trim();
+          const name    = (rows[i][0] || '').trim();
+          const wa      = (rows[i][2] || '').trim();
           const akadRaw = (rows[i][1] || '').trim().toUpperCase();
-          const akad = akadRaw === 'TRUE' || akadRaw === 'YA' || akadRaw === '1';
-          if (name && wa) {
+          const akad    = akadRaw === 'TRUE' || akadRaw === 'YA' || akadRaw === '1';
+          if (name) {
+            // Cache meskipun WA kosong — agar tidak selalu hit Sheets
             const guests  = load(guestsFile);
             guests[token] = { name, akad, wa };
             save(guestsFile, guests);
@@ -323,6 +324,9 @@ app.get('/api/pre-validate', async (req, res) => {
   }
 
   if (!guest) return res.status(403).json({ valid: false });
+
+  // 4. Tamu terdaftar tapi belum punya No WA → link belum aktif → UNAUTH
+  if (!guest.wa) return res.status(403).json({ valid: false, reason: 'no_wa' });
 
   // Kembalikan nama saja — WA tidak dikirim ke client
   res.json({ valid: true, name: guest.name });
