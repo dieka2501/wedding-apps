@@ -150,6 +150,17 @@
     .reveal.visible{opacity:1;transform:translateY(0)}
     @media(max-width:480px){.couple-cards{grid-template-columns:1fr}.c-and{transform:rotate(90deg)}.cd-grid{grid-template-columns:repeat(2,1fr)}}
     @media(min-width:600px){.event-cards{flex-direction:row}.event-card{flex:1}}
+
+    /* ── WATERMARK ───────────────────────────────────────────────────── */
+    #watermark{
+      display:none;
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:8000;
+      opacity:.07;
+      background-repeat:repeat;
+    }
   </style>
 </head>
 <body>
@@ -299,6 +310,22 @@
             </select>
           </div>
           <div class="f-group">
+            <label class="f-label">Jumlah Orang yang Hadir</label>
+            <select id="rsvp-count" class="f-select">
+              <option value="">— Pilih jumlah —</option>
+              <option value="1">1 orang</option>
+              <option value="2">2 orang</option>
+              <option value="3">3 orang</option>
+              <option value="4">4 orang</option>
+              <option value="5">5 orang</option>
+              <option value="6">6 orang</option>
+              <option value="7">7 orang</option>
+              <option value="8">8 orang</option>
+              <option value="9">9 orang</option>
+              <option value="10">10 orang</option>
+            </select>
+          </div>
+          <div class="f-group">
             <label class="f-label">Pesan &amp; Ucapan (opsional)</label>
             <textarea id="rsvp-msg" class="f-textarea" placeholder="Tulis ucapan selamat untuk mempelai…"></textarea>
           </div>
@@ -337,6 +364,8 @@
 </footer>
 
 <div class="toast" id="toast"></div>
+
+<div id="watermark"></div>
 
 <script>
 const P     = new URLSearchParams(location.search);
@@ -433,6 +462,27 @@ function showSuccess(response) {
   document.getElementById('rsvp-ok').classList.add('active');
 }
 
+// ── Watermark: nama tamu sebagai pola diagonal berulang ──────────────────────
+function applyWatermark(name) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180">
+    <text
+      x="160" y="90"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      transform="rotate(-35 160 90)"
+      font-family="Cormorant Garamond, serif"
+      font-size="22"
+      font-weight="600"
+      letter-spacing="3"
+      fill="#162035"
+    >${name}</text>
+  </svg>`;
+  const el = document.getElementById('watermark');
+  el.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  el.style.backgroundSize  = '320px 180px';
+  el.style.display         = 'block';
+}
+
 // ── Muat konten undangan setelah auth berhasil ────────────────────────────────
 async function loadInvitation(name, akad) {
   document.getElementById('cover-guest').textContent = name;
@@ -440,6 +490,7 @@ async function loadInvitation(name, akad) {
   if (!akad) document.getElementById('card-akad').style.display = 'none';
   buildRsvpOpts(akad);
   document.getElementById('rsvp-name').value = name;
+  applyWatermark(name);
 
   // Cek status RSVP dari server
   try {
@@ -493,14 +544,24 @@ async function submitRsvp() {
   const selEl   = document.getElementById('rsvp-opts');
   const selVal  = selEl.value;
   const selText = selEl.options[selEl.selectedIndex]?.text || '';
+  const countEl = document.getElementById('rsvp-count');
+  let count = countEl.value;
   if (!name)   { toast('Mohon isi nama Anda'); return; }
   if (!selVal) { toast('Mohon pilih konfirmasi kehadiran'); return; }
+  if (selVal !== 'tidak-hadir' && !count) {
+  toast('Mohon pilih jumlah orang');
+    return;
+  }
+  // auto set 0 kalau tidak hadir
+  if (selVal === 'tidak-hadir') {
+    count = 0;
+  }
   const btn = document.getElementById('rsvp-btn');
   btn.disabled = true; btn.textContent = 'Mengirim…';
   try {
     const r = await fetch('/api/rsvp', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({token:TOKEN, response:selVal, message:msg, whatsapp:wa})
+      body: JSON.stringify({token:TOKEN, response:selVal, message:msg, whatsapp:wa,count: count})
     });
     const d = await r.json();
     if (d.success) {
