@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Undangan Pernikahan Putri dan Dikdik</title>
+  <!--
+    Font Google digunakan sebagai FALLBACK jika font lokal tidak dikonfigurasi.
+    Tambahkan/hapus sesuai kebutuhan.
+  -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet" />
@@ -17,17 +21,23 @@
       --ink:    #162035;   /* teks utama — navy sangat gelap */
       --ink-lt: #2d4065;   /* teks sekunder */
       --pure:   #ffffff;
+
+      /* ── FONT ROLES — dikendalikan oleh FONT_CONFIG di script ────────
+         Ubah nilai di FONT_CONFIG (bawah), jangan di sini secara langsung. */
+      --font-script: 'Great Vibes', cursive;
+      --font-serif:  'Cormorant Garamond', serif;
+      --font-sans:   'DM Sans', sans-serif;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.8;overflow-x:hidden}
+    body{background:var(--cream);color:var(--ink);font-family:var(--font-sans);font-weight:300;line-height:1.8;overflow-x:hidden}
 
     /* ── GATE ────────────────────────────────────────────────────────── */
     #gate{display:none;position:fixed;inset:0;background:var(--slate);z-index:9999;padding:2.5rem}
     #gate.active{display:flex}
     .gate-inner{position:relative;width:100%;height:100%}
-    .gate-bride{position:absolute;top:1.5rem;left:0;font-family:'Great Vibes',cursive;font-size:clamp(5rem,20vw,11rem);color:var(--ink);line-height:1;animation:gfade 1s ease .1s both}
-    .gate-amp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Great Vibes',cursive;font-size:clamp(3rem,12vw,7rem);color:var(--ink);opacity:.15;animation:gfade 1s ease .5s both}
-    .gate-groom{position:absolute;bottom:6rem;right:0;font-family:'Great Vibes',cursive;font-size:clamp(5rem,20vw,11rem);color:var(--ink);line-height:1;animation:gfade 1s ease .9s both}
+    .gate-bride{position:absolute;top:1.5rem;left:0;font-family:var(--font-script);font-size:clamp(5rem,20vw,11rem);color:var(--ink);line-height:1;animation:gfade 1s ease .1s both}
+    .gate-amp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-script);font-size:clamp(3rem,12vw,7rem);color:var(--ink);opacity:.15;animation:gfade 1s ease .5s both}
+    .gate-groom{position:absolute;bottom:6rem;right:0;font-family:var(--font-script);font-size:clamp(5rem,20vw,11rem);color:var(--ink);line-height:1;animation:gfade 1s ease .9s both}
     .gate-msg{position:absolute;bottom:2.5rem;left:0;color:var(--ink);font-size:.75rem;letter-spacing:.18em;line-height:2.2;opacity:.45;animation:gfade 1s ease 1.2s both}
     @keyframes gfade{from{opacity:0}to{opacity:1}}
 
@@ -41,13 +51,13 @@
     #cover{min-height:100vh;background:var(--slate);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:3rem 2rem;position:relative;overflow:hidden}
     .cc{position:relative;z-index:1;max-width:560px}
     .c-to{font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--ink);opacity:.45;margin-bottom:.5rem;animation:fid 1s ease .2s both}
-    .c-guest{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,9vw,5.5rem);font-weight:400;color:var(--ink);line-height:1.1;margin-bottom:.35rem;animation:fid 1s ease .4s both}
+    .c-guest{font-family:var(--font-serif);font-size:clamp(3rem,9vw,5.5rem);font-weight:400;color:var(--ink);line-height:1.1;margin-bottom:.35rem;animation:fid 1s ease .4s both}
     .c-guest-tag{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:2.5rem;animation:fid 1s ease .6s both}
     .div-line{display:flex;align-items:center;gap:1rem;justify-content:center;margin-bottom:1.5rem;animation:fi 1s ease .8s both}
     .div-line::before,.div-line::after{content:'';flex:1;max-width:50px;height:1px;background:var(--ink);opacity:.2}
     .div-line span{font-size:.65rem;color:var(--ink);opacity:.3}
     .c-pre{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.3;margin-bottom:.4rem;animation:fi 1s ease .95s both}
-    .c-names{font-family:'Great Vibes',cursive;font-size:clamp(2rem,6.5vw,3.5rem);color:var(--ink);opacity:.55;line-height:1.2;animation:fi 1s ease 1.05s both}
+    .c-names{font-family:var(--font-script);font-size:clamp(2rem,6.5vw,3.5rem);color:var(--ink);opacity:.55;line-height:1.2;animation:fi 1s ease 1.05s both}
     .c-names .amp{opacity:.6}
     .c-date{margin-top:1.25rem;font-size:.6rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);opacity:.3;animation:fi 1s ease 1.2s both}
     .scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;color:var(--ink);opacity:.25;animation:bounce 2.5s ease-in-out infinite;font-size:.54rem;letter-spacing:.2em;text-transform:uppercase}
@@ -57,27 +67,27 @@
     .sec{padding:5rem 1.5rem}
     .sec-inner{max-width:660px;margin:0 auto}
     .s-label{font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);opacity:.4;text-align:center;margin-bottom:.75rem}
-    .s-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:300;text-align:center;color:var(--ink);margin-bottom:1.75rem;line-height:1.2}
+    .s-title{font-family:var(--font-serif);font-size:clamp(2rem,5vw,2.8rem);font-weight:300;text-align:center;color:var(--ink);margin-bottom:1.75rem;line-height:1.2}
     .s-title em{font-style:italic;color:var(--ink-lt)}
     .s-rule{width:36px;height:2px;background:var(--ink);opacity:.2;margin:0 auto 2.5rem}
     .s-body{text-align:center;color:var(--ink-lt);font-size:.9rem;line-height:2}
 
     /* ── COUPLE — background: cream ─────────────────────────────────── */
     #couple{background:var(--cream)}
-    .couple-verse{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;text-align:center;color:var(--ink-lt);padding:1.75rem 2rem;border-top:1px solid var(--teal);border-bottom:1px solid var(--teal);margin-bottom:3rem;line-height:1.9}
+    .couple-verse{font-family:var(--font-serif);font-style:italic;font-size:1.05rem;text-align:center;color:var(--ink-lt);padding:1.75rem 2rem;border-top:1px solid var(--teal);border-bottom:1px solid var(--teal);margin-bottom:3rem;line-height:1.9}
     .couple-verse cite{display:block;margin-top:.75rem;font-size:.73rem;letter-spacing:.12em;font-style:normal;color:var(--ink);opacity:.4}
     .couple-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center}
     .couple-card{text-align:center}
     .c-role{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:.6rem}
-    .c-name{font-family:'Great Vibes',cursive;font-size:2.6rem;color:var(--ink);line-height:1.2}
-    .c-fullname{font-family:'Cormorant Garamond',serif;font-size:.85rem;color:var(--ink-lt);margin-top:.25rem}
+    .c-name{font-family:var(--font-script);font-size:2.6rem;color:var(--ink);line-height:1.2}
+    .c-fullname{font-family:var(--font-serif);font-size:.85rem;color:var(--ink-lt);margin-top:.25rem}
     .c-parents{font-size:.78rem;color:var(--ink-lt);margin-top:.5rem;line-height:1.7;opacity:.7}
-    .c-and{font-family:'Great Vibes',cursive;font-size:3rem;color:var(--ink);opacity:.2;text-align:center}
+    .c-and{font-family:var(--font-script);font-size:3rem;color:var(--ink);opacity:.2;text-align:center}
 
     /* ── COUNTDOWN — background: teal ───────────────────────────────── */
     #countdown{background:var(--teal)}
     .cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2.5rem}
-    .cd-num{font-family:'Cormorant Garamond',serif;font-size:clamp(2.8rem,8vw,4.5rem);font-weight:300;color:var(--ink);line-height:1;text-align:center}
+    .cd-num{font-family:var(--font-serif);font-size:clamp(2.8rem,8vw,4.5rem);font-weight:300;color:var(--ink);line-height:1;text-align:center}
     .cd-lbl{font-size:.54rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-top:.4rem;text-align:center}
 
     /* ── EVENTS — background: lblue ─────────────────────────────────── */
@@ -85,7 +95,7 @@
     .event-cards{display:flex;flex-direction:column;gap:1.25rem;margin-top:2rem}
     .event-card{background:rgba(255,255,255,.35);border-radius:6px;padding:2rem;text-align:center;border-bottom:3px solid var(--slate)}
     .e-type{font-size:.56rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);opacity:.45;margin-bottom:.75rem}
-    .e-title{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--ink);margin-bottom:1.5rem}
+    .e-title{font-family:var(--font-serif);font-size:1.9rem;font-weight:300;color:var(--ink);margin-bottom:1.5rem}
     .e-detail{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.7rem;text-align:left;color:var(--ink-lt);font-size:.875rem}
     .e-detail .icon{flex-shrink:0;margin-top:.1rem}
     .e-detail strong{display:block;font-size:.65rem;letter-spacing:.1em;color:var(--ink);opacity:.5;margin-bottom:.1rem;font-weight:400;text-transform:uppercase}
@@ -98,7 +108,7 @@
     .rsvp-form{background:var(--pure);border-radius:6px;padding:2rem;box-shadow:0 2px 20px rgba(22,32,53,.08)}
     .f-group{margin-bottom:1.25rem}
     .f-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);opacity:.5;margin-bottom:.5rem}
-    .f-input,.f-select,.f-textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--teal);border-radius:3px;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:.9rem;transition:border-color .25s;outline:none}
+    .f-input,.f-select,.f-textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--teal);border-radius:3px;background:var(--cream);color:var(--ink);font-family:var(--font-sans);font-size:.9rem;transition:border-color .25s;outline:none}
     .f-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%23162035' stroke-opacity='.4' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;cursor:pointer}
     .f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--slate)}
     .rsvp-chosen{display:inline-block;margin-top:.75rem;padding:.4rem 1rem;background:var(--teal);border-radius:3px;font-size:.82rem;color:var(--ink);opacity:.85}
@@ -107,33 +117,33 @@
     .rsvp-opt{display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;border:1.5px solid var(--teal);border-radius:3px;cursor:pointer;transition:all .2s;background:var(--cream)}
     .rsvp-opt:hover,.rsvp-opt.selected{border-color:var(--slate);background:var(--teal)}
     .rsvp-opt span{font-size:.875rem;color:var(--ink)}
-    .submit-btn{width:100%;padding:1rem;background:var(--slate);color:var(--ink);border:none;border-radius:3px;font-family:'DM Sans',sans-serif;font-size:.72rem;letter-spacing:.35em;text-transform:uppercase;cursor:pointer;transition:background .25s;margin-top:.5rem;font-weight:500}
+    .submit-btn{width:100%;padding:1rem;background:var(--slate);color:var(--ink);border:none;border-radius:3px;font-family:var(--font-sans);font-size:.72rem;letter-spacing:.35em;text-transform:uppercase;cursor:pointer;transition:background .25s;margin-top:.5rem;font-weight:500}
     .submit-btn:hover{background:var(--lblue)}
     .submit-btn:disabled{opacity:.45;cursor:not-allowed}
     .rsvp-success{display:none;text-align:center;padding:2.5rem 1rem}
     .rsvp-success.active{display:block}
     .rsvp-success-icon{font-size:2.5rem;margin-bottom:1rem}
-    .rsvp-success h3{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--ink);margin-bottom:.5rem}
+    .rsvp-success h3{font-family:var(--font-serif);font-size:1.8rem;color:var(--ink);margin-bottom:.5rem}
     .rsvp-already{display:none;text-align:center;padding:1rem;background:var(--teal);border-radius:3px;margin-bottom:1rem;font-size:.875rem;color:var(--ink)}
     .rsvp-already.active{display:block}
 
     /* ── FOOTER — background: slate ─────────────────────────────────── */
     footer{background:var(--slate);text-align:center;padding:3rem 1.5rem}
-    .f-names{font-family:'Great Vibes',cursive;font-size:2.5rem;color:var(--ink);margin-bottom:.5rem}
+    .f-names{font-family:var(--font-script);font-size:2.5rem;color:var(--ink);margin-bottom:.5rem}
     footer p{font-size:.65rem;letter-spacing:.15em;color:var(--ink);opacity:.35}
 
     /* ── WA AUTH OVERLAY ─────────────────────────────────────────────── */
     #wa-auth{display:none;position:fixed;inset:0;background:var(--slate);z-index:9990;justify-content:center;align-items:center;padding:2rem}
     #wa-auth.active{display:flex}
     .auth-card{background:var(--pure);border-radius:10px;padding:2.5rem 2rem;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(22,32,53,.15);text-align:center}
-    .auth-monogram{font-family:'Great Vibes',cursive;font-size:3rem;color:var(--slate);margin-bottom:1.25rem;line-height:1}
-    .auth-to{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:.3rem}
-    .auth-name{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--ink);font-weight:400;margin-bottom:.25rem;line-height:1.2}
-    .auth-desc{font-size:.82rem;color:var(--ink);opacity:.5;margin-bottom:2rem;line-height:1.7}
+    .auth-monogram{font-family:var(--font-script);font-size:3rem;color:var(--slate);margin-bottom:1.25rem;line-height:1}
+    .auth-to{font-size:.9rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:.3rem}
+    .auth-name{font-family:var(--font-serif);font-size:2rem;color:var(--ink);font-weight:400;margin-bottom:.25rem;line-height:1.2}
+    .auth-desc{font-size:.70rem;color:var(--ink);opacity:.5;margin-bottom:2rem;line-height:1.7}
     .auth-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);opacity:.45;margin-bottom:.5rem;text-align:left}
-    .auth-input{width:100%;padding:.85rem 1rem;border:1.5px solid var(--teal);border-radius:4px;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:1.1rem;letter-spacing:.3em;text-align:center;outline:none;transition:border-color .2s}
+    .auth-input{width:100%;padding:.85rem 1rem;border:1.5px solid var(--teal);border-radius:4px;background:var(--cream);color:var(--ink);font-family:var(--font-sans);font-size:1.1rem;letter-spacing:.3em;text-align:center;outline:none;transition:border-color .2s}
     .auth-input:focus{border-color:var(--slate)}
-    .auth-btn{width:100%;margin-top:1rem;padding:.9rem;background:var(--slate);color:var(--ink);border:none;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;transition:background .2s;font-weight:500}
+    .auth-btn{width:100%;margin-top:1rem;padding:.9rem;background:var(--slate);color:var(--ink);border:none;border-radius:4px;font-family:var(--font-sans);font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;transition:background .2s;font-weight:500}
     .auth-btn:hover{background:var(--lblue)}
     .auth-btn:disabled{opacity:.45;cursor:not-allowed}
     .auth-error{display:none;margin-top:1rem;padding:.85rem 1rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:4px;font-size:.82rem;color:#991b1b;line-height:1.6}
@@ -173,7 +183,7 @@
     <h2 class="auth-name" id="auth-guest-name">—</h2>
     <p class="auth-desc">
       Untuk memastikan undangan ini sampai ke tangan yang tepat,<br>
-      mohon masukkan <strong>5 digit terakhir</strong> nomor WhatsApp Anda.
+      mohon masukkan <strong>5 digit terakhir nomor WhatsApp Anda.</strong>
     </p>
     <label class="auth-label">5 Digit Terakhir No. WhatsApp</label>
     <input
@@ -368,6 +378,89 @@
 <div id="watermark"></div>
 
 <script>
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║                        FONT CONFIGURATION                           ║
+// ║                                                                      ║
+// ║  Untuk mengganti font, ubah nilai "file" dan/atau "family" di bawah. ║
+// ║  Letakkan file font di folder  font/  (relatif terhadap index.html). ║
+// ║                                                                      ║
+// ║  Ekstensi yang didukung: .otf  .ttf  .woff  .woff2                  ║
+// ║                                                                      ║
+// ║  Setiap peran punya dua opsi:                                        ║
+// ║    file   → path ke file lokal, mis. "font/regina.otf"              ║
+// ║             Isi null untuk tetap pakai Google Fonts (fallback).      ║
+// ║    family → nama CSS font-family yang dipakai (bebas, unik saja).   ║
+// ║                                                                      ║
+// ║  CONTOH PENGGUNAAN:                                                  ║
+// ║    script: { file: "font/regina.otf",   family: "Regina"    }       ║
+// ║    serif:  { file: "font/playfair.ttf", family: "Playfair"  }       ║
+// ║    sans:   { file: "font/inter.woff2",  family: "Inter"     }       ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+
+const FONT_CONFIG = {
+  script: {
+    // Peran  : Kaligrafi / nama mempelai / dekorasi
+    // Default: Great Vibes (Google Fonts)
+    file:   "font/regina.otf",               // contoh: "font/regina.otf"
+    family: 'Regina-script',      // nama font fallback (Google Fonts)
+  },
+  serif: {
+    // Peran  : Heading / judul section / angka hitung mundur
+    // Default: Cormorant Garamond (Google Fonts)
+    file:   "font/poppins.semibold.ttf",               // contoh: "font/playfair.ttf"
+    family: 'poppins-semibold-serif',
+  },
+  sans: {
+    // Peran  : Body text / form / tombol
+    // Default: DM Sans (Google Fonts)
+    file:   "font/poppins.regular.ttf",               // contoh: "font/inter.woff2"
+    family: 'poppins.regular',
+  },
+};
+
+// ── Inject @font-face dan terapkan ke CSS variables ───────────────────────────
+(function applyFontConfig() {
+  const root  = document.documentElement;
+  const rules = [];
+
+  const ROLE_VAR = {
+    script: '--font-script',
+    serif:  '--font-serif',
+    sans:   '--font-sans',
+  };
+
+  const GENERIC = {
+    script: 'cursive',
+    serif:  'serif',
+    sans:   'sans-serif',
+  };
+
+  // Deteksi format dari ekstensi file
+  function mimeOf(path) {
+    const ext = path.split('.').pop().toLowerCase();
+    return { otf: 'opentype', ttf: 'truetype', woff: 'woff', woff2: 'woff2' }[ext] || 'opentype';
+  }
+
+  for (const [role, cfg] of Object.entries(FONT_CONFIG)) {
+    if (cfg.file) {
+      // Ada file lokal → buat @font-face
+      rules.push(
+        `@font-face { font-family: '${cfg.family}'; src: url('${cfg.file}') format('${mimeOf(cfg.file)}'); font-display: swap; }`
+      );
+    }
+    // Terapkan ke CSS variable (lokal atau Google Fonts — sama saja)
+    root.style.setProperty(ROLE_VAR[role], `'${cfg.family}', ${GENERIC[role]}`);
+  }
+
+  if (rules.length) {
+    const style = document.createElement('style');
+    style.textContent = rules.join('\n');
+    document.head.appendChild(style);
+  }
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const P     = new URLSearchParams(location.search);
 const TOKEN = P.get('token');
 let guestName = '';
