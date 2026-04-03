@@ -37,23 +37,60 @@
     .ld-ring{width:36px;height:36px;border:2px solid var(--teal);border-top-color:var(--slate);border-radius:50%;animation:spin .9s linear infinite;margin-bottom:1.25rem}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* ── COVER — background: slate ───────────────────────────────────── */
-    #cover{min-height:100vh;background:var(--slate);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:3rem 2rem;position:relative;overflow:hidden}
+    /* ── FIRST SECTION (COVER) — dengan background photo ─────────────── */
+    #first-section{
+      min-height:100vh;
+      background:var(--slate);
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      padding:3rem 2rem;
+      position:relative;
+      overflow:hidden;
+    }
+    /* Overlay gelap untuk readability ketika ada background photo */
+    #first-section.has-photo::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, rgba(159,179,223,0.75) 0%, rgba(22,32,53,0.65) 100%);
+      backdrop-filter:blur(1px);
+      z-index:0;
+    }
     .cc{position:relative;z-index:1;max-width:560px}
+    /* Text shadow untuk readability di atas foto */
+    #first-section.has-photo .cc *{
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
+    }
     .c-to{font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--ink);opacity:.45;margin-bottom:.5rem;animation:fid 1s ease .2s both}
+    #first-section.has-photo .c-to{color:var(--pure);opacity:.85}
     .c-guest{font-family:var(--font-serif);font-size:clamp(3rem,9vw,5.5rem);font-weight:400;color:var(--ink);line-height:1.1;margin-bottom:.35rem;animation:fid 1s ease .4s both}
+    #first-section.has-photo .c-guest{color:var(--pure)}
     .c-guest-tag{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:2.5rem;animation:fid 1s ease .6s both}
+    #first-section.has-photo .c-guest-tag{color:var(--pure);opacity:.75}
     .div-line{display:flex;align-items:center;gap:1rem;justify-content:center;margin-bottom:1.5rem;animation:fi 1s ease .8s both}
     .div-line::before,.div-line::after{content:'';flex:1;max-width:50px;height:1px;background:var(--ink);opacity:.2}
+    #first-section.has-photo .div-line::before,
+    #first-section.has-photo .div-line::after{background:var(--pure);opacity:.5}
     .div-line span{font-size:.65rem;color:var(--ink);opacity:.3}
+    #first-section.has-photo .div-line span{color:var(--pure);opacity:.7}
     .c-pre{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.3;margin-bottom:.4rem;animation:fi 1s ease .95s both}
+    #first-section.has-photo .c-pre{color:var(--pure);opacity:.65}
     .c-names{font-family:var(--font-script);font-size:clamp(2rem,6.5vw,3.5rem);color:var(--ink);opacity:.55;line-height:1.2;animation:fi 1s ease 1.05s both}
+    #first-section.has-photo .c-names{color:var(--pure);opacity:.95}
     .c-names .amp{opacity:.6}
     .c-date{margin-top:1.25rem;font-size:.6rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);opacity:.3;animation:fi 1s ease 1.2s both}
+    #first-section.has-photo .c-date{color:var(--pure);opacity:.7}
     .scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;color:var(--ink);opacity:.25;animation:bounce 2.5s ease-in-out infinite;font-size:.54rem;letter-spacing:.2em;text-transform:uppercase}
+    #first-section.has-photo .scroll-hint{color:var(--pure);opacity:.6}
     @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
 
-    /* ── SHARED SECTION STYLES ───────────────────────────────────────── */
+    /* ── SHARED SECTION STYLES (SECOND-SECTION onwards) ──────────────── */
     .sec{padding:5rem 1.5rem}
     .sec-inner{max-width:660px;margin:0 auto}
     .s-label{font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);opacity:.4;text-align:center;margin-bottom:.75rem}
@@ -261,8 +298,8 @@
   <p style="font-size:.7rem;letter-spacing:.2em;color:var(--ink-lt)">Memuat undangan&hellip;</p>
 </div>
 
-<!-- COVER — slate -->
-<section id="cover">
+<!-- FIRST SECTION (COVER) — dengan background photo -->
+<section id="first-section">
   <div class="cc">
     <p class="c-to">Kepada Yang Terhormat</p>
     <h1 class="c-guest" id="cover-guest">Tamu Undangan</h1>
@@ -274,6 +311,8 @@
   </div>
   <div class="scroll-hint"><span>Gulir ke Bawah</span><span>↓</span></div>
 </section>
+
+<!-- SECOND SECTION — konten utama dimulai dari sini -->
 
 <!-- PHOTO SECTION — tampilkan setelah cover jika foto dikonfigurasi -->
 <div id="photo-section" style="display:none">
@@ -487,6 +526,8 @@ const FONT_CONFIG = {
 // ║                                                                      ║
 // ║  Format yang didukung: .jpg  .jpeg  .png  .webp  .avif              ║
 // ║                                                                      ║
+// ║  cover  → background foto untuk first-section (cover page)          ║
+// ║           null = warna solid seperti semula                          ║
 // ║  main   → foto utama di section split kiri-kanan                    ║
 // ║           null = section foto disembunyikan                          ║
 // ║  gate   → background foto halaman Gate (akses tanpa token)          ║
@@ -495,20 +536,28 @@ const FONT_CONFIG = {
 // ║           null = warna solid seperti semula                          ║
 // ║                                                                      ║
 // ║  CONTOH:                                                             ║
+// ║    cover: "photo/couple-landscape.jpg"                               ║
 // ║    main: "photo/couple.jpg"                                          ║
 // ║    gate: "photo/couple.jpg"   ← boleh pakai foto yang sama          ║
 // ║    auth: "photo/couple.jpg"                                          ║
 // ╚══════════════════════════════════════════════════════════════════════╝
 
 const PHOTO_CONFIG = {
+  cover: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/9b93bb66-c9a8-46cd-9be2-5fc913764094-IMG_0036.JPG",   // background foto untuk first-section (cover)
   main: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/0805681d-719f-4fa2-82f3-da33a7610bae-IMG_0018.JPG",    // contoh: "photo/couple.jpg"
   gate: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",    // contoh: "photo/couple.jpg"
   auth: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",    // contoh: "photo/couple.jpg"
 };
 
-// ── Terapkan foto ke gate, auth, dan section foto ────────────────────────────
+// ── Terapkan foto ke cover, gate, auth, dan section foto ─────────────────────
 (function applyPhotoConfig() {
-  const { main, gate, auth } = PHOTO_CONFIG;
+  const { cover, main, gate, auth } = PHOTO_CONFIG;
+
+  if (cover) {
+    const el = document.getElementById('first-section');
+    el.style.backgroundImage = `url('${cover}')`;
+    el.classList.add('has-photo');
+  }
 
   if (gate) {
     const el = document.getElementById('gate');
