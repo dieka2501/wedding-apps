@@ -204,6 +204,23 @@
       mask-size:1200px auto;
       -webkit-mask-position:left bottom;
       mask-position:left bottom;
+      filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(201,97,26,.25));
+    }
+
+    /* Wave overlay - right edge of batik, desktop only */
+    .cover-batik-wave{
+      position:absolute;
+      left:calc(clamp(.35rem, 1.4vw, 1.25rem) + clamp(18rem, 34vw, 27rem) - 2rem);
+      bottom:0;
+      width:4.5rem;
+      height:clamp(15rem, 38vh, 24rem);
+      z-index:2;
+      pointer-events:none;
+    }
+    .cover-batik-wave svg{
+      display:block;
+      width:100%;
+      height:100%;
     }
     
     /* Wave divider - SOLID ORANGE */
@@ -623,7 +640,17 @@
       .c-guest{text-align:left;font-size:clamp(2rem, 8vw, 3rem)}
       .c-guest-tag{text-align:left;max-width:100%}
       
-      .cover-batik{display:none}
+      .cover-batik{
+        display:block;
+        left:0;
+        width:clamp(11rem, 50vw, 16rem);
+        height:clamp(9rem, 26vh, 13rem);
+        -webkit-mask-size:800px auto;
+        mask-size:800px auto;
+        filter:brightness(1.45) saturate(1.3);
+        z-index:5;
+      }
+      .cover-batik-wave{display:none}
       
       #intro .sec-inner{
         padding-left:2rem;
@@ -691,6 +718,11 @@
 <!-- FIRST SECTION (COVER) -->
 <section id="first-section" class="pattern-1">
   <div class="cover-batik" aria-hidden="true"></div>
+  <div class="cover-batik-wave" aria-hidden="true">
+    <svg preserveAspectRatio="none" viewBox="0 0 60 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 30 0 Q 0 10 30 20 Q 60 30 30 40 Q 0 50 30 60 Q 60 70 30 80 Q 0 90 30 100 L 60 100 L 60 0 Z" fill="#151d45"/>
+    </svg>
+  </div>
   <div class="cc">
     <p class="c-to">Kepada Yang Terhormat</p>
     <h1 class="c-guest" id="cover-guest">Tamu Undangan</h1>
