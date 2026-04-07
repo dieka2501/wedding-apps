@@ -4,239 +4,575 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Undangan Pernikahan Putri dan Dikdik</title>
-  <!--
-    Font Google digunakan sebagai FALLBACK jika font lokal tidak dikonfigurasi.
-    Tambahkan/hapus sesuai kebutuhan.
-  -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet" />
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --cream:  #FFF1D5;
-      --teal:   #BDDDE4;
-      --lblue:  #9EC6F3;
-      --slate:  #9FB3DF;
-      --ink:    #162035;   /* teks utama — navy sangat gelap */
-      --ink-lt: #2d4065;   /* teks sekunder */
+      /* ── COLOR PALETTE ──────────────────────────────────────────────── */
+      --tan:    #B9A583;
+      --beige:  #CEC4B6;
+      --navy:   #292F33;
+      --orange: #C9611A;
       --pure:   #ffffff;
-
-      /* ── FONT ROLES — dikendalikan oleh FONT_CONFIG di script ────────
-         Ubah nilai di FONT_CONFIG (bawah), jangan di sini secara langsung. */
+      --navy-deep:#173E70;
+      
+      /* ── FONT ROLES ──────────────────────────────────────────────────── */
       --font-script: 'Great Vibes', cursive;
       --font-serif:  'Cormorant Garamond', serif;
       --font-sans:   'DM Sans', sans-serif;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--cream);color:var(--ink);font-family:var(--font-sans);font-weight:300;line-height:1.8;overflow-x:hidden}
+    body{
+      background:var(--beige);
+      color:var(--navy);
+      font-family:var(--font-sans);
+      font-weight:300;
+      line-height:1.8;
+      overflow-x:hidden;
+      position:relative
+    }
 
     /* ── LOADING ─────────────────────────────────────────────────────── */
-    #loading{display:none;position:fixed;inset:0;background:var(--cream);z-index:9998;justify-content:center;align-items:center;flex-direction:column}
+    #loading{display:none;position:fixed;inset:0;background:var(--beige);z-index:9998;justify-content:center;align-items:center;flex-direction:column}
     #loading.active{display:flex}
-    .ld-ring{width:36px;height:36px;border:2px solid var(--teal);border-top-color:var(--slate);border-radius:50%;animation:spin .9s linear infinite;margin-bottom:1.25rem}
+    .ld-ring{width:36px;height:36px;border:2px solid var(--orange);border-top-color:transparent;border-radius:50%;animation:spin .9s linear infinite;margin-bottom:1.25rem}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* ── FIRST SECTION (COVER) — dengan background photo ─────────────── */
+    /* ── FIRST SECTION (COVER) ───────────────────────────────────────── */
     #first-section{
-      min-height:100vh;
-      background:var(--slate);
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
+      min-height:100svh;
+      background:#151d45;
       display:flex;
       flex-direction:column;
       justify-content:center;
-      align-items:center;
-      text-align:center;
-      padding:3rem 2rem;
+      align-items:flex-start;
+      text-align:left;
+      padding:clamp(2.75rem,5vw,4.5rem) clamp(1.25rem,4vw,3rem) 9rem;
       position:relative;
       overflow:hidden;
     }
-    /* Overlay gelap untuk readability ketika ada background photo */
-    #first-section.has-photo::before{
+    
+    /* Photo background - positioned right */
+    #first-section::before{
       content:'';
       position:absolute;
       inset:0;
-      background:linear-gradient(135deg, rgba(159,179,223,0.75) 0%, rgba(22,32,53,0.65) 100%);
-      backdrop-filter:blur(1px);
-      z-index:0;
+      background-color:transparent;
+      background-image:var(--cover-photo, none);
+      background-size:min(48vw, 42rem) auto;
+      background-position:calc(100% - clamp(.25rem, 1.4vw, 1.2rem)) 34%;
+      background-repeat:no-repeat;
+      z-index:2;
     }
-    .cc{position:relative;z-index:1;max-width:560px}
-    /* Text shadow untuk readability di atas foto */
-    #first-section.has-photo .cc *{
-      text-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
+    #first-section.has-photo::before{
+      filter:saturate(1.02) contrast(1.03) brightness(.96);
     }
-    .c-to{font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--ink);opacity:.45;margin-bottom:.5rem;animation:fid 1s ease .2s both}
-    #first-section.has-photo .c-to{color:var(--pure);opacity:.85}
-    .c-guest{font-family:var(--font-serif);font-size:clamp(3rem,9vw,5.5rem);font-weight:400;color:var(--ink);line-height:1.1;margin-bottom:.35rem;animation:fid 1s ease .4s both}
-    #first-section.has-photo .c-guest{color:var(--pure)}
-    .c-guest-tag{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:2.5rem;animation:fid 1s ease .6s both}
-    #first-section.has-photo .c-guest-tag{color:var(--pure);opacity:.75}
-    .div-line{display:flex;align-items:center;gap:1rem;justify-content:center;margin-bottom:1.5rem;animation:fi 1s ease .8s both}
-    .div-line::before,.div-line::after{content:'';flex:1;max-width:50px;height:1px;background:var(--ink);opacity:.2}
-    #first-section.has-photo .div-line::before,
-    #first-section.has-photo .div-line::after{background:var(--pure);opacity:.5}
-    .div-line span{font-size:.65rem;color:var(--ink);opacity:.3}
-    #first-section.has-photo .div-line span{color:var(--pure);opacity:.7}
-    .c-pre{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.3;margin-bottom:.4rem;animation:fi 1s ease .95s both}
-    #first-section.has-photo .c-pre{color:var(--pure);opacity:.65}
-    .c-names{font-family:var(--font-script);font-size:clamp(2rem,6.5vw,3.5rem);color:var(--ink);opacity:.55;line-height:1.2;animation:fi 1s ease 1.05s both}
-    #first-section.has-photo .c-names{color:var(--pure);opacity:.95}
-    .c-names .amp{opacity:.6}
-    .c-date{margin-top:1.25rem;font-size:.6rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);opacity:.3;animation:fi 1s ease 1.2s both}
-    #first-section.has-photo .c-date{color:var(--pure);opacity:.7}
-    .scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;color:var(--ink);opacity:.25;animation:bounce 2.5s ease-in-out infinite;font-size:.54rem;letter-spacing:.2em;text-transform:uppercase}
-    #first-section.has-photo .scroll-hint{color:var(--pure);opacity:.6}
+    
+    /* Gradient overlay */
+    #first-section::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(90deg, rgba(6,10,28,.8) 0%, rgba(6,10,28,.62) 26%, rgba(6,10,28,.25) 48%, rgba(6,10,28,0) 70%),
+        linear-gradient(180deg, rgba(6,10,28,.12) 0%, rgba(6,10,28,0) 28%, rgba(6,10,28,.2) 100%);
+      z-index:3;
+    }
+    
+    /* Content container */
+    .cc{
+      position:relative;
+      z-index:4;
+      width:min(33vw,28rem);
+      min-height:calc(100svh - 12rem);
+      margin:0;
+      padding:1rem 0 0;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      align-items:flex-start;
+    }
+    
+    .c-to{
+      font-size:.68rem;
+      letter-spacing:.24em;
+      text-transform:uppercase;
+      color:var(--pure);
+      opacity:.75;
+      margin-bottom:1rem;
+      animation:fid 1s ease .2s both
+    }
+    
+    /* Guest name - responsive for long names */
+    .c-guest{
+      font-family:var(--font-sans);
+      font-size:clamp(2.2rem, 4.5vw, 3.8rem);
+      font-weight:700;
+      color:var(--pure);
+      line-height:1.15;
+      margin-bottom:.75rem;
+      animation:fid 1s ease .4s both;
+      word-wrap:break-word;
+      hyphens:auto;
+      max-width:100%;
+    }
+    
+    .c-guest-tag{
+      font-size:.82rem;
+      letter-spacing:.02em;
+      color:var(--pure);
+      opacity:.72;
+      margin-bottom:2.5rem;
+      animation:fid 1s ease .6s both;
+      line-height:1.6;
+      max-width:90%;
+    }
+    
+    .c-pre{
+      font-size:.68rem;
+      letter-spacing:.24em;
+      text-transform:uppercase;
+      color:var(--orange);
+      opacity:.95;
+      margin-bottom:.4rem;
+      animation:fi 1s ease .8s both
+    }
+    
+    .c-names{
+      font-family:var(--font-script);
+      font-size:clamp(2.8rem,5.5vw,4.2rem);
+      color:var(--orange);
+      line-height:1.2;
+      animation:fi 1s ease .95s both;
+      margin-bottom:.35rem;
+    }
+    
+    .c-names .amp{
+      font-size:.65em;
+      line-height:.6;
+      opacity:.76;
+      margin:.18rem 0;
+    }
+    
+    .c-date{
+      margin-top:.9rem;
+      font-size:.56rem;
+      letter-spacing:.34em;
+      text-transform:uppercase;
+      color:var(--pure);
+      opacity:.7;
+      animation:fi 1s ease 1.2s both
+    }
+    
+    .scroll-hint{
+      position:absolute;
+      bottom:2rem;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:.4rem;
+      color:var(--pure);
+      opacity:.6;
+      animation:bounce 2.5s ease-in-out infinite;
+      font-size:.54rem;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      z-index:6;
+      pointer-events:none;
+    }
+    
+    /* Batik pattern overlay - ORANGE #C9611A */
+    .cover-batik{
+      position:absolute;
+      left:clamp(.35rem, 1.4vw, 1.25rem);
+      bottom:0;
+      width:clamp(18rem, 34vw, 27rem);
+      height:clamp(15rem, 38vh, 24rem);
+      background:var(--orange);
+      opacity:1;
+      z-index:1;
+      pointer-events:none;
+      -webkit-mask-image:url('/batik.png');
+      mask-image:url('/batik.png');
+      -webkit-mask-repeat:repeat;
+      mask-repeat:repeat;
+      -webkit-mask-size:1200px auto;
+      mask-size:1200px auto;
+      -webkit-mask-position:left bottom;
+      mask-position:left bottom;
+    }
+    
+    /* Wave divider - SOLID ORANGE */
+    #first-section .section-divider{
+      z-index:5;
+      filter:none;
+      position:absolute;
+      bottom:-2px;
+      left:0;
+      width:100%;
+      height:120px;
+      overflow:hidden;
+    }
+    
+    #first-section .section-divider svg{
+      display:block;
+      width:calc(100% + 2px);
+      height:120px;
+    }
+    
+    #first-section .section-divider svg path{
+      fill:var(--orange) !important;
+      opacity:1;
+    }
+    
     @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+    @keyframes fi{from{opacity:0}to{opacity:1}}
+    @keyframes fid{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 
-    /* ── SHARED SECTION STYLES (SECOND-SECTION onwards) ──────────────── */
-    .sec{padding:5rem 1.5rem}
-    .sec-inner{max-width:660px;margin:0 auto}
-    .s-label{font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);opacity:.4;text-align:center;margin-bottom:.75rem}
-    .s-title{font-family:var(--font-serif);font-size:clamp(2rem,5vw,2.8rem);font-weight:300;text-align:center;color:var(--ink);margin-bottom:1.75rem;line-height:1.2}
-    .s-title em{font-style:italic;color:var(--ink-lt)}
-    .s-rule{width:36px;height:2px;background:var(--ink);opacity:.2;margin:0 auto 2.5rem}
-    .s-body{text-align:center;color:var(--ink-lt);font-size:.9rem;line-height:2}
+    /* ── INTRO SECTION (PUISI) ───────────────────────────────────────── */
+    #intro{
+      background:var(--orange);
+      padding:10rem 2rem 12rem;
+      position:relative;
+      overflow:hidden;
+      isolation:isolate;
+      margin-top:0 !important;
+    }
+    
+    #intro .sec-inner{
+      max-width:600px;
+      margin:0;
+      padding:0 2rem;
+      padding-left:3rem;
+      position:relative;
+      z-index:1;
+    }
+    
+    #intro .s-label{
+      color:var(--pure);
+      letter-spacing:.4em;
+      opacity:0.7;
+      text-align:left;
+    }
+    
+    #intro .s-title{
+      color:var(--pure);
+      font-weight:600;
+      font-size:clamp(3rem,6vw,4.5rem);
+      line-height:1.1;
+      text-align:left;
+    }
+    
+    #intro .s-rule{
+      margin-left:0;
+      background:var(--pure);
+      opacity:0.3;
+    }
+    
+    #intro p{
+      color:var(--pure);
+      opacity:0.85;
+      font-size:1rem;
+    }
+    
+    #intro p:last-child{
+      opacity:0.6;
+    }
+    
+    /* Batik pattern untuk intro section */
+    .intro-batik{
+      position:absolute;
+      left:-2.5rem;
+      bottom:1.25rem;
+      width:13rem;
+      height:10rem;
+      border-radius:50%;
+      transform:rotate(-8deg);
+      pointer-events:none;
+      z-index:0;
+      background-image:url('/batik.png');
+      background-repeat:repeat;
+      background-size:260px auto;
+      filter:sepia(1) saturate(8) hue-rotate(340deg) brightness(1.08);
+      opacity:.18;
+      mix-blend-mode:screen;
+    }
 
-    /* ── COUPLE — background: cream ─────────────────────────────────── */
-    #couple{background:var(--cream)}
-    .couple-verse{font-family:var(--font-serif);font-style:italic;font-size:1.05rem;text-align:center;color:var(--ink-lt);padding:1.75rem 2rem;border-top:1px solid var(--teal);border-bottom:1px solid var(--teal);margin-bottom:3rem;line-height:1.9}
-    .couple-verse cite{display:block;margin-top:.75rem;font-size:.73rem;letter-spacing:.12em;font-style:normal;color:var(--ink);opacity:.4}
+    /* ── SHARED SECTION STYLES ───────────────────────────────────────── */
+    .sec{
+      padding:6rem 2rem;
+      position:relative;
+      overflow:hidden;
+      isolation:isolate;
+    }
+    
+    .sec-inner{
+      max-width:720px;
+      margin:0 auto;
+      position:relative;
+      z-index:1;
+    }
+    
+    .s-label{
+      font-size:.58rem;
+      letter-spacing:.4em;
+      text-transform:uppercase;
+      color:var(--orange);
+      opacity:.8;
+      text-align:center;
+      margin-bottom:.75rem
+    }
+    
+    .s-title{
+      font-family:var(--font-serif);
+      font-size:clamp(2rem,5vw,2.8rem);
+      font-weight:300;
+      text-align:center;
+      color:var(--navy);
+      margin-bottom:1.75rem;
+      line-height:1.2
+    }
+    
+    .s-title em{font-style:italic;color:var(--orange)}
+    .s-rule{width:36px;height:2px;background:var(--orange);opacity:.4;margin:0 auto 2.5rem}
+    .s-body{text-align:center;color:var(--navy);font-size:.9rem;line-height:2;opacity:.85}
+
+    /* Section divider (wave) */
+    .section-divider{
+      position:absolute;
+      bottom:-2px;
+      left:0;
+      width:100%;
+      height:120px;
+      overflow:hidden;
+      z-index:1;
+    }
+    
+    .section-divider svg{
+      display:block;
+      width:calc(100% + 2px);
+      height:120px;
+    }
+    
+    .section-divider svg path{
+      opacity:1;
+    }
+
+    /* Batik pattern blocks */
+    .batik-block{
+      position:absolute;
+      pointer-events:none;
+      z-index:0;
+      background-image:url('/batik.png');
+      background-repeat:repeat;
+      background-size:260px auto;
+      opacity:.22;
+      mix-blend-mode:screen;
+      filter:brightness(1.1);
+    }
+    
+    .batik-amber{
+      filter:sepia(1) saturate(8) hue-rotate(340deg) brightness(1.08);
+      opacity:.18;
+    }
+    
+    .batik-ivory{
+      filter:grayscale(1) brightness(1.35);
+      opacity:.2;
+    }
+    
+    .batik-navy{
+      filter:sepia(1) saturate(6) hue-rotate(170deg) brightness(.82);
+      opacity:.14;
+    }
+    
+    .couple-batik{
+      right:-2.5rem;
+      bottom:.5rem;
+      width:11rem;
+      height:10rem;
+      border-radius:46% 54% 50% 50%;
+    }
+    
+    .countdown-batik{
+      left:-1.5rem;
+      bottom:-1rem;
+      width:12rem;
+      height:9rem;
+      border-radius:50%;
+    }
+    
+    .events-batik{
+      right:-1.25rem;
+      top:10rem;
+      width:10rem;
+      height:9rem;
+      border-radius:50%;
+    }
+
+    /* ── COUPLE SECTION ──────────────────────────────────────────────── */
+    #couple{background:var(--beige);position:relative}
+    .couple-verse{
+      font-family:var(--font-serif);
+      font-style:italic;
+      font-size:1.05rem;
+      text-align:center;
+      color:var(--navy);
+      opacity:.8;
+      padding:1.75rem 2rem;
+      border-top:1px solid var(--orange);
+      border-bottom:1px solid var(--orange);
+      margin-bottom:3rem;
+      line-height:1.9
+    }
+    .couple-verse cite{
+      display:block;
+      margin-top:.75rem;
+      font-size:.73rem;
+      letter-spacing:.12em;
+      font-style:normal;
+      color:var(--orange);
+      opacity:.7
+    }
     .couple-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center}
     .couple-card{text-align:center}
-    .c-role{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:.6rem}
-    .c-name{font-family:var(--font-script);font-size:2.6rem;color:var(--ink);line-height:1.2}
-    .c-fullname{font-family:var(--font-serif);font-size:.85rem;color:var(--ink-lt);margin-top:.25rem}
-    .c-parents{font-size:.78rem;color:var(--ink-lt);margin-top:.5rem;line-height:1.7;opacity:.7}
-    .c-and{font-family:var(--font-script);font-size:3rem;color:var(--ink);opacity:.2;text-align:center}
+    .c-role{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.5;margin-bottom:.6rem}
+    .c-name{font-family:var(--font-script);font-size:2.6rem;color:var(--orange);line-height:1.2}
+    .c-fullname{font-family:var(--font-serif);font-size:.85rem;color:var(--navy);margin-top:.25rem;opacity:.8}
+    .c-parents{font-size:.78rem;color:var(--navy);margin-top:.5rem;line-height:1.7;opacity:.7}
+    .c-and{font-family:var(--font-script);font-size:3rem;color:var(--orange);opacity:.3;text-align:center}
 
-    /* ── COUNTDOWN — background: teal ───────────────────────────────── */
-    #countdown{background:var(--teal)}
+    /* ── COUNTDOWN SECTION ───────────────────────────────────────────── */
+    #countdown{background:var(--tan);position:relative}
     .cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2.5rem}
-    .cd-num{font-family:var(--font-serif);font-size:clamp(2.8rem,8vw,4.5rem);font-weight:300;color:var(--ink);line-height:1;text-align:center}
-    .cd-lbl{font-size:.54rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-top:.4rem;text-align:center}
+    .cd-num{font-family:var(--font-serif);font-size:clamp(2.8rem,8vw,4.5rem);font-weight:300;color:var(--orange);line-height:1;text-align:center}
+    .cd-lbl{font-size:.54rem;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.6;margin-top:.4rem;text-align:center}
 
-    /* ── EVENTS — background: lblue ─────────────────────────────────── */
-    #events{background:var(--lblue)}
+    /* ── EVENTS SECTION ──────────────────────────────────────────────── */
+    #events{background:var(--beige);position:relative}
     .event-cards{display:flex;flex-direction:column;gap:1.25rem;margin-top:2rem}
-    .event-card{background:rgba(255,255,255,.35);border-radius:6px;padding:2rem;text-align:center;border-bottom:3px solid var(--slate)}
-    .e-type{font-size:.56rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);opacity:.45;margin-bottom:.75rem}
-    .e-title{font-family:var(--font-serif);font-size:1.9rem;font-weight:300;color:var(--ink);margin-bottom:1.5rem}
-    .e-detail{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.7rem;text-align:left;color:var(--ink-lt);font-size:.875rem}
+    .event-card{background:rgba(255,255,255,.4);border-radius:8px;padding:2rem;text-align:center;border:1px solid var(--orange);border-opacity:.2}
+    .e-type{font-size:.56rem;letter-spacing:.4em;text-transform:uppercase;color:var(--orange);opacity:.7;margin-bottom:.75rem}
+    .e-title{font-family:var(--font-serif);font-size:1.9rem;font-weight:300;color:var(--navy);margin-bottom:1.5rem}
+    .e-detail{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.7rem;text-align:left;color:var(--navy);font-size:.875rem;opacity:.85}
     .e-detail .icon{flex-shrink:0;margin-top:.1rem}
-    .e-detail strong{display:block;font-size:.65rem;letter-spacing:.1em;color:var(--ink);opacity:.5;margin-bottom:.1rem;font-weight:400;text-transform:uppercase}
-    .map-btn{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.25rem;padding:.6rem 1.4rem;border:1.5px solid var(--ink);border-opacity:.3;color:var(--ink);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border-radius:3px;transition:all .25s;opacity:.6}
-    .map-btn:hover{background:var(--ink);color:var(--pure);opacity:1}
-    .dresscode{text-align:center;margin-top:2rem;font-size:.75rem;color:var(--ink);opacity:.4;letter-spacing:.1em}
+    .e-detail strong{display:block;font-size:.65rem;letter-spacing:.1em;color:var(--orange);opacity:.8;margin-bottom:.1rem;font-weight:400;text-transform:uppercase}
+    .map-btn{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.25rem;padding:.7rem 1.5rem;background:var(--orange);color:var(--pure);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border-radius:4px;transition:all .25s;border:none}
+    .map-btn:hover{background:var(--navy);transform:translateY(-2px);box-shadow:0 4px 12px rgba(201,97,26,.3)}
+    .dresscode{text-align:center;margin-top:2rem;font-size:.75rem;color:var(--navy);opacity:.5;letter-spacing:.1em}
 
-    /* ── RSVP — background: cream ────────────────────────────────────── */
-    #rsvp{background:var(--cream)}
-    .rsvp-form{background:var(--pure);border-radius:6px;padding:2rem;box-shadow:0 2px 20px rgba(22,32,53,.08)}
+    /* ── RSVP SECTION ────────────────────────────────────────────────── */
+    #rsvp{background:var(--tan);position:relative}
+    .rsvp-form{background:var(--pure);border-radius:8px;padding:2rem;box-shadow:0 4px 20px rgba(41,47,51,.08);border:1px solid var(--orange);border-opacity:.15}
     .f-group{margin-bottom:1.25rem}
-    .f-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);opacity:.5;margin-bottom:.5rem}
-    .f-input,.f-select,.f-textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--teal);border-radius:3px;background:var(--cream);color:var(--ink);font-family:var(--font-sans);font-size:.9rem;transition:border-color .25s;outline:none}
-    .f-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%23162035' stroke-opacity='.4' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;cursor:pointer}
-    .f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--slate)}
-    .rsvp-chosen{display:inline-block;margin-top:.75rem;padding:.4rem 1rem;background:var(--teal);border-radius:3px;font-size:.82rem;color:var(--ink);opacity:.85}
+    .f-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.6;margin-bottom:.5rem}
+    .f-input,.f-select,.f-textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--orange);border-opacity:.3;border-radius:4px;background:var(--beige);color:var(--navy);font-family:var(--font-sans);font-size:.9rem;transition:all .25s;outline:none}
+    .f-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%23C9611A' stroke-opacity='.6' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;cursor:pointer}
+    .f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--orange);border-opacity:1;box-shadow:0 0 0 3px rgba(201,97,26,.1)}
     .f-textarea{resize:vertical;min-height:80px}
-    .rsvp-opts{display:flex;flex-direction:column;gap:.6rem}
-    .rsvp-opt{display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;border:1.5px solid var(--teal);border-radius:3px;cursor:pointer;transition:all .2s;background:var(--cream)}
-    .rsvp-opt:hover,.rsvp-opt.selected{border-color:var(--slate);background:var(--teal)}
-    .rsvp-opt span{font-size:.875rem;color:var(--ink)}
-    .submit-btn{width:100%;padding:1rem;background:var(--slate);color:var(--ink);border:none;border-radius:3px;font-family:var(--font-sans);font-size:.72rem;letter-spacing:.35em;text-transform:uppercase;cursor:pointer;transition:background .25s;margin-top:.5rem;font-weight:500}
-    .submit-btn:hover{background:var(--lblue)}
-    .submit-btn:disabled{opacity:.45;cursor:not-allowed}
+    .submit-btn{width:100%;padding:1rem;background:var(--orange);color:var(--pure);border:none;border-radius:4px;font-family:var(--font-sans);font-size:.72rem;letter-spacing:.35em;text-transform:uppercase;cursor:pointer;transition:all .25s;margin-top:.5rem;font-weight:500}
+    .submit-btn:hover{background:var(--navy);transform:translateY(-2px);box-shadow:0 4px 12px rgba(201,97,26,.3)}
+    .submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
     .rsvp-success{display:none;text-align:center;padding:2.5rem 1rem}
     .rsvp-success.active{display:block}
     .rsvp-success-icon{font-size:2.5rem;margin-bottom:1rem}
-    .rsvp-success h3{font-family:var(--font-serif);font-size:1.8rem;color:var(--ink);margin-bottom:.5rem}
-    .rsvp-already{display:none;text-align:center;padding:1rem;background:var(--teal);border-radius:3px;margin-bottom:1rem;font-size:.875rem;color:var(--ink)}
-    .rsvp-already.active{display:block}
+    .rsvp-success h3{font-family:var(--font-serif);font-size:1.8rem;color:var(--navy);margin-bottom:.5rem}
 
-    /* ── FOOTER — background: slate ─────────────────────────────────── */
-    footer{background:var(--slate);text-align:center;padding:3rem 1.5rem}
-    .f-names{font-family:var(--font-script);font-size:2.5rem;color:var(--ink);margin-bottom:.5rem}
-    footer p{font-size:.65rem;letter-spacing:.15em;color:var(--ink);opacity:.35}
-
-    /* ── WA AUTH CARD styles ─────────────────────────────────────────── */
-    .auth-monogram{font-family:var(--font-script);font-size:3rem;color:var(--slate);margin-bottom:1.25rem;line-height:1}
-    .auth-to{font-size:.9rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:.3rem}
-    .auth-name{font-family:var(--font-serif);font-size:2rem;color:var(--ink);font-weight:400;margin-bottom:.25rem;line-height:1.2}
-    .auth-desc{font-size:.70rem;color:var(--ink);opacity:.5;margin-bottom:2rem;line-height:1.7}
-    .auth-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);opacity:.45;margin-bottom:.5rem;text-align:left}
-    .auth-input{width:100%;padding:.85rem 1rem;border:1.5px solid var(--teal);border-radius:4px;background:var(--cream);color:var(--ink);font-family:var(--font-sans);font-size:1.1rem;letter-spacing:.3em;text-align:center;outline:none;transition:border-color .2s}
-    .auth-input:focus{border-color:var(--slate)}
-    .auth-btn{width:100%;margin-top:1rem;padding:.9rem;background:var(--slate);color:var(--ink);border:none;border-radius:4px;font-family:var(--font-sans);font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;transition:background .2s;font-weight:500}
-    .auth-btn:hover{background:var(--lblue)}
-    .auth-btn:disabled{opacity:.45;cursor:not-allowed}
-    .auth-error{display:none;margin-top:1rem;padding:.85rem 1rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:4px;font-size:.82rem;color:#991b1b;line-height:1.6}
-    .auth-error.active{display:block}
-    .auth-divider{height:1px;background:var(--teal);margin:1.5rem 0}
-    .auth-note{font-size:.72rem;color:var(--ink);opacity:.35;line-height:1.7}
-
-    /* ── WA AUTH OVERLAY ─────────────────────────────────────────────── */
-    .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:var(--pure);padding:.875rem 1.5rem;border-radius:3px;font-size:.875rem;transition:transform .4s ease;z-index:9000;white-space:nowrap}
-    .toast.show{transform:translateX(-50%) translateY(0)}
-    @keyframes fi{from{opacity:0}to{opacity:1}}
-    @keyframes fid{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
-    .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
-    .reveal.visible{opacity:1;transform:translateY(0)}
-    @media(max-width:480px){.couple-cards{grid-template-columns:1fr}.c-and{transform:rotate(90deg)}.cd-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(min-width:600px){.event-cards{flex-direction:row}.event-card{flex:1}}
+    /* ── FOOTER ──────────────────────────────────────────────────────── */
+    footer{background:var(--beige);text-align:center;padding:3rem 1.5rem;position:relative;overflow:hidden;isolation:isolate}
+    footer>*{position:relative;z-index:1}
+    .f-names{font-family:var(--font-script);font-size:2.5rem;color:var(--orange);margin-bottom:.5rem}
+    footer p{font-size:.65rem;letter-spacing:.15em;color:var(--navy);opacity:.5}
 
     /* ── PHOTO SECTION ───────────────────────────────────────────────── */
-    #photo-section{background:var(--cream);padding:0}
+    #photo-section{background:var(--tan);padding:0;position:relative;isolation:isolate}
     .photo-split{display:grid;grid-template-columns:1fr 1fr;min-height:90vh}
     .photo-split-img{position:relative;overflow:hidden;min-height:420px}
-    .photo-split-img img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+    .photo-split-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
     .photo-split-body{
-      background:var(--teal);
+      background:var(--beige);
       display:flex;flex-direction:column;
       justify-content:center;align-items:flex-start;
       padding:4rem 3rem;
+      position:relative;
+      overflow:hidden;
     }
-    .ps-label{font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink);opacity:.4;margin-bottom:.75rem}
-    .ps-title{font-family:var(--font-script);font-size:clamp(2.8rem,6vw,4.2rem);color:var(--ink);line-height:1.2;margin-bottom:1.25rem}
-    .ps-date{font-family:var(--font-serif);font-size:1.1rem;font-weight:300;color:var(--ink-lt);letter-spacing:.05em;margin-bottom:.5rem}
-    .ps-venue{font-size:.82rem;color:var(--ink);opacity:.5;line-height:1.8}
-    .ps-rule{width:36px;height:2px;background:var(--ink);opacity:.2;margin:1.75rem 0}
-    .ps-quote{font-family:var(--font-serif);font-style:italic;font-size:1rem;color:var(--ink-lt);line-height:1.8;opacity:.75}
-    @media(max-width:680px){
-      .photo-split{grid-template-columns:1fr}
-      .photo-split-img{min-height:65vw}
-      .photo-split-body{align-items:center;text-align:center;padding:3rem 2rem}
-      .ps-rule{margin:1.75rem auto}
-    }
+    .photo-split-body>*{position:relative;z-index:1}
+    .ps-label{font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;color:var(--orange);opacity:.8;margin-bottom:.75rem}
+    .ps-title{font-family:var(--font-script);font-size:clamp(2.8rem,6vw,4.2rem);color:var(--orange);line-height:1.2;margin-bottom:1.25rem}
+    .ps-date{font-family:var(--font-serif);font-size:1.1rem;font-weight:300;color:var(--navy);letter-spacing:.05em;margin-bottom:.5rem;opacity:.85}
+    .ps-venue{font-size:.82rem;color:var(--navy);opacity:.7;line-height:1.8}
+    .ps-rule{width:36px;height:2px;background:var(--orange);opacity:.4;margin:1.75rem 0}
+    .ps-quote{font-family:var(--font-serif);font-style:italic;font-size:1rem;color:var(--navy);line-height:1.8;opacity:.75}
 
-    /* ── GATE — foto background ──────────────────────────────────────── */
-    #gate{display:none;position:fixed;inset:0;background:var(--slate);z-index:9999;padding:2.5rem}
+    /* ── GATE ────────────────────────────────────────────────────────── */
+    #gate{display:none;position:fixed;inset:0;background:var(--tan);z-index:9999;padding:2.5rem}
     #gate.active{display:flex}
     #gate.has-photo{background-size:cover;background-position:center}
     #gate.has-photo::before{
       content:'';position:absolute;inset:0;
-      background:linear-gradient(135deg,rgba(159,179,223,.82) 0%,rgba(22,32,53,.55) 100%);
+      background:linear-gradient(135deg,rgba(185,165,131,.9) 0%,rgba(41,47,51,.8) 100%);
       backdrop-filter:blur(2px);
     }
-    #gate.has-photo .gate-inner{z-index:1}
-    .gate-inner{position:relative;width:100%;height:100%}
-    .gate-bride{position:absolute;top:1.5rem;left:0;font-family:var(--font-script);font-size:clamp(5rem,20vw,11rem);color:var(--ink);line-height:1;animation:gfade 1s ease .1s both}
-    .gate-amp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-script);font-size:clamp(3rem,12vw,7rem);color:var(--ink);opacity:.15;animation:gfade 1s ease .5s both}
-    .gate-groom{position:absolute;bottom:6rem;right:0;font-family:var(--font-script);font-size:clamp(5rem,20vw,11rem);color:var(--ink);line-height:1;animation:gfade 1s ease .9s both}
-    .gate-msg{position:absolute;bottom:2.5rem;left:0;color:var(--ink);font-size:.75rem;letter-spacing:.18em;line-height:2.2;opacity:.45;animation:gfade 1s ease 1.2s both}
+    #gate::after{
+      content:'';position:absolute;inset:0;
+      background-image:url('/batik.png');
+      background-repeat:repeat;
+      background-size:260px auto;
+      opacity:.15;
+      z-index:1;
+      filter:sepia(1) saturate(8) hue-rotate(340deg) brightness(1.08);
+    }
+    #gate.has-photo .gate-inner{z-index:2}
+    .gate-inner{position:relative;width:100%;height:100%;z-index:2}
+    .gate-bride{position:absolute;top:1.5rem;left:0;font-family:var(--font-script);font-size:clamp(5rem,20vw,11rem);color:var(--orange);line-height:1;animation:gfade 1s ease .1s both}
+    #gate.has-photo .gate-bride{color:var(--pure)}
+    .gate-amp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-script);font-size:clamp(3rem,12vw,7rem);color:var(--orange);opacity:.2;animation:gfade 1s ease .5s both}
+    #gate.has-photo .gate-amp{color:var(--pure);opacity:.3}
+    .gate-groom{position:absolute;bottom:6rem;right:0;font-family:var(--font-script);font-size:clamp(5rem,20vw,11rem);color:var(--orange);line-height:1;animation:gfade 1s ease .9s both}
+    #gate.has-photo .gate-groom{color:var(--pure)}
+    .gate-msg{position:absolute;bottom:2.5rem;left:0;color:var(--navy);font-size:.75rem;letter-spacing:.18em;line-height:2.2;opacity:.6;animation:gfade 1s ease 1.2s both}
+    #gate.has-photo .gate-msg{color:var(--pure);opacity:.8}
     @keyframes gfade{from{opacity:0}to{opacity:1}}
 
-    /* ── WA AUTH — foto background ───────────────────────────────────── */
-    #wa-auth{display:none;position:fixed;inset:0;background:var(--slate);z-index:9990;justify-content:center;align-items:center;padding:2rem}
+    /* ── WA AUTH ─────────────────────────────────────────────────────── */
+    #wa-auth{display:none;position:fixed;inset:0;background:var(--tan);z-index:9990;justify-content:center;align-items:center;padding:2rem}
     #wa-auth.active{display:flex}
     #wa-auth.has-photo{background-size:cover;background-position:center}
     #wa-auth.has-photo::before{
       content:'';position:absolute;inset:0;
-      background:rgba(22,32,53,.45);
+      background:rgba(41,47,51,.6);
       backdrop-filter:blur(8px);
     }
-    #wa-auth.has-photo .auth-card{position:relative;z-index:1}
-    .auth-card{background:var(--pure);border-radius:10px;padding:2.5rem 2rem;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(22,32,53,.15);text-align:center}
+    #wa-auth::after{
+      content:'';position:absolute;inset:0;
+      background-image:url('/batik.png');
+      background-repeat:repeat;
+      background-size:260px auto;
+      opacity:.12;
+      z-index:1;
+      filter:sepia(1) saturate(8) hue-rotate(340deg) brightness(1.08);
+    }
+    #wa-auth.has-photo .auth-card{position:relative;z-index:2}
+    .auth-card{background:var(--pure);border-radius:10px;padding:2.5rem 2rem;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(41,47,51,.2);text-align:center;position:relative;z-index:2}
+    .auth-monogram{font-family:var(--font-script);font-size:3rem;color:var(--orange);margin-bottom:1.25rem;line-height:1}
+    .auth-to{font-size:.9rem;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.5;margin-bottom:.3rem}
+    .auth-name{font-family:var(--font-serif);font-size:2rem;color:var(--navy);font-weight:400;margin-bottom:.25rem;line-height:1.2}
+    .auth-desc{font-size:.70rem;color:var(--navy);opacity:.6;margin-bottom:2rem;line-height:1.7}
+    .auth-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.6;margin-bottom:.5rem;text-align:left}
+    .auth-input{width:100%;padding:.85rem 1rem;border:1.5px solid var(--orange);border-opacity:.3;border-radius:4px;background:var(--beige);color:var(--navy);font-family:var(--font-sans);font-size:1.1rem;letter-spacing:.3em;text-align:center;outline:none;transition:all .2s}
+    .auth-input:focus{border-color:var(--orange);border-opacity:1;box-shadow:0 0 0 3px rgba(201,97,26,.1)}
+    .auth-btn{width:100%;margin-top:1rem;padding:.9rem;background:var(--orange);color:var(--pure);border:none;border-radius:4px;font-family:var(--font-sans);font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;transition:all .2s;font-weight:500}
+    .auth-btn:hover{background:var(--navy);transform:translateY(-2px)}
+    .auth-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .auth-error{display:none;margin-top:1rem;padding:.85rem 1rem;background:#ffe5e5;border:1px solid var(--orange);border-radius:4px;font-size:.82rem;color:var(--navy);line-height:1.6}
+    .auth-error.active{display:block}
+    .auth-divider{height:1px;background:var(--orange);opacity:.2;margin:1.5rem 0}
+    .auth-note{font-size:.72rem;color:var(--navy);opacity:.5;line-height:1.7}
 
     /* ── WATERMARK ───────────────────────────────────────────────────── */
     #watermark{
@@ -245,8 +581,62 @@
       inset:0;
       pointer-events:none;
       z-index:8000;
-      opacity:.07;
+      opacity:.05;
       background-repeat:repeat;
+    }
+
+    /* ── TOAST ───────────────────────────────────────────────────────── */
+    .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--navy);color:var(--pure);padding:.875rem 1.5rem;border-radius:4px;font-size:.875rem;transition:transform .4s ease;z-index:9000;white-space:nowrap}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────────── */
+    @media(max-width:680px){
+      .photo-split{grid-template-columns:1fr}
+      .photo-split-img{min-height:65vw}
+      .photo-split-body{align-items:center;text-align:center;padding:3rem 2rem}
+      .ps-rule{margin:1.75rem auto}
+    }
+    
+    @media(max-width:768px){
+      /* Mobile: Left-aligned layout, full background */
+      #first-section{
+        align-items:flex-start;
+        text-align:left;
+        padding:3rem 1.5rem 9rem;
+      }
+
+      #first-section::before{
+        background-size:cover;
+        background-position:center;
+      }
+
+      .cc{
+        width:100%;
+        max-width:500px;
+        align-items:flex-start;
+      }
+
+      .c-to{text-align:left}
+      .c-guest{text-align:left;font-size:clamp(2rem, 8vw, 3rem)}
+      .c-guest-tag{text-align:left;max-width:100%}
+      
+      .cover-batik{display:none}
+      
+      #intro .sec-inner{
+        padding-left:2rem;
+      }
+      
+      .couple-cards{grid-template-columns:1fr}
+      .c-and{transform:rotate(90deg)}
+      .cd-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    
+    @media(min-width:600px){
+      .event-cards{flex-direction:row}
+      .event-card{flex:1}
     }
   </style>
 </head>
@@ -295,26 +685,43 @@
 <!-- LOADING -->
 <div id="loading">
   <div class="ld-ring"></div>
-  <p style="font-size:.7rem;letter-spacing:.2em;color:var(--ink-lt)">Memuat undangan&hellip;</p>
+  <p style="font-size:.7rem;letter-spacing:.2em;color:var(--navy)">Memuat undangan&hellip;</p>
 </div>
 
-<!-- FIRST SECTION (COVER) — dengan background photo -->
-<section id="first-section">
+<!-- FIRST SECTION (COVER) -->
+<section id="first-section" class="pattern-1">
+  <div class="cover-batik" aria-hidden="true"></div>
   <div class="cc">
     <p class="c-to">Kepada Yang Terhormat</p>
     <h1 class="c-guest" id="cover-guest">Tamu Undangan</h1>
-    <p class="c-guest-tag">Anda diundang untuk hadir</p>
-    <div class="div-line"><span>✦</span></div>
+    <p class="c-guest-tag">Anda diundang untuk hadir di pernikahan.</p>
     <p class="c-pre">Pernikahan</p>
     <div class="c-names">Putri<span class="amp"> &amp; </span>Dikdik</div>
     <p class="c-date">Sabtu, 2 Mei 2026</p>
   </div>
   <div class="scroll-hint"><span>Gulir ke Bawah</span><span>↓</span></div>
+  <div class="section-divider">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M0,60 Q300,100 600,60 T1200,60 L1200,120 L0,120 Z"/>
+    </svg>
+  </div>
 </section>
 
-<!-- SECOND SECTION — konten utama dimulai dari sini -->
+<!-- INTRO SECTION (PUISI) -->
+<div id="intro" class="sec">
+  <div class="batik-block batik-amber intro-batik" aria-hidden="true"></div>
+  <div class="sec-inner">
+    <div class="reveal">
+      <p class="s-label">Mempelai</p>
+      <h2 class="s-title">Dua jiwa, satu perjalanan</h2>
+      <div class="s-rule"></div>
+      <p>"Pada akhir cinta hanyalah satu dari banyak bagian dalam perjalanan hidup"</p>
+      <p>— DK</p>
+    </div>
+  </div>
+</div>
 
-<!-- PHOTO SECTION — tampilkan setelah cover jika foto dikonfigurasi -->
+<!-- PHOTO SECTION -->
 <div id="photo-section" style="display:none">
   <div class="photo-split">
     <div class="photo-split-img">
@@ -335,8 +742,9 @@
   </div>
 </div>
 
-<!-- COUPLE — cream -->
+<!-- COUPLE SECTION -->
 <div id="couple" class="sec">
+  <div class="batik-block batik-navy couple-batik" aria-hidden="true"></div>
   <div class="sec-inner">
     <div class="reveal">
       <p class="s-label">Mempelai</p>
@@ -365,8 +773,27 @@
   </div>
 </div>
 
-<!-- EVENTS — lblue -->
+<!-- COUNTDOWN SECTION -->
+<div id="countdown" class="sec">
+  <div class="batik-block batik-amber countdown-batik" aria-hidden="true"></div>
+  <div class="sec-inner">
+    <div class="reveal">
+      <p class="s-label">Menuju Hari Istimewa</p>
+      <h2 class="s-title">Hitung Mundur</h2>
+      <div class="s-rule"></div>
+      <div class="cd-grid">
+        <div><div class="cd-num" id="cd-d">00</div><div class="cd-lbl">Hari</div></div>
+        <div><div class="cd-num" id="cd-h">00</div><div class="cd-lbl">Jam</div></div>
+        <div><div class="cd-num" id="cd-m">00</div><div class="cd-lbl">Menit</div></div>
+        <div><div class="cd-num" id="cd-s">00</div><div class="cd-lbl">Detik</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENTS SECTION -->
 <div id="events" class="sec">
+  <div class="batik-block batik-ivory events-batik" aria-hidden="true"></div>
   <div class="sec-inner">
     <div class="reveal">
       <p class="s-label">Rangkaian Acara</p>
@@ -395,7 +822,7 @@
   </div>
 </div>
 
-<!-- RSVP — cream -->
+<!-- RSVP SECTION -->
 <div id="rsvp" class="sec">
   <div class="sec-inner">
     <div class="reveal">
@@ -444,119 +871,43 @@
         <div class="rsvp-success" id="rsvp-ok">
           <div class="rsvp-success-icon" id="rsvp-ok-icon">💌</div>
           <h3>Terima Kasih!</h3>
-          <p id="rsvp-ok-msg" style="color:var(--ink-lt);font-size:.9rem;margin-top:.5rem;line-height:1.8"></p>
+          <p id="rsvp-ok-msg" style="color:var(--navy);font-size:.9rem;margin-top:.5rem;line-height:1.8;opacity:.85"></p>
         </div>
       </div>
     </div>
   </div>
 </div>
-<!-- COUNTDOWN — teal -->
-<div id="countdown" class="sec">
-  <div class="sec-inner">
-    <div class="reveal">
-      <p class="s-label">Menuju Hari Istimewa</p>
-      <h2 class="s-title">Hitung Mundur</h2>
-      <div class="s-rule"></div>
-      <div class="cd-grid">
-        <div><div class="cd-num" id="cd-d">00</div><div class="cd-lbl">Hari</div></div>
-        <div><div class="cd-num" id="cd-h">00</div><div class="cd-lbl">Jam</div></div>
-        <div><div class="cd-num" id="cd-m">00</div><div class="cd-lbl">Menit</div></div>
-        <div><div class="cd-num" id="cd-s">00</div><div class="cd-lbl">Detik</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- FOOTER — slate -->
+
+<!-- FOOTER -->
 <footer>
   <div class="f-names">Putri &amp; Dikdik</div>
   <p>Sabtu, 2 Mei 2026</p>
-  <p style="margin-top:.4rem;font-size:.58rem">Made with ♡ for our special day also mecutin anak magang!</p>
+  <p style="margin-top:.4rem;font-size:.58rem">Made with ♡ for our special day</p>
 </footer>
 
 <div class="toast" id="toast"></div>
-
 <div id="watermark"></div>
 
 <script>
-// ╔══════════════════════════════════════════════════════════════════════╗
-// ║                        FONT CONFIGURATION                           ║
-// ║                                                                      ║
-// ║  Untuk mengganti font, ubah nilai "file" dan/atau "family" di bawah. ║
-// ║  Letakkan file font di folder  font/  (relatif terhadap index.html). ║
-// ║                                                                      ║
-// ║  Ekstensi yang didukung: .otf  .ttf  .woff  .woff2                  ║
-// ║                                                                      ║
-// ║  Setiap peran punya dua opsi:                                        ║
-// ║    file   → path ke file lokal, mis. "font/regina.otf"              ║
-// ║             Isi null untuk tetap pakai Google Fonts (fallback).      ║
-// ║    family → nama CSS font-family yang dipakai (bebas, unik saja).   ║
-// ║                                                                      ║
-// ║  CONTOH PENGGUNAAN:                                                  ║
-// ║    script: { file: "font/regina.otf",   family: "Regina"    }       ║
-// ║    serif:  { file: "font/playfair.ttf", family: "Playfair"  }       ║
-// ║    sans:   { file: "font/inter.woff2",  family: "Inter"     }       ║
-// ╚══════════════════════════════════════════════════════════════════════╝
-
 const FONT_CONFIG = {
-  script: {
-    // Peran  : Kaligrafi / nama mempelai / dekorasi
-    // Default: Great Vibes (Google Fonts)
-    file:   "font/regina.otf",               // contoh: "font/regina.otf"
-    family: 'Regina-script',      // nama font fallback (Google Fonts)
-  },
-  serif: {
-    // Peran  : Heading / judul section / angka hitung mundur
-    // Default: Cormorant Garamond (Google Fonts)
-    file:   "font/poppins.semibold.ttf",               // contoh: "font/playfair.ttf"
-    family: 'poppins-semibold-serif',
-  },
-  sans: {
-    // Peran  : Body text / form / tombol
-    // Default: DM Sans (Google Fonts)
-    file:   "font/poppins.regular.ttf",               // contoh: "font/inter.woff2"
-    family: 'poppins.regular',
-  },
+  script: { file: "font/regina.otf", family: 'Regina-script' },
+  serif:  { file: "font/poppins.semibold.ttf", family: 'poppins-semibold-serif' },
+  sans:   { file: "font/poppins.regular.ttf", family: 'poppins.regular' },
 };
-
-// ╔══════════════════════════════════════════════════════════════════════╗
-// ║                       PHOTO CONFIGURATION                           ║
-// ║                                                                      ║
-// ║  Atur path foto di sini. Letakkan file di folder  photo/            ║
-// ║  relatif terhadap index.html.                                        ║
-// ║                                                                      ║
-// ║  Format yang didukung: .jpg  .jpeg  .png  .webp  .avif              ║
-// ║                                                                      ║
-// ║  cover  → background foto untuk first-section (cover page)          ║
-// ║           null = warna solid seperti semula                          ║
-// ║  main   → foto utama di section split kiri-kanan                    ║
-// ║           null = section foto disembunyikan                          ║
-// ║  gate   → background foto halaman Gate (akses tanpa token)          ║
-// ║           null = warna solid seperti semula                          ║
-// ║  auth   → background foto overlay auth WA                           ║
-// ║           null = warna solid seperti semula                          ║
-// ║                                                                      ║
-// ║  CONTOH:                                                             ║
-// ║    cover: "photo/couple-landscape.jpg"                               ║
-// ║    main: "photo/couple.jpg"                                          ║
-// ║    gate: "photo/couple.jpg"   ← boleh pakai foto yang sama          ║
-// ║    auth: "photo/couple.jpg"                                          ║
-// ╚══════════════════════════════════════════════════════════════════════╝
 
 const PHOTO_CONFIG = {
-  cover: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/9b93bb66-c9a8-46cd-9be2-5fc913764094-IMG_0036.JPG",   // background foto untuk first-section (cover)
-  main: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/0805681d-719f-4fa2-82f3-da33a7610bae-IMG_0018.JPG",    // contoh: "photo/couple.jpg"
-  gate: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",    // contoh: "photo/couple.jpg"
-  auth: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",    // contoh: "photo/couple.jpg"
+  cover: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/header.JPG",
+  main: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/0805681d-719f-4fa2-82f3-da33a7610bae-IMG_0018.JPG",
+  gate: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",
+  auth: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",
 };
 
-// ── Terapkan foto ke cover, gate, auth, dan section foto ─────────────────────
 (function applyPhotoConfig() {
   const { cover, main, gate, auth } = PHOTO_CONFIG;
 
   if (cover) {
-    const el = document.getElementById('first-section');
-    el.style.backgroundImage = `url('${cover}')`;
-    el.classList.add('has-photo');
+    document.documentElement.style.setProperty('--cover-photo', `url('${cover}')`);
+    document.getElementById('first-section').classList.add('has-photo');
   }
 
   if (gate) {
@@ -577,26 +928,12 @@ const PHOTO_CONFIG = {
   }
 })();
 
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ── Inject @font-face dan terapkan ke CSS variables ───────────────────────────
 (function applyFontConfig() {
   const root  = document.documentElement;
   const rules = [];
+  const ROLE_VAR = { script: '--font-script', serif: '--font-serif', sans: '--font-sans' };
+  const GENERIC = { script: 'cursive', serif: 'serif', sans: 'sans-serif' };
 
-  const ROLE_VAR = {
-    script: '--font-script',
-    serif:  '--font-serif',
-    sans:   '--font-sans',
-  };
-
-  const GENERIC = {
-    script: 'cursive',
-    serif:  'serif',
-    sans:   'sans-serif',
-  };
-
-  // Deteksi format dari ekstensi file
   function mimeOf(path) {
     const ext = path.split('.').pop().toLowerCase();
     return { otf: 'opentype', ttf: 'truetype', woff: 'woff', woff2: 'woff2' }[ext] || 'opentype';
@@ -604,12 +941,8 @@ const PHOTO_CONFIG = {
 
   for (const [role, cfg] of Object.entries(FONT_CONFIG)) {
     if (cfg.file) {
-      // Ada file lokal → buat @font-face
-      rules.push(
-        `@font-face { font-family: '${cfg.family}'; src: url('${cfg.file}') format('${mimeOf(cfg.file)}'); font-display: swap; }`
-      );
+      rules.push(`@font-face { font-family: '${cfg.family}'; src: url('${cfg.file}') format('${mimeOf(cfg.file)}'); font-display: swap; }`);
     }
-    // Terapkan ke CSS variable (lokal atau Google Fonts — sama saja)
     root.style.setProperty(ROLE_VAR[role], `'${cfg.family}', ${GENERIC[role]}`);
   }
 
@@ -620,8 +953,6 @@ const PHOTO_CONFIG = {
   }
 })();
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 const P     = new URLSearchParams(location.search);
 const TOKEN = P.get('token');
 let guestName = '';
@@ -630,24 +961,19 @@ let authPassed = false;
 document.addEventListener('DOMContentLoaded', async () => {
   setLoading(true);
 
-  // 1. Tidak ada token → gate
   if (!TOKEN) { setLoading(false); showGate(); return; }
 
-  // 2. Pre-validate: cek HMAC + ambil nama untuk ditampilkan di auth overlay
   try {
     const r = await fetch('/api/pre-validate?token=' + TOKEN);
     const d = await r.json();
     if (!d.valid) { setLoading(false); showGate(); return; }
 
-    // Tampilkan nama di halaman auth
     document.getElementById('auth-guest-name').textContent = d.name;
     setLoading(false);
     showWaAuth();
-
   } catch(e) { setLoading(false); showGate(); }
 });
 
-// ── Tampilkan overlay auth WA ─────────────────────────────────────────────────
 function showWaAuth() {
   document.getElementById('wa-auth').classList.add('active');
   setTimeout(() => document.getElementById('auth-wa-input').focus(), 300);
@@ -661,7 +987,6 @@ function setLoading(v) {
   document.getElementById('loading').style.display = v ? 'flex' : 'none';
 }
 
-// ── Submit auth WA ────────────────────────────────────────────────────────────
 async function submitAuth() {
   const input = document.getElementById('auth-wa-input').value.replace(/\D/g, '');
   if (input.length !== 5) { toast('Masukkan tepat 5 digit'); return; }
@@ -679,13 +1004,11 @@ async function submitAuth() {
     const d = await r.json();
 
     if (d.valid) {
-      // Auth berhasil — tutup overlay dan muat undangan
       authPassed = true;
       guestName  = d.name;
       document.getElementById('wa-auth').classList.remove('active');
       loadInvitation(d.name, d.akad);
     } else {
-      // Salah WA
       errEl.classList.add('active');
       btn.disabled = false; btn.textContent = 'Buka Undangan';
       document.getElementById('auth-wa-input').value = '';
@@ -697,7 +1020,6 @@ async function submitAuth() {
   }
 }
 
-// ── Helper: tampilkan card Terima Kasih dengan pesan personal ─────────────────
 function showSuccess(response) {
   const tidakHadir = response === 'tidak-hadir';
   const labelMap = {
@@ -716,28 +1038,17 @@ function showSuccess(response) {
   document.getElementById('rsvp-ok').classList.add('active');
 }
 
-// ── Watermark: nama tamu sebagai pola diagonal berulang ──────────────────────
 function applyWatermark(name) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180">
-    <text
-      x="160" y="90"
-      text-anchor="middle"
-      dominant-baseline="middle"
-      transform="rotate(-35 160 90)"
-      font-family="Cormorant Garamond, serif"
-      font-size="22"
-      font-weight="600"
-      letter-spacing="3"
-      fill="#162035"
-    >${name}</text>
-  </svg>`;
+    <text x="160" y="90" text-anchor="middle" dominant-baseline="middle" transform="rotate(-35 160 90)"
+      font-family="Cormorant Garamond, serif" font-size="22" font-weight="600" letter-spacing="3" fill="#292F33"
+    >${name}</text></svg>`;
   const el = document.getElementById('watermark');
   el.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
   el.style.backgroundSize  = '320px 180px';
   el.style.display         = 'block';
 }
 
-// ── Muat konten undangan setelah auth berhasil ────────────────────────────────
 async function loadInvitation(name, akad) {
   document.getElementById('cover-guest').textContent = name;
   document.title = 'Undangan — ' + name;
@@ -746,19 +1057,18 @@ async function loadInvitation(name, akad) {
   document.getElementById('rsvp-name').value = name;
   applyWatermark(name);
 
-  // Cek status RSVP dari server
   try {
     const r = await fetch('/api/rsvp-status?token=' + TOKEN);
     const d = await r.json();
     if (d.submitted) showSuccess(d.response);
-  } catch(e) { /* abaikan, tampilkan form seperti biasa */ }
+  } catch(e) { }
 
   startCountdown();
   initReveal();
 }
 
 function startCountdown() {
-  const T   = new Date('2026-05-01T14:00:00+07:00').getTime();
+  const T   = new Date('2026-05-02T14:00:00+07:00').getTime();
   const pad = n => String(n).padStart(2,'0');
   function tick() {
     const diff = T - Date.now();
@@ -782,7 +1092,6 @@ function buildRsvpOpts(akad) {
     {v:'tidak-hadir', l:'🙁 Tidak Dapat Hadir'},
   ];
   const sel = document.getElementById('rsvp-opts');
-  // Clear dulu agar tidak duplikat jika dipanggil ulang
   sel.innerHTML = '<option value="">— Pilih konfirmasi kehadiran —</option>';
   opts.forEach(o => {
     const opt = document.createElement('option');
@@ -797,21 +1106,17 @@ async function submitRsvp() {
   const msg     = document.getElementById('rsvp-msg').value.trim();
   const selEl   = document.getElementById('rsvp-opts');
   const selVal  = selEl.value;
-  const selText = selEl.options[selEl.selectedIndex]?.text || '';
   const countEl = document.getElementById('rsvp-count');
   let count = countEl.value;
+
   if (!name)   { toast('Mohon isi nama Anda'); return; }
   if (!selVal) { toast('Mohon pilih konfirmasi kehadiran'); return; }
-  if (selVal !== 'tidak-hadir' && !count) {
-  toast('Mohon pilih jumlah orang');
-    return;
-  }
-  // auto set 0 kalau tidak hadir
-  if (selVal === 'tidak-hadir') {
-    count = 0;
-  }
+  if (selVal !== 'tidak-hadir' && !count) { toast('Mohon pilih jumlah orang'); return; }
+  if (selVal === 'tidak-hadir') count = 0;
+
   const btn = document.getElementById('rsvp-btn');
   btn.disabled = true; btn.textContent = 'Mengirim…';
+
   try {
     const r = await fetch('/api/rsvp', {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -820,8 +1125,16 @@ async function submitRsvp() {
     const d = await r.json();
     if (d.success) {
       showSuccess(selVal);
-    } else { toast(d.message||'Terjadi kesalahan.'); btn.disabled=false; btn.textContent='Kirim Konfirmasi'; }
-  } catch(e) { toast('Gagal mengirim. Periksa koneksi.'); btn.disabled=false; btn.textContent='Kirim Konfirmasi'; }
+    } else {
+      toast(d.message||'Terjadi kesalahan.');
+      btn.disabled=false;
+      btn.textContent='Kirim Konfirmasi';
+    }
+  } catch(e) {
+    toast('Gagal mengirim. Periksa koneksi.');
+    btn.disabled=false;
+    btn.textContent='Kirim Konfirmasi';
+  }
 }
 
 function toast(msg) {
