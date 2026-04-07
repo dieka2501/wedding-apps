@@ -208,6 +208,7 @@
     }
 
     /* Wave overlay - right edge of batik, desktop only */
+    /* Color = #151d45 blended with gradient overlay (~0.55 alpha) at batik right edge */
     .cover-batik-wave{
       position:absolute;
       left:calc(clamp(.35rem, 1.4vw, 1.25rem) + clamp(18rem, 34vw, 27rem) - 2rem);
@@ -216,6 +217,7 @@
       height:clamp(15rem, 38vh, 24rem);
       z-index:5;
       pointer-events:none;
+      color:#0c122d;
     }
     .cover-batik-wave svg{
       display:block;
@@ -665,6 +667,29 @@
       .event-cards{flex-direction:row}
       .event-card{flex:1}
     }
+
+    /* ── TABLET (769–1100px) ─────────────────────────────────────────── */
+    @media(min-width:769px) and (max-width:1100px){
+      /* Foto lebih besar, ~50% lebar layar */
+      #first-section::before{
+        background-size:50vw auto;
+        background-position:calc(100% - clamp(.25rem,1.4vw,1.2rem)) 28%;
+      }
+      /* Teks sedikit lebih lebar untuk balance */
+      .cc{
+        width:min(40vw,24rem);
+      }
+      /* Batik proporsional */
+      .cover-batik{
+        width:clamp(14rem,36vw,20rem);
+        height:clamp(12rem,34vh,18rem);
+      }
+      /* Wave mengikuti ukuran batik */
+      .cover-batik-wave{
+        left:calc(clamp(.35rem,1.4vw,1.25rem) + clamp(14rem,36vw,20rem) - 2rem);
+        height:clamp(12rem,34vh,18rem);
+      }
+    }
   </style>
 </head>
 <body>
@@ -720,7 +745,7 @@
   <div class="cover-batik" aria-hidden="true"></div>
   <div class="cover-batik-wave" aria-hidden="true">
     <svg preserveAspectRatio="none" viewBox="0 0 60 100" xmlns="http://www.w3.org/2000/svg">
-      <path d="M 30 0 Q 0 10 30 20 Q 60 30 30 40 Q 0 50 30 60 Q 60 70 30 80 Q 0 90 30 100 L 60 100 L 60 0 Z" fill="#151d45"/>
+      <path d="M 30 0 Q 0 10 30 20 Q 60 30 30 40 Q 0 50 30 60 Q 60 70 30 80 Q 0 90 30 100 L 60 100 L 60 0 Z" fill="currentColor"/>
     </svg>
   </div>
   <div class="cc">
