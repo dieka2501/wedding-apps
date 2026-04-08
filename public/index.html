@@ -499,8 +499,8 @@
       background-size:1200px auto;
       background-position:right bottom;
       /* multiply bekerja dengan warna GELAP — brightness rendah agar navy tampak */
-      filter:sepia(1) saturate(2.5) hue-rotate(192deg) brightness(0.6);
-      opacity:0.7;
+      filter:sepia(1) saturate(5) hue-rotate(192deg) brightness(0.45);
+      opacity:0.85;
       z-index:0;
       border-radius:0;
       mask-image:radial-gradient(ellipse 80% 80% at 62% 58%, black 25%, rgba(0,0,0,0.6) 50%, transparent 75%);
@@ -724,15 +724,15 @@
       /* & tidak dirotasi, cukup tampil di antara dua kartu */
       .c-and{transform:rotate(0deg);text-align:left;opacity:.25;font-size:2.5rem}
 
-      /* Mobile: mix-blend-mode normal, brightness sedang agar navy terlihat jelas */
+      /* Mobile: mix-blend-mode normal, warna navy pekat & kontras */
       .couple-batik-right-deco{
         width:clamp(11rem,55vw,18rem);
         height:clamp(11rem,55vw,18rem);
         right:-1rem;
         bottom:2rem;
         mix-blend-mode:normal;
-        filter:sepia(1) saturate(2.5) hue-rotate(192deg) brightness(0.75);
-        opacity:0.55;
+        filter:sepia(1) saturate(5) hue-rotate(192deg) brightness(0.5);
+        opacity:0.75;
       }
 
       .cd-grid{grid-template-columns:repeat(2,1fr)}
