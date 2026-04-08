@@ -672,12 +672,31 @@
       .photo-split-img{min-height:65vw}
       .photo-split-body{align-items:center;text-align:center;padding:3rem 2rem}
       .ps-rule{margin:1.75rem auto}
-      /* Couple section stack on mobile */
+
+      /* ── Couple section: stack vertikal ── */
       #couple{grid-template-columns:1fr}
       .couple-photo-left{min-height:65vw}
-      .couple-info-right{padding:3rem 1.5rem}
-      .couple-cards{grid-template-columns:1fr}
-      .c-and{transform:rotate(0deg)}
+
+      /* Teks rata kiri agar tidak menumpuk dengan batik di kanan */
+      .couple-info-right{
+        padding:2.5rem 1.5rem 5rem;
+        align-items:flex-start;
+      }
+      .couple-info-right .s-label{text-align:left}
+      .couple-cards{grid-template-columns:1fr;gap:.5rem}
+      .couple-card{text-align:left}
+      .c-and{transform:rotate(0deg);text-align:left;opacity:.25}
+
+      /* Batik: posisi pojok kanan bawah, tidak makan area teks */
+      .couple-batik-right-deco{
+        width:clamp(11rem,55vw,18rem);
+        height:clamp(11rem,55vw,18rem);
+        right:-1rem;
+        bottom:2rem;
+        /* Brightness seperti cover section */
+        filter:sepia(1) saturate(6) hue-rotate(170deg) brightness(1.4);
+        opacity:0.38;
+      }
     }
     
     @media(max-width:768px){
