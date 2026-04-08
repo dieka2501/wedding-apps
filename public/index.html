@@ -596,24 +596,19 @@
       background:linear-gradient(135deg,rgba(185,165,131,.9) 0%,rgba(41,47,51,.8) 100%);
       backdrop-filter:blur(2px);
     }
-    #gate::after{
-      content:'';position:absolute;inset:0;
-      background-image:url('/batik.png');
-      background-repeat:repeat;
-      background-size:260px auto;
-      opacity:.15;
-      z-index:1;
-      filter:sepia(1) saturate(8) hue-rotate(340deg) brightness(1.08);
-    }
     #gate.has-photo .gate-inner{z-index:2}
-    .gate-inner{position:relative;width:100%;height:100%;z-index:2}
-    .gate-bride{position:absolute;top:1.5rem;left:0;font-family:var(--font-script);font-size:clamp(5rem,20vw,11rem);color:var(--orange);line-height:1;animation:gfade 1s ease .1s both}
+    .gate-inner{
+      position:relative;width:100%;height:100%;z-index:2;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+    }
+    .gate-bride{font-family:var(--font-script);font-size:clamp(4rem,16vw,9rem);color:var(--orange);line-height:1.1;text-align:center;animation:gfade 1s ease .1s both}
     #gate.has-photo .gate-bride{color:var(--pure)}
-    .gate-amp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-script);font-size:clamp(3rem,12vw,7rem);color:var(--orange);opacity:.2;animation:gfade 1s ease .5s both}
+    .gate-amp{font-family:var(--font-script);font-size:clamp(2.5rem,9vw,5rem);color:var(--orange);opacity:.3;line-height:1.2;text-align:center;animation:gfade 1s ease .5s both}
     #gate.has-photo .gate-amp{color:var(--pure);opacity:.3}
-    .gate-groom{position:absolute;bottom:6rem;right:0;font-family:var(--font-script);font-size:clamp(5rem,20vw,11rem);color:var(--orange);line-height:1;animation:gfade 1s ease .9s both}
+    .gate-groom{font-family:var(--font-script);font-size:clamp(4rem,16vw,9rem);color:var(--orange);line-height:1.1;text-align:center;animation:gfade 1s ease .9s both}
     #gate.has-photo .gate-groom{color:var(--pure)}
-    .gate-msg{position:absolute;bottom:2.5rem;left:0;color:var(--navy);font-size:.75rem;letter-spacing:.18em;line-height:2.2;opacity:.6;animation:gfade 1s ease 1.2s both}
+    .gate-msg{position:absolute;bottom:2.5rem;left:0;right:0;text-align:center;color:var(--navy);font-size:.75rem;letter-spacing:.18em;line-height:2.2;opacity:.6;animation:gfade 1s ease 1.2s both}
     #gate.has-photo .gate-msg{color:var(--pure);opacity:.8}
     @keyframes gfade{from{opacity:0}to{opacity:1}}
 
