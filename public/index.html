@@ -451,18 +451,46 @@
       background:var(--navy);
     }
 
-    /* Wave mask di atas foto — mengikuti kurva wave dari section intro */
-    /* Bezier Q300,100 600,60 → titik-titik: 0%=50%, 25%=62.5%, 50%=66.7%, 75%=62.5%, 100%=50% */
+    /* Gradient fade dari kiri — menyatu dengan background navy */
     .couple-photo-left::before{
       content:'';
       position:absolute;
       top:0;left:0;
       width:100%;
-      height:120px;
-      background:var(--beige);
-      clip-path:polygon(0 0,100% 0,100% 50%,75% 62.5%,50% 66.7%,25% 62.5%,0 50%);
+      height:100%;
+      background:
+        linear-gradient(to right, var(--navy) 0%, rgba(21,29,69,0.6) 28%, rgba(21,29,69,0) 58%),
+        linear-gradient(to bottom, var(--navy) 0%, rgba(21,29,69,0.4) 18%, rgba(21,29,69,0) 40%);
       z-index:2;
       pointer-events:none;
+    }
+
+    /* Blob organik beige di bawah-kiri — menyatu dengan background section */
+    .couple-photo-left::after{
+      content:'';
+      position:absolute;
+      bottom:-3rem;
+      left:-4rem;
+      width:68%;
+      height:48%;
+      background:var(--beige);
+      border-radius:58% 42% 35% 65% / 45% 58% 42% 55%;
+      z-index:3;
+      pointer-events:none;
+    }
+
+    /* Orange accent blob di pojok atas foto */
+    .photo-blob-orange{
+      position:absolute;
+      top:-1rem;
+      right:-0.5rem;
+      width:clamp(3.5rem,6vw,5.5rem);
+      height:clamp(4.5rem,8vw,7rem);
+      background:var(--orange);
+      border-radius:40% 60% 55% 45% / 58% 42% 58% 42%;
+      z-index:4;
+      pointer-events:none;
+      opacity:0.9;
     }
 
     .couple-photo-left img{
@@ -487,20 +515,22 @@
     /* Hanya .reveal yang di-stack di atas — bukan semua child */
     .couple-info-right > .reveal{position:relative;z-index:1}
 
-    /* Batik biru dekoratif di pojok kanan bawah */
+    /* Batik biru dekoratif di pojok kanan bawah — scattered look */
     .couple-batik-right-deco{
       position:absolute;
-      right:-2rem;
-      bottom:-1rem;
-      width:clamp(12rem,20vw,18rem);
-      height:clamp(12rem,20vw,18rem);
+      right:-3rem;
+      bottom:-2rem;
+      width:clamp(16rem,28vw,24rem);
+      height:clamp(16rem,28vw,24rem);
       background-image:url('/batik.png');
       background-repeat:repeat;
-      background-size:260px auto;
-      filter:sepia(1) saturate(6) hue-rotate(170deg) brightness(.72);
-      opacity:0.5;
+      background-size:220px auto;
+      filter:sepia(1) saturate(6) hue-rotate(170deg) brightness(.68);
+      opacity:0.55;
       z-index:0;
-      border-radius:46% 54% 50% 50%;
+      border-radius:0;
+      mask-image:radial-gradient(ellipse 80% 80% at 62% 58%, black 25%, rgba(0,0,0,0.6) 50%, transparent 75%);
+      -webkit-mask-image:radial-gradient(ellipse 80% 80% at 62% 58%, black 25%, rgba(0,0,0,0.6) 50%, transparent 75%);
       pointer-events:none;
       mix-blend-mode:multiply;
     }
@@ -853,6 +883,7 @@
 <div id="couple">
   <!-- Kiri: foto mempelai -->
   <div class="couple-photo-left">
+    <div class="photo-blob-orange" aria-hidden="true"></div>
     <img id="photo-main" src="" alt="Foto Putri &amp; Dikdik" />
   </div>
   <!-- Kanan: info mempelai + dekorasi batik biru -->
