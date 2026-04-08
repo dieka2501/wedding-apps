@@ -451,7 +451,7 @@
       background:var(--navy);
     }
 
-    /* Gradient fade dari kiri — menyatu dengan background navy */
+    /* Gradient fade ke kanan — foto menyatu dengan panel info di sisi kanan */
     .couple-photo-left::before{
       content:'';
       position:absolute;
@@ -459,38 +459,9 @@
       width:100%;
       height:100%;
       background:
-        linear-gradient(to right, var(--navy) 0%, rgba(21,29,69,0.6) 28%, rgba(21,29,69,0) 58%),
-        linear-gradient(to bottom, var(--navy) 0%, rgba(21,29,69,0.4) 18%, rgba(21,29,69,0) 40%);
+        linear-gradient(to left, rgba(21,29,69,0.85) 0%, rgba(21,29,69,0.35) 30%, rgba(21,29,69,0) 55%);
       z-index:2;
       pointer-events:none;
-    }
-
-    /* Blob organik beige di bawah-kiri — menyatu dengan background section */
-    .couple-photo-left::after{
-      content:'';
-      position:absolute;
-      bottom:-3rem;
-      left:-4rem;
-      width:68%;
-      height:48%;
-      background:var(--beige);
-      border-radius:58% 42% 35% 65% / 45% 58% 42% 55%;
-      z-index:3;
-      pointer-events:none;
-    }
-
-    /* Orange accent blob di pojok atas foto */
-    .photo-blob-orange{
-      position:absolute;
-      top:-1rem;
-      right:-0.5rem;
-      width:clamp(3.5rem,6vw,5.5rem);
-      height:clamp(4.5rem,8vw,7rem);
-      background:var(--orange);
-      border-radius:40% 60% 55% 45% / 58% 42% 58% 42%;
-      z-index:4;
-      pointer-events:none;
-      opacity:0.9;
     }
 
     .couple-photo-left img{
@@ -881,7 +852,6 @@
 <div id="couple">
   <!-- Kiri: foto mempelai -->
   <div class="couple-photo-left">
-    <div class="photo-blob-orange" aria-hidden="true"></div>
     <img id="photo-main" src="" alt="Foto Putri &amp; Dikdik" />
   </div>
   <!-- Kanan: info mempelai + dekorasi batik biru -->
