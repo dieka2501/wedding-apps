@@ -194,7 +194,7 @@
       height:clamp(15rem, 38vh, 24rem);
       background:var(--orange);
       opacity:1;
-      z-index:1;
+      z-index:4;
       pointer-events:none;
       -webkit-mask-image:url('/batik.png');
       mask-image:url('/batik.png');
@@ -204,6 +204,25 @@
       mask-size:1200px auto;
       -webkit-mask-position:left bottom;
       mask-position:left bottom;
+      filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(201,97,26,.25));
+    }
+
+    /* Wave overlay - right edge of batik, desktop only */
+    /* Color = #151d45 blended with gradient overlay (~0.55 alpha) at batik right edge */
+    .cover-batik-wave{
+      position:absolute;
+      left:calc(clamp(.35rem, 1.4vw, 1.25rem) + clamp(18rem, 34vw, 27rem) - 2rem);
+      bottom:0;
+      width:4.5rem;
+      height:clamp(15rem, 38vh, 24rem);
+      z-index:5;
+      pointer-events:none;
+      color:#0c122d;
+    }
+    .cover-batik-wave svg{
+      display:block;
+      width:100%;
+      height:100%;
     }
     
     /* Wave divider - SOLID ORANGE */
@@ -414,37 +433,86 @@
       border-radius:50%;
     }
 
-    /* ── COUPLE SECTION ──────────────────────────────────────────────── */
-    #couple{background:var(--beige);position:relative}
-    .couple-verse{
-      font-family:var(--font-serif);
-      font-style:italic;
-      font-size:1.05rem;
-      text-align:center;
-      color:var(--navy);
-      opacity:.8;
-      padding:1.75rem 2rem;
-      border-top:1px solid var(--orange);
-      border-bottom:1px solid var(--orange);
-      margin-bottom:3rem;
-      line-height:1.9
+    /* ── COUPLE SECTION (foto kiri + info+batik kanan) ──────────────── */
+    #couple{
+      background:var(--beige);
+      position:relative;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      min-height:80vh;
+      padding:0;          /* override .sec */
+      overflow:hidden;
     }
-    .couple-verse cite{
+
+    .couple-photo-left{
+      position:relative;
+      overflow:hidden;
+      min-height:50vh;
+      background:var(--navy);
+    }
+
+    /* Wave mask di atas foto — mengikuti kurva wave dari section intro */
+    /* Bezier Q300,100 600,60 → titik-titik: 0%=50%, 25%=62.5%, 50%=66.7%, 75%=62.5%, 100%=50% */
+    .couple-photo-left::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;
+      width:100%;
+      height:120px;
+      background:var(--beige);
+      clip-path:polygon(0 0,100% 0,100% 50%,75% 62.5%,50% 66.7%,25% 62.5%,0 50%);
+      z-index:2;
+      pointer-events:none;
+    }
+
+    .couple-photo-left img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center top;
       display:block;
-      margin-top:.75rem;
-      font-size:.73rem;
-      letter-spacing:.12em;
-      font-style:normal;
-      color:var(--orange);
-      opacity:.7
     }
-    .couple-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center}
+
+    .couple-photo-left img[src=""]{display:none}
+
+    .couple-info-right{
+      padding:clamp(3rem,6vw,5rem) clamp(2rem,4vw,3.5rem);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* Hanya .reveal yang di-stack di atas — bukan semua child */
+    .couple-info-right > .reveal{position:relative;z-index:1}
+
+    /* Batik biru dekoratif di pojok kanan bawah */
+    .couple-batik-right-deco{
+      position:absolute;
+      right:-2rem;
+      bottom:-1rem;
+      width:clamp(12rem,20vw,18rem);
+      height:clamp(12rem,20vw,18rem);
+      background-image:url('/batik.png');
+      background-repeat:repeat;
+      background-size:260px auto;
+      filter:sepia(1) saturate(6) hue-rotate(170deg) brightness(.72);
+      opacity:0.5;
+      z-index:0;
+      border-radius:46% 54% 50% 50%;
+      pointer-events:none;
+      mix-blend-mode:multiply;
+    }
+
+    .couple-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin-top:1.5rem}
     .couple-card{text-align:center}
     .c-role{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.5;margin-bottom:.6rem}
-    .c-name{font-family:var(--font-script);font-size:2.6rem;color:var(--orange);line-height:1.2}
-    .c-fullname{font-family:var(--font-serif);font-size:.85rem;color:var(--navy);margin-top:.25rem;opacity:.8}
-    .c-parents{font-size:.78rem;color:var(--navy);margin-top:.5rem;line-height:1.7;opacity:.7}
-    .c-and{font-family:var(--font-script);font-size:3rem;color:var(--orange);opacity:.3;text-align:center}
+    /* Nama lebih besar & responsive untuk desktop/tablet */
+    .c-name{font-family:var(--font-script);font-size:clamp(2.6rem,4.5vw,4.8rem);color:var(--orange);line-height:1.2}
+    .c-fullname{font-family:var(--font-serif);font-size:clamp(.85rem,1.2vw,1.05rem);color:var(--navy);margin-top:.25rem;opacity:.8}
+    .c-parents{font-size:clamp(.78rem,1.1vw,.95rem);color:var(--navy);margin-top:.5rem;line-height:1.7;opacity:.7}
+    .c-and{font-family:var(--font-script);font-size:clamp(3rem,5vw,4.5rem);color:var(--orange);opacity:.3;text-align:center}
 
     /* ── COUNTDOWN SECTION ───────────────────────────────────────────── */
     #countdown{background:var(--tan);position:relative}
@@ -598,6 +666,12 @@
       .photo-split-img{min-height:65vw}
       .photo-split-body{align-items:center;text-align:center;padding:3rem 2rem}
       .ps-rule{margin:1.75rem auto}
+      /* Couple section stack on mobile */
+      #couple{grid-template-columns:1fr}
+      .couple-photo-left{min-height:65vw}
+      .couple-info-right{padding:3rem 1.5rem}
+      .couple-cards{grid-template-columns:1fr}
+      .c-and{transform:rotate(0deg)}
     }
     
     @media(max-width:768px){
@@ -623,7 +697,17 @@
       .c-guest{text-align:left;font-size:clamp(2rem, 8vw, 3rem)}
       .c-guest-tag{text-align:left;max-width:100%}
       
-      .cover-batik{display:none}
+      .cover-batik{
+        display:block;
+        left:0;
+        width:clamp(9rem, 36vw, 13rem);
+        height:clamp(9rem, 26vh, 13rem);
+        -webkit-mask-size:800px auto;
+        mask-size:800px auto;
+        filter:brightness(1.45) saturate(1.3);
+        z-index:5;
+      }
+      .cover-batik-wave{display:none}
       
       #intro .sec-inner{
         padding-left:2rem;
@@ -637,6 +721,39 @@
     @media(min-width:600px){
       .event-cards{flex-direction:row}
       .event-card{flex:1}
+    }
+
+    /* ── TABLET (769–1100px) ─────────────────────────────────────────── */
+    /* Sama seperti mobile: foto cover full-background, teks overlay kiri   */
+    @media(min-width:769px) and (max-width:1100px){
+      /* Foto full-cover seperti mobile */
+      #first-section::before{
+        background-size:cover;
+        background-position:center;
+      }
+      /* Gradient kiri lebih kuat agar teks terbaca di atas foto */
+      #first-section::after{
+        background:
+          linear-gradient(90deg, rgba(6,10,28,.88) 0%, rgba(6,10,28,.72) 32%, rgba(6,10,28,.3) 56%, rgba(6,10,28,0) 74%),
+          linear-gradient(180deg, rgba(6,10,28,.15) 0%, rgba(6,10,28,0) 28%, rgba(6,10,28,.28) 100%);
+      }
+      /* Teks column lebih lebar dari mobile */
+      .cc{
+        width:min(52vw,28rem);
+      }
+      /* Batik proporsional untuk tablet */
+      .cover-batik{
+        display:block;
+        left:0;
+        width:clamp(12rem,38vw,20rem);
+        height:clamp(10rem,28vh,16rem);
+        -webkit-mask-size:1000px auto;
+        mask-size:1000px auto;
+        filter:brightness(1.45) saturate(1.3);
+        z-index:5;
+      }
+      /* Wave disembunyikan — gradient jadi transisi natural */
+      .cover-batik-wave{display:none}
     }
   </style>
 </head>
@@ -691,6 +808,11 @@
 <!-- FIRST SECTION (COVER) -->
 <section id="first-section" class="pattern-1">
   <div class="cover-batik" aria-hidden="true"></div>
+  <div class="cover-batik-wave" aria-hidden="true">
+    <svg preserveAspectRatio="none" viewBox="0 0 60 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 30 0 Q 0 10 30 20 Q 60 30 30 40 Q 0 50 30 60 Q 60 70 30 80 Q 0 90 30 100 L 60 100 L 60 0 Z" fill="currentColor"/>
+    </svg>
+  </div>
   <div class="cc">
     <p class="c-to">Kepada Yang Terhormat</p>
     <h1 class="c-guest" id="cover-guest">Tamu Undangan</h1>
@@ -719,41 +841,25 @@
       <p>— DK</p>
     </div>
   </div>
-</div>
-
-<!-- PHOTO SECTION -->
-<div id="photo-section" style="display:none">
-  <div class="photo-split">
-    <div class="photo-split-img">
-      <img id="photo-main" src="" alt="Foto Putri &amp; Dikdik" />
-    </div>
-    <div class="photo-split-body">
-      <p class="ps-label">Kami Menikah</p>
-      <div class="ps-title">Putri &amp; Dikdik</div>
-      <div class="ps-rule"></div>
-      <p class="ps-date">Sabtu, 2 Mei 2026</p>
-      <p class="ps-venue">
-        Kampoeng Percik — Prosesi Pernikahan<br>
-        Hotel Wahid Prime — Resepsi
-      </p>
-      <div class="ps-rule"></div>
-      <p class="ps-quote">"Pada akhir cinta hanyalah satu dari banyak<br>bagian dalam perjalanan hidup"</p>
-    </div>
+  <!-- Wave ke section 3 (beige) -->
+  <div class="section-divider" aria-hidden="true">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M0,60 Q300,100 600,60 T1200,60 L1200,120 L0,120 Z" style="fill:#CEC4B6"/>
+    </svg>
   </div>
 </div>
 
-<!-- COUPLE SECTION -->
-<div id="couple" class="sec">
-  <div class="batik-block batik-navy couple-batik" aria-hidden="true"></div>
-  <div class="sec-inner">
+<!-- COUPLE SECTION: foto kiri + info+batik kanan -->
+<div id="couple">
+  <!-- Kiri: foto mempelai -->
+  <div class="couple-photo-left">
+    <img id="photo-main" src="" alt="Foto Putri &amp; Dikdik" />
+  </div>
+  <!-- Kanan: info mempelai + dekorasi batik biru -->
+  <div class="couple-info-right">
+    <div class="couple-batik-right-deco" aria-hidden="true"></div>
     <div class="reveal">
-      <p class="s-label">Mempelai</p>
-      <h2 class="s-title">Dua jiwa, satu <em>perjalanan</em></h2>
-      <div class="s-rule"></div>
-      <blockquote class="couple-verse">
-        "Pada akhir cinta hanyalah satu dari banyak bagian dalam perjalanan hidup"
-        <cite>— DK</cite>
-      </blockquote>
+      <p class="s-label" style="text-align:center">Mempelai</p>
       <div class="couple-cards">
         <div class="couple-card">
           <p class="c-role">Mempelai Wanita</p>
@@ -923,8 +1029,8 @@ const PHOTO_CONFIG = {
   }
 
   if (main) {
-    document.getElementById('photo-main').src = main;
-    document.getElementById('photo-section').style.display = 'block';
+    const photoEl = document.getElementById('photo-main');
+    if (photoEl) photoEl.src = main;
   }
 })();
 
