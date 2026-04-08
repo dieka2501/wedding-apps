@@ -487,16 +487,17 @@
     /* Hanya .reveal yang di-stack di atas — bukan semua child */
     .couple-info-right > .reveal{position:relative;z-index:1}
 
-    /* Batik biru dekoratif di pojok kanan bawah — scattered look */
+    /* Batik biru dekoratif di pojok kanan bawah — ukuran motif sama dengan cover */
     .couple-batik-right-deco{
       position:absolute;
-      right:-3rem;
+      right:-2rem;
       bottom:-2rem;
-      width:clamp(16rem,28vw,24rem);
-      height:clamp(16rem,28vw,24rem);
+      width:clamp(20rem,38vw,32rem);
+      height:clamp(20rem,38vw,32rem);
       background-image:url('/batik.png');
       background-repeat:repeat;
-      background-size:220px auto;
+      background-size:1200px auto;
+      background-position:right bottom;
       filter:sepia(1) saturate(6) hue-rotate(170deg) brightness(.68);
       opacity:0.55;
       z-index:0;
