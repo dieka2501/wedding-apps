@@ -433,31 +433,63 @@
       border-radius:50%;
     }
 
-    /* ── COUPLE SECTION ──────────────────────────────────────────────── */
-    #couple{background:var(--beige);position:relative}
-    .couple-verse{
-      font-family:var(--font-serif);
-      font-style:italic;
-      font-size:1.05rem;
-      text-align:center;
-      color:var(--navy);
-      opacity:.8;
-      padding:1.75rem 2rem;
-      border-top:1px solid var(--orange);
-      border-bottom:1px solid var(--orange);
-      margin-bottom:3rem;
-      line-height:1.9
+    /* ── COUPLE SECTION (foto kiri + info+batik kanan) ──────────────── */
+    #couple{
+      background:var(--beige);
+      position:relative;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      min-height:80vh;
+      padding:0;          /* override .sec */
+      overflow:hidden;
     }
-    .couple-verse cite{
+
+    .couple-photo-left{
+      position:relative;
+      overflow:hidden;
+      min-height:50vh;
+      background:var(--navy);
+    }
+
+    .couple-photo-left img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center top;
       display:block;
-      margin-top:.75rem;
-      font-size:.73rem;
-      letter-spacing:.12em;
-      font-style:normal;
-      color:var(--orange);
-      opacity:.7
     }
-    .couple-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center}
+
+    .couple-photo-left img[src=""]{display:none}
+
+    .couple-info-right{
+      padding:clamp(3rem,6vw,5rem) clamp(2rem,4vw,3.5rem);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .couple-info-right > *{position:relative;z-index:1}
+
+    /* Batik biru dekoratif di pojok kanan bawah */
+    .couple-batik-right-deco{
+      position:absolute;
+      right:-2rem;
+      bottom:-1rem;
+      width:clamp(10rem,18vw,16rem);
+      height:clamp(10rem,18vw,16rem);
+      background-image:url('/batik.png');
+      background-repeat:repeat;
+      background-size:260px auto;
+      filter:sepia(1) saturate(6) hue-rotate(170deg) brightness(.82);
+      opacity:0.28;
+      z-index:0;
+      border-radius:46% 54% 50% 50%;
+      pointer-events:none;
+    }
+
+    .couple-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin-top:1.5rem}
     .couple-card{text-align:center}
     .c-role{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.5;margin-bottom:.6rem}
     .c-name{font-family:var(--font-script);font-size:2.6rem;color:var(--orange);line-height:1.2}
@@ -617,6 +649,12 @@
       .photo-split-img{min-height:65vw}
       .photo-split-body{align-items:center;text-align:center;padding:3rem 2rem}
       .ps-rule{margin:1.75rem auto}
+      /* Couple section stack on mobile */
+      #couple{grid-template-columns:1fr}
+      .couple-photo-left{min-height:65vw}
+      .couple-info-right{padding:3rem 1.5rem}
+      .couple-cards{grid-template-columns:1fr}
+      .c-and{transform:rotate(0deg)}
     }
     
     @media(max-width:768px){
@@ -786,41 +824,25 @@
       <p>— DK</p>
     </div>
   </div>
-</div>
-
-<!-- PHOTO SECTION -->
-<div id="photo-section" style="display:none">
-  <div class="photo-split">
-    <div class="photo-split-img">
-      <img id="photo-main" src="" alt="Foto Putri &amp; Dikdik" />
-    </div>
-    <div class="photo-split-body">
-      <p class="ps-label">Kami Menikah</p>
-      <div class="ps-title">Putri &amp; Dikdik</div>
-      <div class="ps-rule"></div>
-      <p class="ps-date">Sabtu, 2 Mei 2026</p>
-      <p class="ps-venue">
-        Kampoeng Percik — Prosesi Pernikahan<br>
-        Hotel Wahid Prime — Resepsi
-      </p>
-      <div class="ps-rule"></div>
-      <p class="ps-quote">"Pada akhir cinta hanyalah satu dari banyak<br>bagian dalam perjalanan hidup"</p>
-    </div>
+  <!-- Wave ke section 3 (beige) -->
+  <div class="section-divider" aria-hidden="true">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M0,60 Q300,100 600,60 T1200,60 L1200,120 L0,120 Z" style="fill:#CEC4B6"/>
+    </svg>
   </div>
 </div>
 
-<!-- COUPLE SECTION -->
-<div id="couple" class="sec">
-  <div class="batik-block batik-navy couple-batik" aria-hidden="true"></div>
-  <div class="sec-inner">
+<!-- COUPLE SECTION: foto kiri + info+batik kanan -->
+<div id="couple">
+  <!-- Kiri: foto mempelai -->
+  <div class="couple-photo-left">
+    <img id="photo-main" src="" alt="Foto Putri &amp; Dikdik" />
+  </div>
+  <!-- Kanan: info mempelai + dekorasi batik biru -->
+  <div class="couple-info-right">
+    <div class="couple-batik-right-deco" aria-hidden="true"></div>
     <div class="reveal">
-      <p class="s-label">Mempelai</p>
-      <h2 class="s-title">Dua jiwa, satu <em>perjalanan</em></h2>
-      <div class="s-rule"></div>
-      <blockquote class="couple-verse">
-        "Pada akhir cinta hanyalah satu dari banyak bagian dalam perjalanan hidup"
-        <cite>— DK</cite>
-      </blockquote>
+      <p class="s-label" style="text-align:center">Mempelai</p>
       <div class="couple-cards">
         <div class="couple-card">
           <p class="c-role">Mempelai Wanita</p>
@@ -990,8 +1012,8 @@ const PHOTO_CONFIG = {
   }
 
   if (main) {
-    document.getElementById('photo-main').src = main;
-    document.getElementById('photo-section').style.display = 'block';
+    const photoEl = document.getElementById('photo-main');
+    if (photoEl) photoEl.src = main;
   }
 })();
 
