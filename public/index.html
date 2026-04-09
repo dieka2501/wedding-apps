@@ -517,18 +517,19 @@
     .countdown-batik-deco{
       position:absolute;
       right:-2rem;
-      bottom:-2rem;
+      top:-2rem;
+      bottom:auto;
       width:clamp(20rem,38vw,32rem);
       height:clamp(20rem,38vw,32rem);
       background:#111737;
-      -webkit-mask-image:url('/batik.png'), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:url('/batik.png'), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      -webkit-mask-image:url('/batik.png'), radial-gradient(ellipse 85% 100% at 65% 10%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      mask-image:url('/batik.png'), radial-gradient(ellipse 85% 100% at 65% 10%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
       -webkit-mask-repeat:repeat, no-repeat;
       mask-repeat:repeat, no-repeat;
       -webkit-mask-size:1200px auto, 100% 100%;
       mask-size:1200px auto, 100% 100%;
-      -webkit-mask-position:right bottom, center;
-      mask-position:right bottom, center;
+      -webkit-mask-position:right top, center;
+      mask-position:right top, center;
       -webkit-mask-composite:source-in;
       mask-composite:intersect;
       filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(17,23,55,.35));
@@ -787,6 +788,16 @@
         height:clamp(22rem,80vh,22rem);
         right:-1rem;
         bottom:2rem;
+        -webkit-mask-size:600px auto, 100% 100%;
+        mask-size:600px auto, 100% 100%;
+      }
+
+      .countdown-batik-deco{
+        width:clamp(11rem,55vw,18rem);
+        height:clamp(10rem,35vh,14rem);
+        right:-1rem;
+        top:0;
+        bottom:auto;
         -webkit-mask-size:600px auto, 100% 100%;
         mask-size:600px auto, 100% 100%;
       }
