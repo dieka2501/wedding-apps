@@ -520,7 +520,7 @@
     .c-name{font-family:var(--font-script);font-size:clamp(2.6rem,4.5vw,4.8rem);color:var(--orange);line-height:1.2}
     .c-fullname{font-family:var(--font-serif);font-size:clamp(.85rem,1.2vw,1.05rem);color:var(--navy);margin-top:.25rem;opacity:.8}
     .c-parents{font-size:clamp(.78rem,1.1vw,.95rem);color:var(--navy);margin-top:.5rem;line-height:1.7;opacity:.7}
-    .c-and{font-family:var(--font-script);font-size:clamp(3rem,5vw,4.5rem);color:var(--orange);opacity:.3;text-align:center}
+    .c-and{font-family:var(--font-script);font-size:clamp(3rem,5vw,4.5rem);color:var(--orange);opacity:.8;text-align:center}
 
     /* Wave di couple section harus di atas grid content */
     #couple .section-divider{z-index:6}
@@ -561,11 +561,23 @@
     .rsvp-success-icon{font-size:2.5rem;margin-bottom:1rem}
     .rsvp-success h3{font-family:var(--font-serif);font-size:1.8rem;color:var(--navy);margin-bottom:.5rem}
 
+    /* ── CLOSING PHOTO SECTION ──────────────────────────────────────── */
+    #closing-photo{background:#151d45;position:relative;overflow:hidden;min-height:80vh}
+    .closing-photo-wrap{position:relative;width:100%;min-height:80vh}
+    .closing-photo-wrap::before{
+      content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+      background:
+        linear-gradient(to right,  #151d45 0%, transparent 22%, transparent 78%, #151d45 100%),
+        linear-gradient(to bottom, #151d45 0%, transparent 18%, transparent 76%, #151d45 100%);
+    }
+    .closing-photo-wrap img{width:100%;min-height:80vh;object-fit:cover;object-position:center top;display:block}
+    .closing-photo-wrap img[src=""]{display:none}
+
     /* ── FOOTER ──────────────────────────────────────────────────────── */
-    footer{background:var(--beige);text-align:center;padding:3rem 1.5rem;position:relative;overflow:hidden;isolation:isolate}
+    footer{background:#151d45;text-align:center;padding:3rem 1.5rem;position:relative;overflow:hidden;isolation:isolate}
     footer>*{position:relative;z-index:1}
     .f-names{font-family:var(--font-script);font-size:2.5rem;color:var(--orange);margin-bottom:.5rem}
-    footer p{font-size:.65rem;letter-spacing:.15em;color:var(--navy);opacity:.5}
+    footer p{font-size:.65rem;letter-spacing:.15em;color:var(--beige);opacity:.5}
 
     /* ── PHOTO SECTION ───────────────────────────────────────────────── */
     #photo-section{background:var(--tan);padding:0;position:relative;isolation:isolate}
@@ -719,12 +731,12 @@
       .couple-cards{grid-template-columns:1fr;gap:.5rem}
       .couple-card{text-align:left}
       /* & tidak dirotasi, cukup tampil di antara dua kartu */
-      .c-and{transform:rotate(0deg);text-align:left;opacity:.25;font-size:2.5rem}
+      .c-and{transform:rotate(0deg);text-align:left;opacity:.8;font-size:2.5rem}
 
       /* Mobile: lebar tetap, tinggi ditambah, ukuran motif setengahnya */
       .couple-batik-right-deco{
         width:clamp(11rem,55vw,18rem);
-        height:clamp(22rem,80vh,36rem);
+        height:clamp(22rem,80vh,22rem);
         right:-1rem;
         bottom:2rem;
         -webkit-mask-size:600px auto, 100% 100%;
@@ -936,7 +948,7 @@
           <p class="e-type">Akad & Pemberkatan</p>
           <h3 class="e-title">Prosesi Pernikahan</h3>
           <div class="e-detail"><span class="icon">📅</span><div><strong>Hari &amp; Tanggal</strong>Sabtu, 2 Mei 2026</div></div>
-          <div class="e-detail"><span class="icon">🕑</span><div><strong>Waktu</strong>14:00 – 15:30 WIB</div></div>
+          <div class="e-detail"><span class="icon">🕑</span><div><strong>Waktu</strong>12:00 – 15:30 WIB</div></div>
           <div class="e-detail"><span class="icon">📍</span><div><strong>Tempat</strong>Kampoeng Percik<br><span style="font-size:.8rem;opacity:.6">Kampung Percik Terusan, JL Patimura KM. 1, Salatiga, Sidorejo, Salatiga, Kec. Sidorejo, Kota Salatiga, Jawa Tengah</span></div></div>
           <a class="map-btn" href="https://maps.google.com/?q=Kampoeng+Percik+Salatiga" target="_blank" rel="noopener">🗺 Buka Google Maps</a>
         </div>
@@ -944,7 +956,7 @@
           <p class="e-type">Resepsi Pernikahan</p>
           <h3 class="e-title">Resepsi Pernikahan</h3>
           <div class="e-detail"><span class="icon">📅</span><div><strong>Hari &amp; Tanggal</strong>Sabtu, 2 Mei 2026</div></div>
-          <div class="e-detail"><span class="icon">🕓</span><div><strong>Waktu</strong>16:30 WIB</div></div>
+          <div class="e-detail"><span class="icon">🕓</span><div><strong>Waktu</strong>18:15 WIB</div></div>
           <div class="e-detail"><span class="icon">📍</span><div><strong>Tempat</strong>Hotel Wahid Prime<br><span style="font-size:.8rem;opacity:.6">Jl. Jend. Sudirman No.95, Kutowinangun Kidul, Kec. Tingkir, Kota Salatiga, Jawa Tengah</span></div></div>
           <a class="map-btn" href="https://maps.google.com/?q=Hotel+Wahid+Prime+Salatiga" target="_blank" rel="noopener">🗺 Buka Google Maps</a>
         </div>
@@ -1014,11 +1026,18 @@
       </div>
     </div>
   </div>
-  <!-- Wave rsvp → footer (tan ke beige) -->
+  <!-- Wave rsvp → closing photo (tan ke navy) -->
   <div class="section-divider" aria-hidden="true">
     <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-      <path d="M0,60 Q300,100 600,60 T1200,60 L1200,120 L0,120 Z" style="fill:#CEC4B6"/>
+      <path d="M0,60 Q300,100 600,60 T1200,60 L1200,120 L0,120 Z" style="fill:#151d45"/>
     </svg>
+  </div>
+</div>
+
+<!-- CLOSING PHOTO SECTION -->
+<div id="closing-photo">
+  <div class="closing-photo-wrap">
+    <img id="photo-closing" src="" alt="Foto Putri &amp; Dikdik" />
   </div>
 </div>
 
@@ -1044,10 +1063,11 @@ const PHOTO_CONFIG = {
   main: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/0805681d-719f-4fa2-82f3-da33a7610bae-IMG_0018.JPG",
   gate: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",
   auth: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",
+  closing: "", // isi dengan URL foto untuk closing section
 };
 
 (function applyPhotoConfig() {
-  const { cover, main, gate, auth } = PHOTO_CONFIG;
+  const { cover, main, gate, auth, closing } = PHOTO_CONFIG;
 
   if (cover) {
     document.documentElement.style.setProperty('--cover-photo', `url('${cover}')`);
@@ -1069,6 +1089,11 @@ const PHOTO_CONFIG = {
   if (main) {
     const photoEl = document.getElementById('photo-main');
     if (photoEl) photoEl.src = main;
+  }
+
+  if (closing) {
+    const photoEl = document.getElementById('photo-closing');
+    if (photoEl) photoEl.src = closing;
   }
 })();
 
