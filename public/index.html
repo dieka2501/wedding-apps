@@ -569,19 +569,19 @@
     /* Batik closing — di dalam closing-photo-wrap, di atas foto (z:1) tapi di bawah gradient overlay (z:2) */
     .closing-batik-deco{
       position:absolute;
-      right:-2rem;
+      left:-2rem;
       bottom:-2rem;
       width:clamp(20rem,38vw,32rem);
       height:clamp(20rem,38vw,32rem);
       background:var(--pure);
-      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 35% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 35% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
       -webkit-mask-repeat:repeat, no-repeat;
       mask-repeat:repeat, no-repeat;
       -webkit-mask-size:1200px auto, 100% 100%;
       mask-size:1200px auto, 100% 100%;
-      -webkit-mask-position:right bottom, center;
-      mask-position:right bottom, center;
+      -webkit-mask-position:left bottom, center;
+      mask-position:left bottom, center;
       -webkit-mask-composite:source-in;
       mask-composite:intersect;
       filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(255,255,255,.25));
@@ -590,22 +590,22 @@
       pointer-events:none;
     }
 
-    /* Batik footer — konsep sama, warna putih, posisi bawah-kanan */
+    /* Batik footer — konsep sama, warna putih, posisi bawah-kiri */
     .footer-batik-deco{
       position:absolute;
-      right:-2rem;
+      left:-2rem;
       bottom:-2rem;
       width:clamp(16rem,32vw,26rem);
       height:clamp(16rem,32vw,26rem);
       background:var(--pure);
-      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 35% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 35% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
       -webkit-mask-repeat:repeat, no-repeat;
       mask-repeat:repeat, no-repeat;
       -webkit-mask-size:1200px auto, 100% 100%;
       mask-size:1200px auto, 100% 100%;
-      -webkit-mask-position:right bottom, center;
-      mask-position:right bottom, center;
+      -webkit-mask-position:left bottom, center;
+      mask-position:left bottom, center;
       -webkit-mask-composite:source-in;
       mask-composite:intersect;
       filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(255,255,255,.2));
