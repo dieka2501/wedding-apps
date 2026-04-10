@@ -24,7 +24,7 @@
       --font-sans:   'DM Sans', sans-serif;
 
       /* ── ASSET URLS (diatur lewat PHOTO_CONFIG di JS) ───────────────── */
-      --batik-url: url('https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/optimized_batik.webp');
+      --batik-url: url('/optimized_batik.webp');
     }
     html{scroll-behavior:smooth}
     body{
@@ -1166,7 +1166,7 @@ const PHOTO_CONFIG = {
   gate: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",
   auth: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",
   closing: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/footer.JPG",
-  batik: "/batik.png", // URL motif batik — ganti sesuai kebutuhan (harus file lokal atau S3 dengan CORS aktif)
+  batik: "/optimized_batik.webp", // URL motif batik — ganti sesuai kebutuhan (harus file lokal atau S3 dengan CORS aktif)
 };
 
 (function applyPhotoConfig() {
