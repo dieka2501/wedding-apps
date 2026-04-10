@@ -566,6 +566,7 @@
     }
 
     /* Batik deco di closing section — style identik, warna pure/putih */
+    /* Batik closing — di dalam closing-photo-wrap, di atas foto (z:1) tapi di bawah gradient overlay (z:2) */
     .closing-batik-deco{
       position:absolute;
       right:-2rem;
@@ -583,9 +584,33 @@
       mask-position:right bottom, center;
       -webkit-mask-composite:source-in;
       mask-composite:intersect;
+      filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(255,255,255,.25));
+      opacity:0.9;
+      z-index:1;
+      pointer-events:none;
+    }
+
+    /* Batik footer — konsep sama, warna putih, posisi bawah-kanan */
+    .footer-batik-deco{
+      position:absolute;
+      right:-2rem;
+      bottom:-2rem;
+      width:clamp(16rem,32vw,26rem);
+      height:clamp(16rem,32vw,26rem);
+      background:var(--pure);
+      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      -webkit-mask-repeat:repeat, no-repeat;
+      mask-repeat:repeat, no-repeat;
+      -webkit-mask-size:1200px auto, 100% 100%;
+      mask-size:1200px auto, 100% 100%;
+      -webkit-mask-position:right bottom, center;
+      mask-position:right bottom, center;
+      -webkit-mask-composite:source-in;
+      mask-composite:intersect;
       filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(255,255,255,.2));
-      opacity:0.85;
-      z-index:3;
+      opacity:0.18;
+      z-index:0;
       pointer-events:none;
     }
 
@@ -832,6 +857,15 @@
       .countdown-batik-bridge{
         width:clamp(11rem,55vw,18rem);
         height:clamp(6rem,12vh,9rem);
+        right:-1rem;
+        -webkit-mask-size:600px auto, 100% 100%;
+        mask-size:600px auto, 100% 100%;
+      }
+
+      .closing-batik-deco,
+      .footer-batik-deco{
+        width:clamp(11rem,55vw,18rem);
+        height:clamp(11rem,55vw,18rem);
         right:-1rem;
         -webkit-mask-size:600px auto, 100% 100%;
         mask-size:600px auto, 100% 100%;
@@ -1135,12 +1169,13 @@
 <div id="closing-photo">
   <div class="closing-photo-wrap">
     <img id="photo-closing" src="" alt="Foto Putri &amp; Dikdik" />
+    <div class="closing-batik-deco" aria-hidden="true"></div>
   </div>
-  <div class="closing-batik-deco" aria-hidden="true"></div>
 </div>
 
 <!-- FOOTER -->
 <footer>
+  <div class="footer-batik-deco" aria-hidden="true"></div>
   <div class="f-names">Putri &amp; Dikdik</div>
   <p>Sabtu, 2 Mei 2026</p>
   <p style="margin-top:.4rem;font-size:.58rem">Made with ♡ for our special day</p>
