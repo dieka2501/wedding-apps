@@ -1150,6 +1150,10 @@
 <div id="watermark"></div>
 
 <script>
+// Selalu mulai dari paling atas saat halaman dimuat / di-refresh
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+
 const FONT_CONFIG = {
   script: { file: "font/regina.otf", family: 'Regina-script' },
   serif:  { file: "font/poppins.semibold.ttf", family: 'poppins-semibold-serif' },
