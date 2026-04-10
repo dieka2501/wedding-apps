@@ -17,11 +17,14 @@
       --orange: #C9611A;
       --pure:   #ffffff;
       --navy-deep:#173E70;
-      
+
       /* ── FONT ROLES ──────────────────────────────────────────────────── */
       --font-script: 'Great Vibes', cursive;
       --font-serif:  'Cormorant Garamond', serif;
       --font-sans:   'DM Sans', sans-serif;
+
+      /* ── ASSET URLS (diatur lewat PHOTO_CONFIG di JS) ───────────────── */
+      --batik-url: var(--batik-url);
     }
     html{scroll-behavior:smooth}
     body{
@@ -196,8 +199,8 @@
       opacity:1;
       z-index:4;
       pointer-events:none;
-      -webkit-mask-image:url('/batik.png');
-      mask-image:url('/batik.png');
+      -webkit-mask-image:var(--batik-url);
+      mask-image:var(--batik-url);
       -webkit-mask-repeat:repeat;
       mask-repeat:repeat;
       -webkit-mask-size:1200px auto;
@@ -313,7 +316,7 @@
       transform:rotate(-8deg);
       pointer-events:none;
       z-index:0;
-      background-image:url('/batik.png');
+      background-image:var(--batik-url);
       background-repeat:repeat;
       background-size:260px auto;
       filter:sepia(1) saturate(8) hue-rotate(340deg) brightness(1.08);
@@ -386,7 +389,7 @@
       position:absolute;
       pointer-events:none;
       z-index:0;
-      background-image:url('/batik.png');
+      background-image:var(--batik-url);
       background-repeat:repeat;
       background-size:260px auto;
       opacity:.22;
@@ -497,8 +500,8 @@
       height:clamp(20rem,38vw,32rem);
       background:#111737;
       /* Dua mask layer: batik pattern + radial fade di pinggiran */
-      -webkit-mask-image:url('/batik.png'), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:url('/batik.png'), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
       -webkit-mask-repeat:repeat, no-repeat;
       mask-repeat:repeat, no-repeat;
       -webkit-mask-size:1200px auto, 100% 100%;
@@ -522,8 +525,8 @@
       width:clamp(20rem,38vw,32rem);
       height:clamp(20rem,38vw,32rem);
       background:#111737;
-      -webkit-mask-image:url('/batik.png'), radial-gradient(ellipse 85% 100% at 65% 10%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:url('/batik.png'), radial-gradient(ellipse 85% 100% at 65% 10%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 100% at 65% 10%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      mask-image:var(--batik-url), radial-gradient(ellipse 85% 100% at 65% 10%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
       -webkit-mask-repeat:repeat, no-repeat;
       mask-repeat:repeat, no-repeat;
       -webkit-mask-size:1200px auto, 100% 100%;
@@ -546,8 +549,8 @@
       width:clamp(20rem,38vw,32rem);
       height:clamp(10rem,18vw,14rem);
       background:#111737;
-      -webkit-mask-image:url('/batik.png'), radial-gradient(ellipse 85% 100% at 65% 90%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:url('/batik.png'), radial-gradient(ellipse 85% 100% at 65% 90%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 100% at 65% 90%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      mask-image:var(--batik-url), radial-gradient(ellipse 85% 100% at 65% 90%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
       -webkit-mask-repeat:repeat, no-repeat;
       mask-repeat:repeat, no-repeat;
       -webkit-mask-size:1200px auto, 100% 100%;
@@ -570,8 +573,8 @@
       width:clamp(20rem,38vw,32rem);
       height:clamp(20rem,38vw,32rem);
       background:var(--pure);
-      -webkit-mask-image:url('/batik.png'), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:url('/batik.png'), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
+      mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
       -webkit-mask-repeat:repeat, no-repeat;
       mask-repeat:repeat, no-repeat;
       -webkit-mask-size:1200px auto, 100% 100%;
@@ -1158,11 +1161,16 @@ const PHOTO_CONFIG = {
   main: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/0805681d-719f-4fa2-82f3-da33a7610bae-IMG_0018.JPG",
   gate: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",
   auth: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/23a7e952-1087-4dc2-a4e8-3d5b4943b4e1-IMG_0031.JPG",
-  closing: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/footer.JPG", // isi dengan URL foto untuk closing section
+  closing: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/footer.JPG",
+  batik: "/batik.png", // URL motif batik — ganti sesuai kebutuhan
 };
 
 (function applyPhotoConfig() {
-  const { cover, main, gate, auth, closing } = PHOTO_CONFIG;
+  const { cover, main, gate, auth, closing, batik } = PHOTO_CONFIG;
+
+  if (batik) {
+    document.documentElement.style.setProperty('--batik-url', `url('${batik}')`);
+  }
 
   if (cover) {
     document.documentElement.style.setProperty('--cover-photo', `url('${cover}')`);
