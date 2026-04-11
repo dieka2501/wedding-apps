@@ -1357,10 +1357,12 @@ function showSuccess(response) {
 }
 
 function applyWatermark(name) {
+  // Escape XML special chars agar SVG tetap valid (misal: "Bapak & Ibu" → "Bapak &amp; Ibu")
+  const safeName = name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180">
     <text x="160" y="90" text-anchor="middle" dominant-baseline="middle" transform="rotate(-35 160 90)"
       font-family="Cormorant Garamond, serif" font-size="22" font-weight="600" letter-spacing="3" fill="#ffffff"
-    >${name}</text></svg>`;
+    >${safeName}</text></svg>`;
   const el = document.getElementById('watermark');
   el.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
   el.style.backgroundSize  = '320px 180px';
