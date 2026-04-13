@@ -108,14 +108,14 @@ async function syncRsvpToSheets(data) {
   try {
     const sheets = await getSheetsClient();
     const hdr = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1:H1`,
+      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1:J1`,
     });
     const hasHeader = hdr.data.values?.[0]?.[0] === 'Token';
     if (!hasHeader) {
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1`,
         valueInputOption: 'RAW',
-        requestBody: { values: [['Token','Nama','Akad','Respons','WhatsApp','Pesan','Jumlah Hadirin','Waktu Submit']] },
+        requestBody: { values: [['Token','Nama','Akad','Respons','WhatsApp','Pesan','Jumlah Akad','Jumlah Resepsi','Total Hadirin','Waktu Submit']] },
       });
     }
     const col    = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A:A` });
@@ -126,7 +126,8 @@ async function syncRsvpToSheets(data) {
     }
     const row = [
       data.token, data.name, data.akad ? 'Ya' : 'Tidak',
-      fmtResp(data.response), data.whatsapp || '', data.message || '', data.count || '0',
+      fmtResp(data.response), data.whatsapp || '', data.message || '',
+      data.count_akad ?? '0', data.count_resepsi ?? '0', data.count ?? '0',
       new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }),
     ];
     if (rowIdx > 0) {
@@ -398,7 +399,7 @@ app.get('/api/rsvp-status', (req, res) => {
 
 // ── Submit RSVP ───────────────────────────────────────────────────────────────
 app.post('/api/rsvp', async (req, res) => {
-  const { token, response, message, whatsapp,count } = req.body;
+  const { token, response, message, whatsapp, count, count_akad, count_resepsi } = req.body;
   if (!token || !response) return res.status(400).json({ success: false, message: 'Missing fields' });
 
   const result = verifyToken(token);
@@ -408,11 +409,21 @@ app.post('/api/rsvp', async (req, res) => {
   const name   = guests[token]?.name || 'Tamu Undangan';
   const akad   = result.akad;
 
+  // Dukung format lama (count) dan format baru (count_akad + count_resepsi)
+  const cAkad    = parseInt(count_akad)    || 0;
+  const cResepsi = parseInt(count_resepsi) || 0;
+  const cTotal   = cAkad + cResepsi || parseInt(count) || 0;
+
   const rsvp  = load(rsvpFile);
-  rsvp[token] = { name, akad, response, message: message || '', whatsapp: whatsapp || '', count: count || '0', submittedAt: new Date().toISOString() };
+  rsvp[token] = {
+    name, akad, response,
+    message: message || '', whatsapp: whatsapp || '',
+    count_akad: cAkad, count_resepsi: cResepsi, count: cTotal,
+    submittedAt: new Date().toISOString()
+  };
   save(rsvpFile, rsvp);
 
-  syncRsvpToSheets({ token, name, akad, response, message, whatsapp,count })
+  syncRsvpToSheets({ token, name, akad, response, message, whatsapp, count_akad: cAkad, count_resepsi: cResepsi, count: cTotal })
     .catch(e => console.error('[RSVP] Unhandled sync error:', e.message));
 
   res.json({ success: true });

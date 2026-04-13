@@ -652,6 +652,8 @@
     .rsvp-form{background:var(--pure);border-radius:8px;padding:2rem;box-shadow:0 4px 20px rgba(41,47,51,.08);border:1px solid var(--orange);border-opacity:.15}
     .f-group{margin-bottom:1.25rem}
     .f-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.6;margin-bottom:.5rem}
+    .f-label-sub{font-size:.55rem;letter-spacing:.1em;opacity:.7;text-transform:none;font-style:italic}
+    .f-select:disabled{opacity:.38;cursor:not-allowed;background-color:rgba(0,0,0,.04)}
     .f-input,.f-select,.f-textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--orange);border-opacity:.3;border-radius:4px;background:var(--beige);color:var(--navy);font-family:var(--font-sans);font-size:.9rem;transition:all .25s;outline:none}
     .f-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%23C9611A' stroke-opacity='.6' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;cursor:pointer}
     .f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--orange);border-opacity:1;box-shadow:0 0 0 3px rgba(201,97,26,.1)}
@@ -1130,14 +1132,30 @@
           </div>
           <div class="f-group">
             <label class="f-label">Konfirmasi Kehadiran</label>
-            <select id="rsvp-opts" class="f-select">
+            <select id="rsvp-opts" class="f-select" onchange="updateCountFields()">
               <option value="">— Pilih konfirmasi kehadiran —</option>
             </select>
           </div>
           <div class="f-group">
-            <label class="f-label">Jumlah Orang yang Hadir</label>
-            <select id="rsvp-count" class="f-select">
-              <option value="">— Pilih jumlah —</option>
+            <label class="f-label">Jumlah Hadir Akad <span class="f-label-sub">(Kampoeng Percik)</span></label>
+            <select id="rsvp-count-akad" class="f-select">
+              <option value="0">0 orang</option>
+              <option value="1">1 orang</option>
+              <option value="2">2 orang</option>
+              <option value="3">3 orang</option>
+              <option value="4">4 orang</option>
+              <option value="5">5 orang</option>
+              <option value="6">6 orang</option>
+              <option value="7">7 orang</option>
+              <option value="8">8 orang</option>
+              <option value="9">9 orang</option>
+              <option value="10">10 orang</option>
+            </select>
+          </div>
+          <div class="f-group">
+            <label class="f-label">Jumlah Hadir Resepsi <span class="f-label-sub">(Hotel Wahid Prime)</span></label>
+            <select id="rsvp-count-resepsi" class="f-select">
+              <option value="0">0 orang</option>
               <option value="1">1 orang</option>
               <option value="2">2 orang</option>
               <option value="3">3 orang</option>
@@ -1420,19 +1438,44 @@ function buildRsvpOpts(akad) {
   });
 }
 
+// Atur field count akad/resepsi berdasarkan pilihan kehadiran
+function updateCountFields() {
+  const selVal     = document.getElementById('rsvp-opts').value;
+  const akadEl     = document.getElementById('rsvp-count-akad');
+  const resepsiEl  = document.getElementById('rsvp-count-resepsi');
+
+  // Reset
+  akadEl.disabled    = false;
+  resepsiEl.disabled = false;
+
+  if (selVal === 'tidak-hadir') {
+    akadEl.value    = '0'; akadEl.disabled    = true;
+    resepsiEl.value = '0'; resepsiEl.disabled = true;
+  } else if (selVal === 'hadir-kampoeng') {
+    resepsiEl.value = '0'; resepsiEl.disabled = true;
+  } else if (selVal === 'hadir-hotel') {
+    akadEl.value    = '0'; akadEl.disabled    = true;
+  }
+  // hadir-keduanya & hadir: keduanya aktif, isi sesuai kebutuhan
+}
+
 async function submitRsvp() {
-  const name    = document.getElementById('rsvp-name').value.trim();
-  const wa      = document.getElementById('rsvp-wa').value.trim();
-  const msg     = document.getElementById('rsvp-msg').value.trim();
-  const selEl   = document.getElementById('rsvp-opts');
-  const selVal  = selEl.value;
-  const countEl = document.getElementById('rsvp-count');
-  let count = countEl.value;
+  const name       = document.getElementById('rsvp-name').value.trim();
+  const wa         = document.getElementById('rsvp-wa').value.trim();
+  const msg        = document.getElementById('rsvp-msg').value.trim();
+  const selEl      = document.getElementById('rsvp-opts');
+  const selVal     = selEl.value;
+  let countAkad    = parseInt(document.getElementById('rsvp-count-akad').value)    || 0;
+  let countResepsi = parseInt(document.getElementById('rsvp-count-resepsi').value) || 0;
 
   if (!name)   { toast('Mohon isi nama Anda'); return; }
   if (!selVal) { toast('Mohon pilih konfirmasi kehadiran'); return; }
-  if (selVal !== 'tidak-hadir' && !count) { toast('Mohon pilih jumlah orang'); return; }
-  if (selVal === 'tidak-hadir') count = 0;
+
+  // Validasi: jika hadir, minimal salah satu count harus > 0
+  if (selVal !== 'tidak-hadir' && countAkad === 0 && countResepsi === 0) {
+    toast('Mohon isi jumlah orang yang hadir'); return;
+  }
+  if (selVal === 'tidak-hadir') { countAkad = 0; countResepsi = 0; }
 
   const btn = document.getElementById('rsvp-btn');
   btn.disabled = true; btn.textContent = 'Mengirim…';
@@ -1440,7 +1483,12 @@ async function submitRsvp() {
   try {
     const r = await fetch('/api/rsvp', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({token:TOKEN, response:selVal, message:msg, whatsapp:wa,count: count})
+      body: JSON.stringify({
+        token: TOKEN, response: selVal, message: msg, whatsapp: wa,
+        count_akad: countAkad, count_resepsi: countResepsi,
+        // backward-compat: total gabungan
+        count: countAkad + countResepsi
+      })
     });
     const d = await r.json();
     if (d.success) {
