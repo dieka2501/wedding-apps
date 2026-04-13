@@ -57,30 +57,30 @@
       overflow:hidden;
     }
     
-    /* Photo background - positioned right */
+    /* Photo background - full cover on all breakpoints */
     #first-section::before{
       content:'';
       position:absolute;
       inset:0;
       background-color:transparent;
       background-image:var(--cover-photo, none);
-      background-size:min(48vw, 42rem) auto;
-      background-position:calc(100% - clamp(.25rem, 1.4vw, 1.2rem)) 34%;
+      background-size:cover;
+      background-position:center right;
       background-repeat:no-repeat;
       z-index:2;
     }
     #first-section.has-photo::before{
       filter:saturate(1.02) contrast(1.03) brightness(.96);
     }
-    
-    /* Gradient overlay */
+
+    /* Gradient overlay - stronger on desktop to keep text readable over full photo */
     #first-section::after{
       content:'';
       position:absolute;
       inset:0;
       background:
-        linear-gradient(90deg, rgba(6,10,28,.8) 0%, rgba(6,10,28,.62) 26%, rgba(6,10,28,.25) 48%, rgba(6,10,28,0) 70%),
-        linear-gradient(180deg, rgba(6,10,28,.12) 0%, rgba(6,10,28,0) 28%, rgba(6,10,28,.2) 100%);
+        linear-gradient(90deg, rgba(6,10,28,.94) 0%, rgba(6,10,28,.82) 28%, rgba(6,10,28,.48) 50%, rgba(6,10,28,.12) 70%, rgba(6,10,28,0) 82%),
+        linear-gradient(180deg, rgba(6,10,28,.15) 0%, rgba(6,10,28,0) 28%, rgba(6,10,28,.25) 100%);
       z-index:3;
     }
     
@@ -99,42 +99,44 @@
     }
     
     .c-to{
-      font-size:.68rem;
+      font-size:clamp(.58rem, 1.1vw, .72rem);
       letter-spacing:.24em;
       text-transform:uppercase;
       color:var(--pure);
       opacity:.75;
-      margin-bottom:1rem;
+      margin-bottom:.75rem;
       animation:fid 1s ease .2s both
     }
-    
-    /* Guest name - responsive for long names */
+
+    /* Guest name - same size as "Kepada Yang Terhormat" */
     .c-guest{
       font-family:var(--font-sans);
-      font-size:clamp(2.2rem, 4.5vw, 3.8rem);
+      font-size:clamp(.58rem, 1.1vw, .72rem);
       font-weight:700;
+      letter-spacing:.22em;
+      text-transform:uppercase;
       color:var(--pure);
-      line-height:1.15;
-      margin-bottom:.75rem;
+      line-height:1.5;
+      margin-bottom:.6rem;
       animation:fid 1s ease .4s both;
       word-wrap:break-word;
       hyphens:auto;
       max-width:100%;
     }
-    
+
     .c-guest-tag{
-      font-size:.82rem;
+      font-size:clamp(.7rem, 1.3vw, .84rem);
       letter-spacing:.02em;
       color:var(--pure);
       opacity:.72;
-      margin-bottom:2.5rem;
+      margin-bottom:2rem;
       animation:fid 1s ease .6s both;
       line-height:1.6;
       max-width:90%;
     }
-    
+
     .c-pre{
-      font-size:.68rem;
+      font-size:clamp(.54rem, 1vw, .66rem);
       letter-spacing:.24em;
       text-transform:uppercase;
       color:var(--orange);
@@ -142,26 +144,27 @@
       margin-bottom:.4rem;
       animation:fi 1s ease .8s both
     }
-    
+
     .c-names{
       font-family:var(--font-script);
-      font-size:clamp(2.8rem,5.5vw,4.2rem);
+      font-size:clamp(2.4rem, 4.8vw, 4rem);
       color:var(--orange);
       line-height:1.2;
+      text-transform:uppercase;
       animation:fi 1s ease .95s both;
       margin-bottom:.35rem;
     }
-    
+
     .c-names .amp{
       font-size:.65em;
       line-height:.6;
       opacity:.76;
       margin:.18rem 0;
     }
-    
+
     .c-date{
       margin-top:.9rem;
-      font-size:.56rem;
+      font-size:clamp(.48rem, .9vw, .6rem);
       letter-spacing:.34em;
       text-transform:uppercase;
       color:var(--pure);
@@ -798,11 +801,6 @@
         padding:3rem 1.5rem 9rem;
       }
 
-      #first-section::before{
-        background-size:cover;
-        background-position:center;
-      }
-
       .cc{
         width:100%;
         max-width:500px;
@@ -810,8 +808,10 @@
       }
 
       .c-to{text-align:left}
-      .c-guest{text-align:left;font-size:clamp(2rem, 8vw, 3rem)}
+      .c-guest{text-align:left;font-size:clamp(.6rem, 3vw, .78rem);letter-spacing:.2em}
       .c-guest-tag{text-align:left;max-width:100%}
+      .c-names{font-size:clamp(2rem, 8vw, 3rem)}
+      .c-date{font-size:clamp(.46rem, 2.4vw, .6rem);letter-spacing:.28em}
 
       .cover-batik{
         display:block;
@@ -887,23 +887,9 @@
     }
 
     /* ── TABLET (769–1100px) ─────────────────────────────────────────── */
-    /* Sama seperti mobile: foto cover full-background, teks overlay kiri   */
     @media(min-width:769px) and (max-width:1100px){
-      /* Foto full-cover seperti mobile */
-      #first-section::before{
-        background-size:cover;
-        background-position:center;
-      }
-      /* Gradient kiri lebih kuat agar teks terbaca di atas foto */
-      #first-section::after{
-        background:
-          linear-gradient(90deg, rgba(6,10,28,.88) 0%, rgba(6,10,28,.72) 32%, rgba(6,10,28,.3) 56%, rgba(6,10,28,0) 74%),
-          linear-gradient(180deg, rgba(6,10,28,.15) 0%, rgba(6,10,28,0) 28%, rgba(6,10,28,.28) 100%);
-      }
       /* Teks column lebih lebar dari mobile */
-      .cc{
-        width:min(52vw,28rem);
-      }
+      .cc{ width:min(52vw,28rem); }
       /* Batik proporsional untuk tablet */
       .cover-batik{
         display:block;
@@ -917,7 +903,6 @@
         filter:brightness(1.45) saturate(1.3);
         z-index:5;
       }
-      /* Wave disembunyikan — gradient jadi transisi natural */
       .cover-batik-wave{display:none}
     }
   </style>
@@ -932,9 +917,9 @@
     <h2 class="auth-name" id="auth-guest-name">—</h2>
     <p class="auth-desc">
       Untuk memastikan undangan ini sampai ke tangan yang tepat,<br>
-      mohon masukkan <strong>5 digit terakhir nomor WhatsApp Anda.</strong>
+      mohon masukkan <strong>5 digit yang diberikan kepada anda.</strong>
     </p>
-    <label class="auth-label">5 Digit Terakhir No. WhatsApp</label>
+    <label class="auth-label">5 Digit Rahasia</label>
     <input
       type="tel" id="auth-wa-input" class="auth-input"
       maxlength="5" placeholder="_ _ _ _ _"
@@ -1101,7 +1086,7 @@
           <a class="map-btn" href="https://maps.google.com/?q=Hotel+Wahid+Prime+Salatiga" target="_blank" rel="noopener">🗺 Buka Google Maps</a>
         </div>
       </div>
-      <p class="dresscode">Dresscode: {BELUM ADA KEPUTUSAN!!!!!!!}</p>
+      <p class="dresscode">Dresscode: [bebas aja lah, asal jangan baju ultramen]</p>
     </div>
   </div>
   <!-- Wave events → rsvp (beige ke tan) -->
