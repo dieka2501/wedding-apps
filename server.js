@@ -108,14 +108,17 @@ async function syncRsvpToSheets(data) {
   try {
     const sheets = await getSheetsClient();
     const hdr = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1:H1`,
+      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1:I1`,
     });
-    const hasHeader = hdr.data.values?.[0]?.[0] === 'Token';
-    if (!hasHeader) {
+    const headerCols = hdr.data.values?.[0] || [];
+    const hasHeader  = headerCols[0] === 'Token';
+    // Tulis/update header jika belum ada atau format lama (< 9 kolom / belum ada kolom akad-resepsi)
+    const needsHeaderUpdate = !hasHeader || headerCols.length < 9 || !headerCols[6]?.includes('Akad');
+    if (needsHeaderUpdate) {
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1`,
         valueInputOption: 'RAW',
-        requestBody: { values: [['Token','Nama','Akad','Respons','WhatsApp','Pesan','Jumlah Hadirin','Waktu Submit']] },
+        requestBody: { values: [['Token','Nama','Akad','Respons','WhatsApp','Pesan','Jumlah Hadirin Akad','Jumlah Hadirin Resepsi','Waktu Submit']] },
       });
     }
     const col    = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A:A` });
@@ -124,9 +127,12 @@ async function syncRsvpToSheets(data) {
     for (let i = 1; i < tokens.length; i++) {
       if (tokens[i]?.[0] === data.token) { rowIdx = i + 1; break; }
     }
+    const cAkad    = data.count_akad    != null ? String(data.count_akad)    : '0';
+    const cResepsi = data.count_resepsi != null ? String(data.count_resepsi) : '0';
     const row = [
       data.token, data.name, data.akad ? 'Ya' : 'Tidak',
-      fmtResp(data.response), data.whatsapp || '', data.message || '', data.count || '0',
+      fmtResp(data.response), data.whatsapp || '', data.message || '',
+      cAkad, cResepsi,
       new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }),
     ];
     if (rowIdx > 0) {
@@ -398,7 +404,7 @@ app.get('/api/rsvp-status', (req, res) => {
 
 // ── Submit RSVP ───────────────────────────────────────────────────────────────
 app.post('/api/rsvp', async (req, res) => {
-  const { token, response, message, whatsapp,count } = req.body;
+  const { token, response, message, whatsapp, count, count_akad, count_resepsi } = req.body;
   if (!token || !response) return res.status(400).json({ success: false, message: 'Missing fields' });
 
   const result = verifyToken(token);
@@ -408,11 +414,21 @@ app.post('/api/rsvp', async (req, res) => {
   const name   = guests[token]?.name || 'Tamu Undangan';
   const akad   = result.akad;
 
+  // Dukung format lama (count) dan format baru (count_akad + count_resepsi)
+  const cAkad    = parseInt(count_akad)    || 0;
+  const cResepsi = parseInt(count_resepsi) || 0;
+  const cTotal   = cAkad + cResepsi || parseInt(count) || 0;
+
   const rsvp  = load(rsvpFile);
-  rsvp[token] = { name, akad, response, message: message || '', whatsapp: whatsapp || '', count: count || '0', submittedAt: new Date().toISOString() };
+  rsvp[token] = {
+    name, akad, response,
+    message: message || '', whatsapp: whatsapp || '',
+    count_akad: cAkad, count_resepsi: cResepsi, count: cTotal,
+    submittedAt: new Date().toISOString()
+  };
   save(rsvpFile, rsvp);
 
-  syncRsvpToSheets({ token, name, akad, response, message, whatsapp,count })
+  syncRsvpToSheets({ token, name, akad, response, message, whatsapp, count_akad: cAkad, count_resepsi: cResepsi, count: cTotal })
     .catch(e => console.error('[RSVP] Unhandled sync error:', e.message));
 
   res.json({ success: true });

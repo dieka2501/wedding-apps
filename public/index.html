@@ -57,30 +57,43 @@
       overflow:hidden;
     }
     
-    /* Photo background - positioned right */
+    /* Photo background — desktop: auto 100% agar foto full tinggi tanpa zoom crop */
     #first-section::before{
       content:'';
       position:absolute;
       inset:0;
       background-color:transparent;
       background-image:var(--cover-photo, none);
-      background-size:min(48vw, 42rem) auto;
-      background-position:calc(100% - clamp(.25rem, 1.4vw, 1.2rem)) 34%;
+      background-size:auto 100%;
+      background-position:right top;
       background-repeat:no-repeat;
       z-index:2;
     }
     #first-section.has-photo::before{
       filter:saturate(1.02) contrast(1.03) brightness(.96);
     }
-    
-    /* Gradient overlay */
+
+    /* Gradient overlay
+       - Kiri: fade navy→transparent agar teks terbaca
+       - Kanan: fade transparent→navy untuk smooth edge jika foto tidak mencapai tepi layar
+       - Atas/bawah: subtle vignette */
     #first-section::after{
       content:'';
       position:absolute;
       inset:0;
       background:
-        linear-gradient(90deg, rgba(6,10,28,.8) 0%, rgba(6,10,28,.62) 26%, rgba(6,10,28,.25) 48%, rgba(6,10,28,0) 70%),
-        linear-gradient(180deg, rgba(6,10,28,.12) 0%, rgba(6,10,28,0) 28%, rgba(6,10,28,.2) 100%);
+        linear-gradient(90deg,
+          rgba(6,10,28,.96)  0%,
+          rgba(6,10,28,.84) 24%,
+          rgba(6,10,28,.45) 46%,
+          rgba(6,10,28,.08) 62%,
+          rgba(6,10,28,0)   72%,
+          rgba(6,10,28,0)   88%,
+          rgba(6,10,28,.55) 100%),
+        linear-gradient(180deg,
+          rgba(6,10,28,.18) 0%,
+          rgba(6,10,28,0)   22%,
+          rgba(6,10,28,.22) 100%);
       z-index:3;
     }
     
@@ -99,42 +112,44 @@
     }
     
     .c-to{
-      font-size:.68rem;
+      font-size:clamp(.58rem, 1.1vw, .72rem);
       letter-spacing:.24em;
       text-transform:uppercase;
       color:var(--pure);
       opacity:.75;
-      margin-bottom:1rem;
+      margin-bottom:.75rem;
       animation:fid 1s ease .2s both
     }
-    
-    /* Guest name - responsive for long names */
+
+    /* Guest name - same size as "Kepada Yang Terhormat" */
     .c-guest{
       font-family:var(--font-sans);
-      font-size:clamp(2.2rem, 4.5vw, 3.8rem);
+      font-size:clamp(.58rem, 1.1vw, .72rem);
       font-weight:700;
+      letter-spacing:.22em;
+      text-transform:uppercase;
       color:var(--pure);
-      line-height:1.15;
-      margin-bottom:.75rem;
+      line-height:1.5;
+      margin-bottom:.6rem;
       animation:fid 1s ease .4s both;
       word-wrap:break-word;
       hyphens:auto;
       max-width:100%;
     }
-    
+
     .c-guest-tag{
-      font-size:.82rem;
+      font-size:clamp(.7rem, 1.3vw, .84rem);
       letter-spacing:.02em;
       color:var(--pure);
       opacity:.72;
-      margin-bottom:2.5rem;
+      margin-bottom:2rem;
       animation:fid 1s ease .6s both;
       line-height:1.6;
       max-width:90%;
     }
-    
+
     .c-pre{
-      font-size:.68rem;
+      font-size:clamp(.54rem, 1vw, .66rem);
       letter-spacing:.24em;
       text-transform:uppercase;
       color:var(--orange);
@@ -142,26 +157,27 @@
       margin-bottom:.4rem;
       animation:fi 1s ease .8s both
     }
-    
+
     .c-names{
       font-family:var(--font-script);
-      font-size:clamp(2.8rem,5.5vw,4.2rem);
+      font-size:clamp(2.4rem, 4.8vw, 4rem);
       color:var(--orange);
       line-height:1.2;
+      text-transform:uppercase;
       animation:fi 1s ease .95s both;
       margin-bottom:.35rem;
     }
-    
+
     .c-names .amp{
       font-size:.65em;
       line-height:.6;
       opacity:.76;
       margin:.18rem 0;
     }
-    
+
     .c-date{
       margin-top:.9rem;
-      font-size:.56rem;
+      font-size:clamp(.48rem, .9vw, .6rem);
       letter-spacing:.34em;
       text-transform:uppercase;
       color:var(--pure);
@@ -652,6 +668,8 @@
     .rsvp-form{background:var(--pure);border-radius:8px;padding:2rem;box-shadow:0 4px 20px rgba(41,47,51,.08);border:1px solid var(--orange);border-opacity:.15}
     .f-group{margin-bottom:1.25rem}
     .f-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.6;margin-bottom:.5rem}
+    .f-label-sub{font-size:.55rem;letter-spacing:.1em;opacity:.7;text-transform:none;font-style:italic}
+    .f-select:disabled{opacity:.38;cursor:not-allowed;pointer-events:none}
     .f-input,.f-select,.f-textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--orange);border-opacity:.3;border-radius:4px;background:var(--beige);color:var(--navy);font-family:var(--font-sans);font-size:.9rem;transition:all .25s;outline:none}
     .f-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%23C9611A' stroke-opacity='.6' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;cursor:pointer}
     .f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--orange);border-opacity:1;box-shadow:0 0 0 3px rgba(201,97,26,.1)}
@@ -789,16 +807,21 @@
     }
 
     @media(max-width:768px){
-      /* Mobile: Left-aligned layout, full background */
+      /* Mobile: foto full-cover, teks overlay kiri */
       #first-section{
         align-items:flex-start;
         text-align:left;
         padding:3rem 1.5rem 9rem;
       }
-
       #first-section::before{
         background-size:cover;
-        background-position:center;
+        background-position:center 20%;
+      }
+      /* Mobile gradient: kiri lebih gelap agar teks terbaca */
+      #first-section::after{
+        background:
+          linear-gradient(90deg, rgba(6,10,28,.92) 0%, rgba(6,10,28,.7) 40%, rgba(6,10,28,.3) 70%, rgba(6,10,28,.1) 100%),
+          linear-gradient(180deg, rgba(6,10,28,.2) 0%, rgba(6,10,28,0) 25%, rgba(6,10,28,.3) 100%);
       }
 
       .cc{
@@ -808,8 +831,10 @@
       }
 
       .c-to{text-align:left}
-      .c-guest{text-align:left;font-size:clamp(2rem, 8vw, 3rem)}
+      .c-guest{text-align:left;font-size:clamp(.6rem, 3vw, .78rem);letter-spacing:.2em}
       .c-guest-tag{text-align:left;max-width:100%}
+      .c-names{font-size:clamp(2rem, 8vw, 3rem)}
+      .c-date{font-size:clamp(.46rem, 2.4vw, .6rem);letter-spacing:.28em}
 
       .cover-batik{
         display:block;
@@ -885,23 +910,9 @@
     }
 
     /* ── TABLET (769–1100px) ─────────────────────────────────────────── */
-    /* Sama seperti mobile: foto cover full-background, teks overlay kiri   */
     @media(min-width:769px) and (max-width:1100px){
-      /* Foto full-cover seperti mobile */
-      #first-section::before{
-        background-size:cover;
-        background-position:center;
-      }
-      /* Gradient kiri lebih kuat agar teks terbaca di atas foto */
-      #first-section::after{
-        background:
-          linear-gradient(90deg, rgba(6,10,28,.88) 0%, rgba(6,10,28,.72) 32%, rgba(6,10,28,.3) 56%, rgba(6,10,28,0) 74%),
-          linear-gradient(180deg, rgba(6,10,28,.15) 0%, rgba(6,10,28,0) 28%, rgba(6,10,28,.28) 100%);
-      }
       /* Teks column lebih lebar dari mobile */
-      .cc{
-        width:min(52vw,28rem);
-      }
+      .cc{ width:min(52vw,28rem); }
       /* Batik proporsional untuk tablet */
       .cover-batik{
         display:block;
@@ -915,7 +926,6 @@
         filter:brightness(1.45) saturate(1.3);
         z-index:5;
       }
-      /* Wave disembunyikan — gradient jadi transisi natural */
       .cover-batik-wave{display:none}
     }
   </style>
@@ -930,9 +940,9 @@
     <h2 class="auth-name" id="auth-guest-name">—</h2>
     <p class="auth-desc">
       Untuk memastikan undangan ini sampai ke tangan yang tepat,<br>
-      mohon masukkan <strong>5 digit terakhir nomor WhatsApp Anda.</strong>
+      mohon masukkan <strong>5 digit yang diberikan kepada anda.</strong>
     </p>
-    <label class="auth-label">5 Digit Terakhir No. WhatsApp</label>
+    <label class="auth-label">5 Digit Rahasia</label>
     <input
       type="tel" id="auth-wa-input" class="auth-input"
       maxlength="5" placeholder="_ _ _ _ _"
@@ -1099,7 +1109,7 @@
           <a class="map-btn" href="https://maps.google.com/?q=Hotel+Wahid+Prime+Salatiga" target="_blank" rel="noopener">🗺 Buka Google Maps</a>
         </div>
       </div>
-      <p class="dresscode">Dresscode: {BELUM ADA KEPUTUSAN!!!!!!!}</p>
+      <p class="dresscode">Dresscode: [bebas aja lah, asal jangan baju ultramen]</p>
     </div>
   </div>
   <!-- Wave events → rsvp (beige ke tan) -->
@@ -1130,12 +1140,12 @@
           </div>
           <div class="f-group">
             <label class="f-label">Konfirmasi Kehadiran</label>
-            <select id="rsvp-opts" class="f-select">
+            <select id="rsvp-opts" class="f-select" onchange="updateCountFields()">
               <option value="">— Pilih konfirmasi kehadiran —</option>
             </select>
           </div>
-          <div class="f-group">
-            <label class="f-label">Jumlah Orang yang Hadir</label>
+          <div class="f-group" id="rsvp-count-wrap">
+            <label class="f-label" id="rsvp-count-label">Jumlah Hadir</label>
             <select id="rsvp-count" class="f-select">
               <option value="">— Pilih jumlah —</option>
               <option value="1">1 orang</option>
@@ -1420,19 +1430,36 @@ function buildRsvpOpts(akad) {
   });
 }
 
+// Atur field count berdasarkan pilihan kehadiran
+function updateCountFields() {
+  const selVal  = document.getElementById('rsvp-opts').value;
+  const countEl = document.getElementById('rsvp-count');
+
+  if (selVal === 'tidak-hadir') {
+    countEl.value    = '';
+    countEl.disabled = true;
+  } else {
+    countEl.disabled = false;
+  }
+}
+
 async function submitRsvp() {
   const name    = document.getElementById('rsvp-name').value.trim();
   const wa      = document.getElementById('rsvp-wa').value.trim();
   const msg     = document.getElementById('rsvp-msg').value.trim();
-  const selEl   = document.getElementById('rsvp-opts');
-  const selVal  = selEl.value;
-  const countEl = document.getElementById('rsvp-count');
-  let count = countEl.value;
+  const selVal  = document.getElementById('rsvp-opts').value;
+  const count   = parseInt(document.getElementById('rsvp-count').value) || 0;
 
   if (!name)   { toast('Mohon isi nama Anda'); return; }
   if (!selVal) { toast('Mohon pilih konfirmasi kehadiran'); return; }
-  if (selVal !== 'tidak-hadir' && !count) { toast('Mohon pilih jumlah orang'); return; }
-  if (selVal === 'tidak-hadir') count = 0;
+  if (selVal !== 'tidak-hadir' && count === 0) { toast('Mohon pilih jumlah orang yang hadir'); return; }
+
+  // Split count ke akad/resepsi sesuai pilihan kehadiran
+  let countAkad = 0, countResepsi = 0;
+  if (selVal === 'hadir-kampoeng') { countAkad = count; }
+  else if (selVal === 'hadir-hotel') { countResepsi = count; }
+  else if (selVal === 'hadir-keduanya' || selVal === 'hadir') { countAkad = count; countResepsi = count; }
+  // tidak-hadir: tetap 0
 
   const btn = document.getElementById('rsvp-btn');
   btn.disabled = true; btn.textContent = 'Mengirim…';
@@ -1440,7 +1467,10 @@ async function submitRsvp() {
   try {
     const r = await fetch('/api/rsvp', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({token:TOKEN, response:selVal, message:msg, whatsapp:wa,count: count})
+      body: JSON.stringify({
+        token: TOKEN, response: selVal, message: msg, whatsapp: wa,
+        count_akad: countAkad, count_resepsi: countResepsi, count: count
+      })
     });
     const d = await r.json();
     if (d.success) {
