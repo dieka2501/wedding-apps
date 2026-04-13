@@ -653,6 +653,7 @@
     .f-group{margin-bottom:1.25rem}
     .f-label{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.6;margin-bottom:.5rem}
     .f-label-sub{font-size:.55rem;letter-spacing:.1em;opacity:.7;text-transform:none;font-style:italic}
+    .f-select:disabled{opacity:.38;cursor:not-allowed;pointer-events:none}
     .f-input,.f-select,.f-textarea{width:100%;padding:.75rem 1rem;border:1.5px solid var(--orange);border-opacity:.3;border-radius:4px;background:var(--beige);color:var(--navy);font-family:var(--font-sans);font-size:.9rem;transition:all .25s;outline:none}
     .f-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%23C9611A' stroke-opacity='.6' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;cursor:pointer}
     .f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--orange);border-opacity:1;box-shadow:0 0 0 3px rgba(201,97,26,.1)}
@@ -1135,7 +1136,7 @@
               <option value="">— Pilih konfirmasi kehadiran —</option>
             </select>
           </div>
-          <div class="f-group" id="rsvp-count-wrap" style="display:none">
+          <div class="f-group" id="rsvp-count-wrap">
             <label class="f-label" id="rsvp-count-label">Jumlah Hadir</label>
             <select id="rsvp-count" class="f-select">
               <option value="">— Pilih jumlah —</option>
@@ -1421,18 +1422,16 @@ function buildRsvpOpts(akad) {
   });
 }
 
-// Tampilkan/sembunyikan field count berdasarkan pilihan kehadiran
+// Atur field count berdasarkan pilihan kehadiran
 function updateCountFields() {
   const selVal  = document.getElementById('rsvp-opts').value;
-  const wrap    = document.getElementById('rsvp-count-wrap');
   const countEl = document.getElementById('rsvp-count');
 
-  if (!selVal || selVal === 'tidak-hadir') {
-    wrap.style.display = 'none';
-    countEl.value = '';
+  if (selVal === 'tidak-hadir') {
+    countEl.value    = '';
+    countEl.disabled = true;
   } else {
-    wrap.style.display = 'block';
-    countEl.value = countEl.value || '';
+    countEl.disabled = false;
   }
 }
 
