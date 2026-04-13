@@ -57,15 +57,15 @@
       overflow:hidden;
     }
     
-    /* Photo background - full cover on all breakpoints */
+    /* Photo background — desktop: auto 100% agar foto full tinggi tanpa zoom crop */
     #first-section::before{
       content:'';
       position:absolute;
       inset:0;
       background-color:transparent;
       background-image:var(--cover-photo, none);
-      background-size:cover;
-      background-position:center right;
+      background-size:auto 100%;
+      background-position:right top;
       background-repeat:no-repeat;
       z-index:2;
     }
@@ -73,14 +73,27 @@
       filter:saturate(1.02) contrast(1.03) brightness(.96);
     }
 
-    /* Gradient overlay - stronger on desktop to keep text readable over full photo */
+    /* Gradient overlay
+       - Kiri: fade navy→transparent agar teks terbaca
+       - Kanan: fade transparent→navy untuk smooth edge jika foto tidak mencapai tepi layar
+       - Atas/bawah: subtle vignette */
     #first-section::after{
       content:'';
       position:absolute;
       inset:0;
       background:
-        linear-gradient(90deg, rgba(6,10,28,.94) 0%, rgba(6,10,28,.82) 28%, rgba(6,10,28,.48) 50%, rgba(6,10,28,.12) 70%, rgba(6,10,28,0) 82%),
-        linear-gradient(180deg, rgba(6,10,28,.15) 0%, rgba(6,10,28,0) 28%, rgba(6,10,28,.25) 100%);
+        linear-gradient(90deg,
+          rgba(6,10,28,.96)  0%,
+          rgba(6,10,28,.84) 24%,
+          rgba(6,10,28,.45) 46%,
+          rgba(6,10,28,.08) 62%,
+          rgba(6,10,28,0)   72%,
+          rgba(6,10,28,0)   88%,
+          rgba(6,10,28,.55) 100%),
+        linear-gradient(180deg,
+          rgba(6,10,28,.18) 0%,
+          rgba(6,10,28,0)   22%,
+          rgba(6,10,28,.22) 100%);
       z-index:3;
     }
     
@@ -794,11 +807,21 @@
     }
 
     @media(max-width:768px){
-      /* Mobile: Left-aligned layout, full background */
+      /* Mobile: foto full-cover, teks overlay kiri */
       #first-section{
         align-items:flex-start;
         text-align:left;
         padding:3rem 1.5rem 9rem;
+      }
+      #first-section::before{
+        background-size:cover;
+        background-position:center 20%;
+      }
+      /* Mobile gradient: kiri lebih gelap agar teks terbaca */
+      #first-section::after{
+        background:
+          linear-gradient(90deg, rgba(6,10,28,.92) 0%, rgba(6,10,28,.7) 40%, rgba(6,10,28,.3) 70%, rgba(6,10,28,.1) 100%),
+          linear-gradient(180deg, rgba(6,10,28,.2) 0%, rgba(6,10,28,0) 25%, rgba(6,10,28,.3) 100%);
       }
 
       .cc{
