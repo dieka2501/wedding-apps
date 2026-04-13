@@ -108,14 +108,17 @@ async function syncRsvpToSheets(data) {
   try {
     const sheets = await getSheetsClient();
     const hdr = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1:J1`,
+      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1:I1`,
     });
-    const hasHeader = hdr.data.values?.[0]?.[0] === 'Token';
-    if (!hasHeader) {
+    const headerCols = hdr.data.values?.[0] || [];
+    const hasHeader  = headerCols[0] === 'Token';
+    // Tulis/update header jika belum ada atau format lama (< 9 kolom / belum ada kolom akad-resepsi)
+    const needsHeaderUpdate = !hasHeader || headerCols.length < 9 || !headerCols[6]?.includes('Akad');
+    if (needsHeaderUpdate) {
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A1`,
         valueInputOption: 'RAW',
-        requestBody: { values: [['Token','Nama','Akad','Respons','WhatsApp','Pesan','Jumlah Akad','Jumlah Resepsi','Total Hadirin','Waktu Submit']] },
+        requestBody: { values: [['Token','Nama','Akad','Respons','WhatsApp','Pesan','Jumlah Hadirin Akad','Jumlah Hadirin Resepsi','Waktu Submit']] },
       });
     }
     const col    = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${SHEET_RSVP}!A:A` });
@@ -124,10 +127,12 @@ async function syncRsvpToSheets(data) {
     for (let i = 1; i < tokens.length; i++) {
       if (tokens[i]?.[0] === data.token) { rowIdx = i + 1; break; }
     }
+    const cAkad    = data.count_akad    != null ? String(data.count_akad)    : '0';
+    const cResepsi = data.count_resepsi != null ? String(data.count_resepsi) : '0';
     const row = [
       data.token, data.name, data.akad ? 'Ya' : 'Tidak',
       fmtResp(data.response), data.whatsapp || '', data.message || '',
-      data.count_akad ?? '0', data.count_resepsi ?? '0', data.count ?? '0',
+      cAkad, cResepsi,
       new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }),
     ];
     if (rowIdx > 0) {
