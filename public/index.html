@@ -42,6 +42,18 @@
     #loading.active{display:flex}
     .ld-ring{width:36px;height:36px;border:2px solid var(--orange);border-top-color:transparent;border-radius:50%;animation:spin .9s linear infinite;margin-bottom:1.25rem}
     @keyframes spin{to{transform:rotate(360deg)}}
+    
+    /* =========================
+    BATIK SYSTEM (REFactored)
+    ========================= */
+    :root {
+        --batik-url: url('/optimized_batik.webp');
+
+        /* ukuran lebih besar karena raster */
+        --batik-size: clamp(400px, 60vw, 900px);
+
+        --batik-opacity: 0.9;
+      }
 
     /* ── FIRST SECTION (COVER) ───────────────────────────────────────── */
     #first-section{
@@ -209,25 +221,31 @@
       position:absolute;
       left:clamp(.35rem, 1.4vw, 1.25rem);
       bottom:0;
+
       width:clamp(22rem, 41vw, 32rem);
       height:clamp(18rem, 46vh, 29rem);
+
       background:var(--orange);
-      opacity:1;
+
       z-index:4;
       pointer-events:none;
-      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 90% 90% at 20% 85%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:var(--batik-url), radial-gradient(ellipse 90% 90% at 20% 85%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      -webkit-mask-repeat:repeat, no-repeat;
-      mask-repeat:repeat, no-repeat;
-      -webkit-mask-size:1200px auto, 100% 100%;
-      mask-size:1200px auto, 100% 100%;
-      -webkit-mask-position:left bottom, center;
-      mask-position:left bottom, center;
-      -webkit-mask-composite:source-in;
-      mask-composite:intersect;
-      filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(201,97,26,.25));
-    }
 
+      /* ✅ single mask */
+      -webkit-mask-image: var(--batik-url);
+      mask-image: var(--batik-url);
+
+      -webkit-mask-repeat: repeat;
+      mask-repeat: repeat;
+
+      -webkit-mask-size: var(--batik-size);
+      mask-size: var(--batik-size);
+
+      -webkit-mask-position: left bottom;
+      mask-position: left bottom;
+
+      /* optional styling */
+      filter: brightness(1.35) saturate(1.2);
+    }
     /* Wave overlay - right edge of batik, desktop only */
     /* Color = #151d45 blended with gradient overlay (~0.55 alpha) at batik right edge */
     .cover-batik-wave{
@@ -511,28 +529,55 @@
 
     /* Batik navy dekoratif — pendekatan sama dengan cover: warna solid + batik sebagai mask */
     .couple-batik-right-deco{
-      position:absolute;
-      right:-2rem;
-      bottom:-2rem;
-      width:clamp(20rem,38vw,32rem);
-      height:clamp(20rem,38vw,32rem);
-      background:#111737;
-      /* Dua mask layer: batik pattern + radial fade di pinggiran */
-      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 65% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      -webkit-mask-repeat:repeat, no-repeat;
-      mask-repeat:repeat, no-repeat;
-      -webkit-mask-size:1200px auto, 100% 100%;
-      mask-size:1200px auto, 100% 100%;
-      -webkit-mask-position:right bottom, center;
-      mask-position:right bottom, center;
-      -webkit-mask-composite:source-in;
-      mask-composite:intersect;
-      filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(17,23,55,.35));
-      opacity:0.9;
-      z-index:0;
-      pointer-events:none;
-    }
+        position:absolute;
+        right:-2rem;
+        bottom:-2rem;
+
+        width:clamp(20rem,38vw,32rem);
+        height:clamp(20rem,38vw,32rem);
+
+        background:#111737;
+
+        /* 🔥 mask layer */
+        -webkit-mask-image:
+          var(--batik-url),
+          radial-gradient(
+            ellipse 120% 120% at 70% 70%,
+            black 15%,
+            rgba(0,0,0,0.45) 55%,
+            transparent 85%
+          );
+
+        mask-image:
+          var(--batik-url),
+          radial-gradient(
+            ellipse 120% 120% at 70% 70%,
+            black 15%,
+            rgba(0,0,0,0.45) 55%,
+            transparent 85%
+          );
+
+        -webkit-mask-repeat: repeat, no-repeat;
+        mask-repeat: repeat, no-repeat;
+
+        /* 🔥 pakai system */
+        -webkit-mask-size: var(--batik-size), 100% 100%;
+        mask-size: var(--batik-size), 100% 100%;
+
+        -webkit-mask-position: right bottom, center;
+        mask-position: right bottom, center;
+
+        -webkit-mask-composite: source-in;
+        mask-composite: intersect;
+
+        /* 🔥 lebih soft untuk navy */
+        filter: brightness(1.3) saturate(1.2);
+
+        opacity: 0.85;
+
+        z-index:0;
+        pointer-events:none;
+      }
 
     /* Batik deco di countdown — style identik dengan couple */
     .countdown-batik-deco{
@@ -560,28 +605,57 @@
     }
 
     /* Batik bridge — di couple section, mengisi area wave agar batik tidak terputus */
-    .countdown-batik-bridge{
-      position:absolute;
-      right:-2rem;
-      bottom:0;
-      width:clamp(20rem,38vw,32rem);
-      height:clamp(10rem,18vw,14rem);
-      background:#111737;
-      -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 85% 100% at 65% 90%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      mask-image:var(--batik-url), radial-gradient(ellipse 85% 100% at 65% 90%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-      -webkit-mask-repeat:repeat, no-repeat;
-      mask-repeat:repeat, no-repeat;
-      -webkit-mask-size:1200px auto, 100% 100%;
-      mask-size:1200px auto, 100% 100%;
-      -webkit-mask-position:right bottom, center;
-      mask-position:right bottom, center;
-      -webkit-mask-composite:source-in;
-      mask-composite:intersect;
-      filter:brightness(1.45) saturate(1.3) drop-shadow(0 0 6px rgba(17,23,55,.35));
-      opacity:0.9;
-      z-index:7;
-      pointer-events:none;
-    }
+    .countdown-batik-deco{
+        position:absolute;
+        right:-2rem;
+        top:-2rem;
+        bottom:auto;
+
+        width:clamp(20rem,38vw,32rem);
+        height:clamp(20rem,38vw,32rem);
+
+        background:#111737;
+
+        /* 🔥 arah fade dari atas ke tengah */
+        -webkit-mask-image:
+          var(--batik-url),
+          radial-gradient(
+            ellipse 120% 120% at 70% 10%,
+            black 15%,
+            rgba(0,0,0,0.45) 55%,
+            transparent 85%
+          );
+
+        mask-image:
+          var(--batik-url),
+          radial-gradient(
+            ellipse 120% 120% at 70% 10%,
+            black 15%,
+            rgba(0,0,0,0.45) 55%,
+            transparent 85%
+          );
+
+        -webkit-mask-repeat: repeat, no-repeat;
+        mask-repeat: repeat, no-repeat;
+
+        /* 🔥 pakai system (hapus 1200px!) */
+        -webkit-mask-size: var(--batik-size), 100% 100%;
+        mask-size: var(--batik-size), 100% 100%;
+
+        -webkit-mask-position: right top, center;
+        mask-position: right top, center;
+
+        -webkit-mask-composite: source-in;
+        mask-composite: intersect;
+
+        /* 🔥 lebih subtle dari couple */
+        filter: brightness(1.25) saturate(1.15);
+
+        opacity: 0.8;
+
+        z-index:0;
+        pointer-events:none;
+      }
 
     /* Batik deco di closing section — style identik, warna pure/putih */
     /* Batik closing — di dalam closing-photo-wrap, di atas foto (z:1) tapi di bawah gradient overlay (z:2) */
@@ -596,8 +670,9 @@
       mask-image:var(--batik-url), radial-gradient(ellipse 85% 85% at 35% 60%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
       -webkit-mask-repeat:repeat, no-repeat;
       mask-repeat:repeat, no-repeat;
-      -webkit-mask-size:1200px auto, 100% 100%;
-      mask-size:1200px auto, 100% 100%;
+       /* 🔥 pakai system (hapus 1200px!) */
+      -webkit-mask-size: var(--batik-size), 100% 100%;
+      mask-size: var(--batik-size), 100% 100%;
       -webkit-mask-position:left bottom, center;
       mask-position:left bottom, center;
       -webkit-mask-composite:source-in;
@@ -808,10 +883,24 @@
 
     @media(max-width:768px){
       /* Mobile: foto full-cover, teks overlay kiri */
+      
       #first-section{
         align-items:flex-start;
         text-align:left;
         padding:3rem 1.5rem 9rem;
+         position: relative; /* 🔥 penting untuk anchor */
+      }
+      #first-section .section-divider{
+        position: absolute;   /* 🔥 WAJIB */
+        bottom: -2px;         /* 🔥 WAJIB */
+        left: 0;
+
+        width: 100%;
+        height: 120px;
+
+        display: block;
+        pointer-events: none;
+        z-index: 5;
       }
       #first-section::before{
         background-size:cover;
@@ -819,10 +908,9 @@
       }
       /* Mobile gradient: kiri lebih gelap agar teks terbaca */
       #first-section::after{
-        background:
-          linear-gradient(90deg, rgba(6,10,28,.92) 0%, rgba(6,10,28,.7) 40%, rgba(6,10,28,.3) 70%, rgba(6,10,28,.1) 100%),
-          linear-gradient(180deg, rgba(6,10,28,.2) 0%, rgba(6,10,28,0) 25%, rgba(6,10,28,.3) 100%);
-      }
+            background: none;
+              
+          }
 
       .cc{
         width:100%;
@@ -841,12 +929,18 @@
         left:0;
         width:clamp(11rem, 43vw, 16rem);
         height:clamp(11rem, 31vh, 16rem);
-        -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 90% 90% at 20% 85%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-        mask-image:var(--batik-url), radial-gradient(ellipse 90% 90% at 20% 85%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-        -webkit-mask-size:800px auto, 100% 100%;
-        mask-size:800px auto, 100% 100%;
-        filter:brightness(1.45) saturate(1.3);
-        z-index:5;
+        -webkit-mask-image:var(--batik-url);
+        mask-image:var(--batik-url);
+        -webkit-mask-size: var(--batik-size), 100% 100%;
+        mask-size: var(--batik-size), 100% 100%;
+        filter:none;
+        z-index:2;
+        clip-path: polygon(
+            0% 0%,   /* kiri atas masuk */
+            100% 20%,
+            100% 100%,
+            0% 100%   /* kiri bawah full */
+          );
       }
       .cover-batik-wave{display:none}
 
@@ -865,31 +959,47 @@
       .c-and{transform:rotate(0deg);text-align:left;opacity:.8;font-size:2.5rem}
 
       /* Mobile: lebar tetap, tinggi ditambah, ukuran motif setengahnya */
-      .couple-batik-right-deco{
-        width:clamp(11rem,55vw,18rem);
-        height:clamp(22rem,80vh,22rem);
-        right:-1rem;
-        bottom:2rem;
-        -webkit-mask-size:600px auto, 100% 100%;
-        mask-size:600px auto, 100% 100%;
+      .couple-batik-right-deco{   
+        width: clamp(10rem, 45vw, 16rem);  /* 🔥 override */     
+        right:-2rem;
+        bottom: 0;
+        transform: translateY(10px); /* 🔥 adjust ini */
+        -webkit-mask-size: var(--batik-size);
+        mask-size: var(--batik-size);
+        z-index:5;
+        clip-path: polygon(60% 0%, 100% 0%, 80% 90%, 0% 100%);
       }
 
       .countdown-batik-deco{
-        width:clamp(11rem,55vw,18rem);
-        height:clamp(10rem,35vh,14rem);
-        right:-1rem;
-        top:0;
-        bottom:auto;
-        -webkit-mask-size:600px auto, 100% 100%;
-        mask-size:600px auto, 100% 100%;
+        display: none;
+        width: clamp(10rem, 45vw, 16rem);  /* 🔥 override */     
+        right:-2rem;
+        bottom: 0;
+        transform: translateY(40px); /* 🔥 adjust ini */
+        -webkit-mask-size: var(--batik-size);
+        mask-size: var(--batik-size);
+        z-index:5;
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        
       }
+        .couple .section-divider{
+          position: relative;
+        }     
+        .couple .section-divider svg{
+        position: relative;
+        z-index: 2;
+        mix-blend-mode: destination-in; /* 🔥 MAGIC */
+      }
+      
+      
 
       .countdown-batik-bridge{
+        display: none;
         width:clamp(11rem,55vw,18rem);
         height:clamp(6rem,12vh,9rem);
         right:-1rem;
-        -webkit-mask-size:600px auto, 100% 100%;
-        mask-size:600px auto, 100% 100%;
+        -webkit-mask-size: var(--batik-size);
+        mask-size: var(--batik-size);
       }
 
       .closing-batik-deco,
@@ -1052,6 +1162,7 @@
   <div class="countdown-batik-bridge" aria-hidden="true"></div>
   <!-- Wave couple → countdown (beige ke tan) -->
   <div class="section-divider" aria-hidden="true">
+    <div class="wave-batik"></div>
     <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
       <path d="M0,60 Q300,100 600,60 T1200,60 L1200,120 L0,120 Z" style="fill:#B9A583"/>
     </svg>
