@@ -928,8 +928,8 @@
       .cover-batik{
         display:block;
         left:0;
-        width:clamp(19rem, 43vw, 22rem);
-        height:clamp(20rem, 31vh, 36rem);
+        width:clamp(13rem, 43vw, 13.5rem);
+        height:clamp(22rem, 31vh, 34rem);
         -webkit-mask-image:var(--batik-url);
         mask-image:var(--batik-url);
         -webkit-mask-size: var(--batik-size), 100% 100%;
@@ -938,7 +938,7 @@
         z-index:2;
         clip-path: polygon(
             0% 0%,   /* kiri atas masuk */
-            100% 100%,
+            60% 0%,
             100% 100%,
             0% 100%   /* kiri bawah full */
           );
@@ -961,16 +961,18 @@
 
       /* Mobile: lebar tetap, tinggi ditambah, ukuran motif setengahnya */
       .couple-batik-right-deco{   
-        --batik-size: clamp(1000px, 60vw, 2000px);
-        width: clamp(15rem, 45vw, 25rem);  /* 🔥 override */     
-        height: clamp(30rem, 45vw, 60rem);  /* 🔥 override */     
+        --batik-size: clamp(930px, 60vw, 980px);
+        width: clamp(15rem, 45vw, 15rem);  /* 🔥 override */     
+        height: clamp(25rem, 45vw, 30rem);  /* 🔥 override */     
         right:-2rem;
         bottom: 0;
         transform: translateY(10px); /* 🔥 adjust ini */
         -webkit-mask-size: var(--batik-size);
         mask-size: var(--batik-size);
         z-index:5;
-        clip-path: polygon(100% 0%, 100% 0%, 80% 90%, 0% 100%);
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        mask-position: center;
+        -webkit-mask-position: center;
       }
 
       .countdown-batik-deco{
@@ -998,7 +1000,7 @@
 
       .countdown-batik-bridge{
         display: none;
-        width:clamp(11rem,55vw,18rem);
+        width:clamp(6rem,55vw,10rem);
         height:clamp(6rem,12vh,9rem);
         right:-1rem;
         -webkit-mask-size: var(--batik-size);
@@ -1008,14 +1010,14 @@
       .closing-batik-deco,
       .footer-batik-deco{
         --batik-size: clamp(1000px, 60vw, 2000px);
-        width: clamp(15rem, 45vw, 25rem);  /* 🔥 override */     
+        width: clamp(11rem, 45vw, 15rem);  /* 🔥 override */     
         height: clamp(30rem, 45vw, 60rem);  /* 🔥 override */             
         bottom: 0;
         transform: translateY(10px); /* 🔥 adjust ini */
         -webkit-mask-size: var(--batik-size);
         mask-size: var(--batik-size);
         z-index:5;
-        clip-path: polygon(100% 0%, 100% 0%, 80% 90%, 0% 100%);
+        clip-path: polygon(0% 0%, 0% 0%, 80% 90%, 0% 100%);
         /* width:clamp(11rem,55vw,18rem); */
         /* height:clamp(11rem,55vw,18rem); */
         right:-1rem;
