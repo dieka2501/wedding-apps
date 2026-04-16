@@ -49,6 +49,8 @@
     :root {
         --batik-url: url('/optimized_batik.webp');
         --batik-kanan-url: url('/batik-sisi-kanan.webp');
+        --batik-orange-kiri-url: url('/batik-orange-kiri-cropped.webp');
+        --batik-putih-kanan-url: url('/batik-putih-kanan-cropped.webp');
 
         /* ukuran lebih besar karena raster */
         --batik-size: clamp(400px, 60vw, 900px);
@@ -519,7 +521,7 @@
     .couple-info-right{
       padding:clamp(3rem,6vw,5rem) clamp(2rem,4vw,3.5rem);
       padding-top:clamp(4rem,10vh,8rem);
-      display:flex;
+      display:block;
       flex-direction:column;
       justify-content:flex-start;
       position:relative;
@@ -929,20 +931,23 @@
       .cover-batik{
         display:block;
         left:0;
-        width:clamp(13rem, 43vw, 13.5rem);
+        bottom:4rem;
+        width:clamp(19rem, 43vw, 20rem);
         height:clamp(22rem, 31vh, 34rem);
-        -webkit-mask-image:var(--batik-url);
-        mask-image:var(--batik-url);
-        -webkit-mask-size: var(--batik-size), 100% 100%;
-        mask-size: var(--batik-size), 100% 100%;
+        -webkit-mask-image:var(--batik-orange-kiri-url);
+        mask-image:var(--batik-orange-kiri-url);
+        mask-size: 50% auto;
+        -webkit-mask-size: 50% auto;
         filter:none;
         z-index:2;
-        clip-path: polygon(
-            0% 0%,   /* kiri atas masuk */
-            60% 0%,
-            100% 100%,
-            0% 100%   /* kiri bawah full */
-          );
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        /* clip-path: polygon( */
+            /* 0% 0%,   kiri atas masuk */
+            /* 60% 0%, */
+            /* 100% 100%, */
+            /* 0% 100%   kiri bawah full */
+          /* ); */
       }
       .cover-batik-wave{display:none}
 
@@ -1020,21 +1025,37 @@
 
       .closing-batik-deco,
       .footer-batik-deco{
-        --batik-size: clamp(1000px, 60vw, 2000px);
-        width: clamp(11rem, 45vw, 15rem);  /* 🔥 override */     
-        height: clamp(30rem, 45vw, 60rem);  /* 🔥 override */             
-        bottom: 0;
-        transform: translateY(10px); /* 🔥 adjust ini */
-        -webkit-mask-size: var(--batik-size);
-        mask-size: var(--batik-size);
-        z-index:5;
-        clip-path: polygon(0% 0%, 0% 0%, 80% 90%, 0% 100%);
-        /* width:clamp(11rem,55vw,18rem); */
-        /* height:clamp(11rem,55vw,18rem); */
-        right:-1rem;
-        
-      }
+        position: absolute;
+        display: none;
 
+        right: 9rem;
+        top: -5rem;
+
+        width: clamp(13rem, 43vw, 20rem);
+        height: clamp(22rem, 31vh, 34rem);
+
+        background: #ffffff;
+
+        -webkit-mask-image: var(--batik-putih-kanan-url);
+        mask-image: var(--batik-putih-kanan-url);
+
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+
+        -webkit-mask-size: 50% auto;
+        mask-size: 50% auto;
+
+        -webkit-mask-position: right bottom; /* 🔥 INI KUNCI */
+        mask-position: right bottom;
+                  
+      }
+      .closing-photo-wrap img{width:100%;min-height:80vh;object-fit:cover;object-position:right top;display:block}
+      .closing-photo-wrap::before{
+      content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+      background:
+        /* linear-gradient(to right,  #151d45 0%, transparent 22%, transparent 78%, #151d45 100%), */
+        linear-gradient(to bottom, #151d45 0%, transparent 18%, transparent 76%, #151d45 100%);
+    }
       .cd-grid{grid-template-columns:repeat(2,1fr)}
     }
     
@@ -1354,8 +1375,10 @@ const PHOTO_CONFIG = {
   gate: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/optimized_auth.webp",
   auth: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/optimized_auth.webp",
   closing: "https://wedding-184208908848-ap-southeast-1-an.s3.ap-southeast-1.amazonaws.com/footer.JPG",
-  batik: "/optimized_batik.webp", // URL motif batik — ganti sesuai kebutuhan (harus file lokal atau S3 dengan CORS aktif)
-  batik_kanan: "/batik-sisi-kanan.webp", // URL motif batik — ganti sesuai kebutuhan (harus file lokal atau S3 dengan CORS aktif)
+  batik: "/optimized_batik.webp", 
+  batik_kanan: "/batik-sisi-kanan.webp", 
+  batik_orange_kiri :"/batik-orange-kiri-cropped.webp", 
+  batik_putih_kanan : "/batik-putih-kanan-cropped.webp" 
 };
 
 (function applyPhotoConfig() {
