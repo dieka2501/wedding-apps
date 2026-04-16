@@ -73,14 +73,15 @@
     }
     
     /* Photo background — desktop: auto 100% agar foto full tinggi tanpa zoom crop */
+    /* Desktop: foto di kanan dengan lebar fixed, tidak di-cover agar kedua wajah terlihat */
     #first-section::before{
       content:'';
       position:absolute;
       inset:0;
       background-color:transparent;
       background-image:var(--cover-photo, none);
-      background-size:auto 100%;
-      background-position:right top;
+      background-size:min(62vw, 56rem) auto;
+      background-position:right 28%;
       background-repeat:no-repeat;
       z-index:2;
     }
@@ -88,11 +89,8 @@
       filter:saturate(1.02) contrast(1.03) brightness(.96);
     }
 
-    /* Gradient overlay
-       - Kiri: fade navy→transparent agar teks terbaca
-       - Kanan: fade transparent→navy untuk smooth edge jika foto tidak mencapai tepi layar
-       - Atas/bawah: subtle vignette */
-    /* Gradient menggunakan warna persis sama dengan background section (#151d45 = rgb(21,29,69)) */
+    /* Gradient overlay — warna tepat sama dengan background #151d45 = rgb(21,29,69)
+       Foto kiri edge ≈ 38vw dari kiri (100% - 62vw), gradient fade habis di 36% */
     #first-section::after{
       content:'';
       position:absolute;
@@ -100,18 +98,17 @@
       background:
         linear-gradient(90deg,
           rgba(21,29,69,1)    0%,
-          rgba(21,29,69,1)   12%,
-          rgba(21,29,69,.88) 28%,
-          rgba(21,29,69,.62) 42%,
-          rgba(21,29,69,.32) 54%,
-          rgba(21,29,69,.10) 64%,
-          rgba(21,29,69,0)   72%,
+          rgba(21,29,69,1)   24%,
+          rgba(21,29,69,.7)  32%,
+          rgba(21,29,69,.3)  38%,
+          rgba(21,29,69,.08) 43%,
+          rgba(21,29,69,0)   48%,
           rgba(21,29,69,0)   88%,
-          rgba(21,29,69,.45) 100%),
+          rgba(21,29,69,.4)  100%),
         linear-gradient(180deg,
-          rgba(21,29,69,.2)  0%,
-          rgba(21,29,69,0)   20%,
-          rgba(21,29,69,.2) 100%);
+          rgba(21,29,69,.18) 0%,
+          rgba(21,29,69,0)   18%,
+          rgba(21,29,69,.18) 100%);
       z-index:3;
     }
     
