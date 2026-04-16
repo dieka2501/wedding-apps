@@ -990,12 +990,11 @@
 
           z-index: 0;
       }
-      /* Mobile: gradient bawah foto → beige section di bawah */
+      /* Mobile: hanya gradient tipis di bawah foto → beige */
       .couple-photo-left::before{
         background:
-          linear-gradient(to right,  transparent 40%, var(--beige) 92%),
-          linear-gradient(to bottom, var(--beige) 0%,  transparent 30%),
-          linear-gradient(to top,    var(--beige) 0%,  transparent 38%);
+          linear-gradient(to bottom, var(--beige) 0%, transparent 18%),
+          linear-gradient(to top,    var(--beige) 0%, transparent 12%);
       }
       .countdown-batik-deco{
         display: none;
