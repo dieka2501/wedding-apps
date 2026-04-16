@@ -92,23 +92,26 @@
        - Kiri: fade navy→transparent agar teks terbaca
        - Kanan: fade transparent→navy untuk smooth edge jika foto tidak mencapai tepi layar
        - Atas/bawah: subtle vignette */
+    /* Gradient menggunakan warna persis sama dengan background section (#151d45 = rgb(21,29,69)) */
     #first-section::after{
       content:'';
       position:absolute;
       inset:0;
       background:
         linear-gradient(90deg,
-          rgba(6,10,28,.96)  0%,
-          rgba(6,10,28,.84) 24%,
-          rgba(6,10,28,.45) 46%,
-          rgba(6,10,28,.08) 62%,
-          rgba(6,10,28,0)   72%,
-          rgba(6,10,28,0)   88%,
-          rgba(6,10,28,.55) 100%),
+          rgba(21,29,69,1)    0%,
+          rgba(21,29,69,1)   12%,
+          rgba(21,29,69,.88) 28%,
+          rgba(21,29,69,.62) 42%,
+          rgba(21,29,69,.32) 54%,
+          rgba(21,29,69,.10) 64%,
+          rgba(21,29,69,0)   72%,
+          rgba(21,29,69,0)   88%,
+          rgba(21,29,69,.45) 100%),
         linear-gradient(180deg,
-          rgba(6,10,28,.18) 0%,
-          rgba(6,10,28,0)   22%,
-          rgba(6,10,28,.22) 100%);
+          rgba(21,29,69,.2)  0%,
+          rgba(21,29,69,0)   20%,
+          rgba(21,29,69,.2) 100%);
       z-index:3;
     }
     
@@ -221,13 +224,13 @@
     
     /* Batik pattern overlay - ORANGE #C9611A */
     .cover-batik{
-      position:absolute;
-      left:clamp(.35rem, 1.4vw, 1.25rem);
-      --batik-size: clamp(1000px, 60vw, 2000px);
-      bottom:0;
 
-      width:clamp(22rem, 41vw, 32rem);
-      height:clamp(18rem, 46vh, 29rem);
+      position:absolute;
+      left:0rem;      
+      bottom:4rem;
+
+      width:clamp(25rem, 41vw, 32rem);
+      height:clamp(50rem, 46vh, 51rem);
       
       background:var(--orange);
 
@@ -235,14 +238,14 @@
       pointer-events:none;
 
       /* ✅ single mask */
-      -webkit-mask-image: var(--batik-url);
-      mask-image: var(--batik-url);
+      -webkit-mask-image: var(--batik-orange-kiri-url);
+      mask-image: var(--batik-orange-kiri-url);
 
-      -webkit-mask-repeat: repeat;
-      mask-repeat: repeat;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
 
-      -webkit-mask-size: var(--batik-size);
-      mask-size: var(--batik-size);
+      mask-size: 40% auto;
+        -webkit-mask-size: 40% auto;
 
       -webkit-mask-position: left bottom;
       mask-position: left bottom;
@@ -534,57 +537,34 @@
     /* Batik navy dekoratif — pendekatan sama dengan cover: warna solid + batik sebagai mask */
     .couple-batik-right-deco{
         position:absolute;
-        right:-2rem;
-        bottom:-2rem;
+        right:1rem;
+        bottom:5rem;
 
-        width:clamp(20rem,38vw,32rem);
-        height:clamp(20rem,38vw,32rem);
+        width:clamp(25rem,38vw,32rem);
+        height:clamp(30rem,38vw,32rem);
 
         background:#111737;
 
-        /* 🔥 mask layer */
-        -webkit-mask-image:
-          var(--batik-url),
-          radial-gradient(
-            ellipse 120% 120% at 70% 70%,
-            black 15%,
-            rgba(0,0,0,0.45) 55%,
-            transparent 85%
-          );
+        -webkit-mask-image: var(--batik-kanan-url);
+          mask-image: var(--batik-kanan-url);
 
-        mask-image:
-          var(--batik-url),
-          radial-gradient(
-            ellipse 120% 120% at 70% 70%,
-            black 15%,
-            rgba(0,0,0,0.45) 55%,
-            transparent 85%
-          );
+          -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
 
-        -webkit-mask-repeat: repeat, no-repeat;
-        mask-repeat: repeat, no-repeat;
+          mask-size: 50% auto;
+          -webkit-mask-size: 50% auto;
 
-        /* 🔥 pakai system */
-        -webkit-mask-size: var(--batik-size), 100% 100%;
-        mask-size: var(--batik-size), 100% 100%;
+          -webkit-mask-position: right bottom;
+          mask-position: right bottom;
 
-        -webkit-mask-position: right bottom, center;
-        mask-position: right bottom, center;
+          z-index: 0;
+        
 
-        -webkit-mask-composite: source-in;
-        mask-composite: intersect;
-
-        /* 🔥 lebih soft untuk navy */
-        filter: brightness(1.3) saturate(1.2);
-
-        opacity: 0.85;
-
-        z-index:0;
-        pointer-events:none;
       }
 
     /* Batik deco di countdown — style identik dengan couple */
     .countdown-batik-deco{
+      display: none;
       position:absolute;
       right:-2rem;
       top:-2rem;
@@ -664,6 +644,7 @@
     /* Batik deco di closing section — style identik, warna pure/putih */
     /* Batik closing — di dalam closing-photo-wrap, di atas foto (z:1) tapi di bawah gradient overlay (z:2) */
     .closing-batik-deco{
+      display: none;
       position:absolute;
       left:-2rem;
       bottom:-2rem;
@@ -715,7 +696,7 @@
     .couple-card{text-align:center}
     .c-role{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.5;margin-bottom:.6rem}
     /* Nama lebih besar & responsive untuk desktop/tablet */
-    .c-name{font-family:var(--font-script);font-size:clamp(2.6rem,4.5vw,4.8rem);color:var(--orange);line-height:1;margin-bottom:-.1rem}
+    .c-name{font-family:var(--font-script);font-size:clamp(2.6rem,4.5vw,4.8rem);color:var(--orange);line-height:1;margin-bottom:-0.8rem}
     .c-fullname{font-family:var(--font-script);font-size:clamp(1.5rem,1.2vw,3.05rem);color:var(--orange);margin-top:0;opacity:.8}
     .c-parents{font-size:clamp(.78rem,1.1vw,.95rem);color:var(--navy);margin-top:.5rem;line-height:1.7;opacity:.7}
     .c-and{font-family:var(--font-script);font-size:clamp(3rem,5vw,4.5rem);color:var(--orange);opacity:.8;text-align:center}
@@ -1075,16 +1056,33 @@
       .cc{ width:min(52vw,28rem); }
       /* Batik proporsional untuk tablet */
       .cover-batik{
-        display:block;
-        left:0;
-        width:clamp(14rem,46vw,24rem);
-        height:clamp(12rem,34vh,19rem);
-        -webkit-mask-image:var(--batik-url), radial-gradient(ellipse 90% 90% at 20% 85%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-        mask-image:var(--batik-url), radial-gradient(ellipse 90% 90% at 20% 85%, black 20%, rgba(0,0,0,0.55) 52%, transparent 80%);
-        -webkit-mask-size:1000px auto, 100% 100%;
-        mask-size:1000px auto, 100% 100%;
-        filter:brightness(1.45) saturate(1.3);
-        z-index:5;
+         position:absolute;
+          left:0rem;      
+          bottom:4rem;
+
+          width:clamp(25rem, 41vw, 32rem);
+          height:clamp(50rem, 46vh, 51rem);
+          
+          background:var(--orange);
+
+          z-index:4;
+          pointer-events:none;
+
+          /* ✅ single mask */
+          -webkit-mask-image: var(--batik-orange-kiri-url);
+          mask-image: var(--batik-orange-kiri-url);
+
+          -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+
+          mask-size: 40% auto;
+            -webkit-mask-size: 40% auto;
+
+          -webkit-mask-position: left bottom;
+          mask-position: left bottom;
+
+          /* optional styling */
+          filter: brightness(1.35) saturate(1.2);
       }
       .cover-batik-wave{display:none}
     }
