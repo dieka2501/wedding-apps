@@ -1327,6 +1327,12 @@
           <div class="rsvp-success-icon" id="rsvp-ok-icon">💌</div>
           <h3>Terima Kasih!</h3>
           <p id="rsvp-ok-msg" style="color:var(--navy);font-size:.9rem;margin-top:.5rem;line-height:1.8;opacity:.85"></p>
+          <!-- QR code check-in — hanya tampil jika hadir -->
+          <div id="rsvp-qr-wrap" style="display:none;margin-top:2rem">
+            <p style="font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.55;margin-bottom:.75rem">QR Code Check In</p>
+            <div id="rsvp-qr" style="display:inline-block;padding:.75rem;background:#fff;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.1)"></div>
+            <p style="font-size:.75rem;color:var(--navy);opacity:.6;margin-top:.85rem;line-height:1.6;max-width:260px;margin-left:auto;margin-right:auto">Simpan atau screenshot QR code ini.<br>Tunjukkan kepada petugas saat tiba di lokasi.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1524,6 +1530,28 @@ function showSuccess(response) {
     ? 'Terima kasih telah melakukan konfirmasi.<br>Sayang sekali Anda tidak dapat hadir di hari spesial kami.<br>Doa dan restu Anda sangat berarti untuk kami.'
     : `Terima kasih telah melakukan konfirmasi dan memilih untuk<br><strong>${labelMap[response] || response}</strong>.<br>Kami sangat menantikan kehadiran Anda!`;
   document.getElementById('rsvp-ok').classList.add('active');
+
+  // Tampilkan QR code check-in jika hadir
+  if (!tidakHadir && TOKEN) {
+    const qrWrap = document.getElementById('rsvp-qr-wrap');
+    const qrEl   = document.getElementById('rsvp-qr');
+    const checkinUrl = `${location.origin}/check-in?token=${TOKEN}`;
+    qrWrap.style.display = 'block';
+
+    // Load QR library lalu generate
+    if (window.QRCode) {
+      qrEl.innerHTML = '';
+      new QRCode(qrEl, { text: checkinUrl, width: 180, height: 180, colorDark:'#151d45', colorLight:'#ffffff' });
+    } else {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      s.onload = () => {
+        qrEl.innerHTML = '';
+        new QRCode(qrEl, { text: checkinUrl, width: 180, height: 180, colorDark:'#151d45', colorLight:'#ffffff' });
+      };
+      document.head.appendChild(s);
+    }
+  }
 }
 
 function applyWatermark(name) {
