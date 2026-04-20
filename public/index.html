@@ -1511,7 +1511,7 @@ async function submitAuth() {
 function showSuccess(response) {
   const tidakHadir = response === 'tidak-hadir';
   const labelMap = {
-    'hadir':           '🎉 Hadir',
+    'hadir':           '🏨 Hadir di Hotel Wahid Prime (Resepsi)',
     'hadir-kampoeng':  '📍 Hadir di Kampoeng Percik (Prosesi)',
     'hadir-hotel':     '🏨 Hadir di Hotel Wahid Prime (Resepsi)',
     'hadir-keduanya':  '✨ Hadir di Kedua Acara',
@@ -1581,7 +1581,7 @@ function buildRsvpOpts(akad) {
     {v:'hadir-keduanya', l:'✨ Hadir di Kedua Acara'},
     {v:'tidak-hadir',   l:'🙁 Tidak Dapat Hadir'},
   ] : [
-    {v:'hadir',        l:'🎉 Hadir'},
+    {v:'hadir',        l:'🏨 Hadir di Hotel Wahid Prime (Resepsi)'},
     {v:'tidak-hadir', l:'🙁 Tidak Dapat Hadir'},
   ];
   const sel = document.getElementById('rsvp-opts');
