@@ -90,7 +90,7 @@
     }
 
     /* Gradient overlay — warna tepat sama dengan background #151d45 = rgb(21,29,69)
-       Foto kiri edge ≈ 42vw dari kiri (100% - 58vw), gradient fade zona diperlebar */
+       Foto kiri edge ≈ 42% (100% - 58vw). Gradient solid sampai tepi foto, baru fade. */
     #first-section::after{
       content:'';
       position:absolute;
@@ -98,12 +98,11 @@
       background:
         linear-gradient(90deg,
           rgba(21,29,69,1)    0%,
-          rgba(21,29,69,1)   26%,
-          rgba(21,29,69,.88) 33%,
-          rgba(21,29,69,.6)  39%,
-          rgba(21,29,69,.28) 44%,
-          rgba(21,29,69,.08) 49%,
-          rgba(21,29,69,0)   55%,
+          rgba(21,29,69,1)   44%,
+          rgba(21,29,69,.8)  50%,
+          rgba(21,29,69,.35) 56%,
+          rgba(21,29,69,.08) 62%,
+          rgba(21,29,69,0)   67%,
           rgba(21,29,69,0)   86%,
           rgba(21,29,69,.38) 100%),
         linear-gradient(180deg,
@@ -864,16 +863,15 @@
         background-size:auto 100%;
         background-position:right center;
       }
-      /* Sesuaikan gradient agar lebih tajam di tablet */
+      /* Tablet gradient: solid sampai 54% (foto auto 100% mulai di ~35-45%) */
       #first-section::after{
         background:
           linear-gradient(90deg,
             rgba(21,29,69,1)    0%,
-            rgba(21,29,69,1)   28%,
-            rgba(21,29,69,.75) 36%,
-            rgba(21,29,69,.3)  42%,
-            rgba(21,29,69,.06) 48%,
-            rgba(21,29,69,0)   54%,
+            rgba(21,29,69,1)   54%,
+            rgba(21,29,69,.75) 60%,
+            rgba(21,29,69,.25) 66%,
+            rgba(21,29,69,0)   72%,
             rgba(21,29,69,0)   86%,
             rgba(21,29,69,.35) 100%),
           linear-gradient(180deg,
