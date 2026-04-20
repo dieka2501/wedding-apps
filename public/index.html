@@ -857,30 +857,6 @@
 
     /* ── RESPONSIVE ──────────────────────────────────────────────────── */
 
-    /* Tablet / iPad: foto full-height, kanan */
-    @media(min-width:769px) and (max-width:1100px){
-      #first-section::before{
-        background-size:auto 100%;
-        background-position:right center;
-      }
-      /* Tablet gradient: solid sampai 54% (foto auto 100% mulai di ~35-45%) */
-      #first-section::after{
-        background:
-          linear-gradient(90deg,
-            rgba(21,29,69,1)    0%,
-            rgba(21,29,69,1)   54%,
-            rgba(21,29,69,.75) 60%,
-            rgba(21,29,69,.25) 66%,
-            rgba(21,29,69,0)   72%,
-            rgba(21,29,69,0)   86%,
-            rgba(21,29,69,.35) 100%),
-          linear-gradient(180deg,
-            rgba(21,29,69,.2)  0%,
-            rgba(21,29,69,0)   15%,
-            rgba(21,29,69,.2)  100%);
-      }
-    }
-
     @media(max-width:680px){
       .photo-split{grid-template-columns:1fr}
       .photo-split-img{min-height:65vw}
