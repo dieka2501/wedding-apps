@@ -80,8 +80,8 @@
       inset:0;
       background-color:transparent;
       background-image:var(--cover-photo, none);
-      background-size:min(58vw, 52rem) auto;
-      background-position:right 22%;
+      background-size:cover;
+      background-position:right 20%;
       background-repeat:no-repeat;
       z-index:2;
     }
@@ -89,8 +89,7 @@
       filter:saturate(1.02) contrast(1.03) brightness(.96);
     }
 
-    /* Gradient overlay — warna tepat sama dengan background #151d45 = rgb(21,29,69)
-       Foto kiri edge ≈ 42% (100% - 58vw). Gradient solid sampai tepi foto, baru fade. */
+    /* Gradient overlay — foto pakai cover (full section), gradient ciptakan area teks kiri */
     #first-section::after{
       content:'';
       position:absolute;
@@ -98,17 +97,17 @@
       background:
         linear-gradient(90deg,
           rgba(21,29,69,1)    0%,
-          rgba(21,29,69,1)   44%,
-          rgba(21,29,69,.8)  50%,
-          rgba(21,29,69,.35) 56%,
-          rgba(21,29,69,.08) 62%,
-          rgba(21,29,69,0)   67%,
+          rgba(21,29,69,1)   30%,
+          rgba(21,29,69,.8)  38%,
+          rgba(21,29,69,.4)  46%,
+          rgba(21,29,69,.1)  54%,
+          rgba(21,29,69,0)   60%,
           rgba(21,29,69,0)   86%,
           rgba(21,29,69,.38) 100%),
         linear-gradient(180deg,
-          rgba(21,29,69,.18) 0%,
+          rgba(21,29,69,.25) 0%,
           rgba(21,29,69,0)   18%,
-          rgba(21,29,69,.18) 100%);
+          rgba(21,29,69,.25) 100%);
       z-index:3;
     }
     
@@ -867,7 +866,7 @@
         background:
           linear-gradient(90deg,
             rgba(21,29,69,1)    0%,
-            rgba(21,29,69,1)   34%,
+            rgba(21,29,69,1)   4%,
             rgba(21,29,69,.7)  40%,
             rgba(21,29,69,.2)  46%,
             rgba(21,29,69,0)   52%,
