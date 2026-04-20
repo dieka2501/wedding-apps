@@ -857,11 +857,26 @@
 
     /* ── RESPONSIVE ──────────────────────────────────────────────────── */
 
-    /* Tablet / iPad: kembalikan ukuran foto ke proporsi semula sebelum perubahan desktop */
+    /* Tablet / iPad: foto fill full height, gradient solid sampai batas teks */
     @media(min-width:769px) and (max-width:1100px){
       #first-section::before{
-        background-size:min(62vw, 56rem) auto;
-        background-position:right 28%;
+        background-size:auto 100%;
+        background-position:right center;
+      }
+      #first-section::after{
+        background:
+          linear-gradient(90deg,
+            rgba(21,29,69,1)    0%,
+            rgba(21,29,69,1)   52%,
+            rgba(21,29,69,.7)  58%,
+            rgba(21,29,69,.2)  64%,
+            rgba(21,29,69,0)   70%,
+            rgba(21,29,69,0)   86%,
+            rgba(21,29,69,.35) 100%),
+          linear-gradient(180deg,
+            rgba(21,29,69,.2)  0%,
+            rgba(21,29,69,0)   15%,
+            rgba(21,29,69,.2)  100%);
       }
     }
 
