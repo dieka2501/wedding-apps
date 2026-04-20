@@ -1327,12 +1327,6 @@
           <div class="rsvp-success-icon" id="rsvp-ok-icon">💌</div>
           <h3>Terima Kasih!</h3>
           <p id="rsvp-ok-msg" style="color:var(--navy);font-size:.9rem;margin-top:.5rem;line-height:1.8;opacity:.85"></p>
-          <!-- QR code check-in — hanya tampil jika hadir -->
-          <div id="rsvp-qr-wrap" style="display:none;margin-top:2rem">
-            <p style="font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.55;margin-bottom:.75rem">QR Code Check In</p>
-            <div id="rsvp-qr" style="display:inline-block;padding:.75rem;background:#fff;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.1)"></div>
-            <p style="font-size:.75rem;color:var(--navy);opacity:.6;margin-top:.85rem;line-height:1.6;max-width:260px;margin-left:auto;margin-right:auto">Simpan atau screenshot QR code ini.<br>Tunjukkan kepada petugas saat tiba di lokasi.</p>
-          </div>
         </div>
       </div>
     </div>
@@ -1369,8 +1363,6 @@
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
 
-// ── Set false saat deploy production ──────────────────────────────────────────
-const SHOW_CHECKIN_LINK = true;
 
 const FONT_CONFIG = {
   script: { file: "font/regina.otf", family: 'Regina-script' },
@@ -1520,49 +1512,22 @@ async function submitAuth() {
 function showSuccess(response) {
   const tidakHadir = response === 'tidak-hadir';
   const labelMap = {
-    'hadir':           'Hadir',
-    'hadir-kampoeng':  'Hadir di Kampoeng Percik (Prosesi)',
-    'hadir-hotel':     'Hadir di Hotel Wahid Prime (Resepsi)',
-    'hadir-keduanya':  'Hadir di Kedua Acara',
-    'tidak-hadir':     'Tidak Dapat Hadir',
+    'hadir':           '🎉 Hadir',
+    'hadir-kampoeng':  '📍 Hadir di Kampoeng Percik (Prosesi)',
+    'hadir-hotel':     '🏨 Hadir di Hotel Wahid Prime (Resepsi)',
+    'hadir-keduanya':  '✨ Hadir di Kedua Acara',
+    'tidak-hadir':     '🙁 Tidak Dapat Hadir',
   };
+  const label = labelMap[response] || response;
+
   document.getElementById('rsvp-desc').style.display = 'none';
   document.getElementById('rsvp-body').style.display = 'none';
   document.getElementById('rsvp-ok-icon').textContent = tidakHadir ? '🙁' : '💌';
   document.getElementById('rsvp-ok-msg').innerHTML = tidakHadir
     ? 'Terima kasih telah melakukan konfirmasi.<br>Sayang sekali Anda tidak dapat hadir di hari spesial kami.<br>Doa dan restu Anda sangat berarti untuk kami.'
-    : `Terima kasih telah melakukan konfirmasi dan memilih untuk<br><strong>${labelMap[response] || response}</strong>.<br>Kami sangat menantikan kehadiran Anda!`;
+    : `Terima kasih telah melakukan konfirmasi kehadiran.<br>Kami sangat menantikan Anda!
+       <br><span style="display:inline-block;margin-top:.75rem;padding:.4rem 1.1rem;background:var(--orange);color:#fff;border-radius:99px;font-size:.75rem;font-weight:500;letter-spacing:.05em">${label}</span>`;
   document.getElementById('rsvp-ok').classList.add('active');
-
-  // Tampilkan QR code check-in jika hadir
-  if (!tidakHadir && TOKEN) {
-    const qrWrap = document.getElementById('rsvp-qr-wrap');
-    const qrEl   = document.getElementById('rsvp-qr');
-    const checkinUrl = `${location.origin}/check-in?token=${TOKEN}`;
-    qrWrap.style.display = 'block';
-
-    // Load QR library lalu generate
-    const genQr = () => {
-      qrEl.innerHTML = '';
-      new QRCode(qrEl, { text: checkinUrl, width: 180, height: 180, colorDark:'#151d45', colorLight:'#ffffff' });
-    };
-    if (window.QRCode) { genQr(); }
-    else {
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-      s.onload = genQr;
-      document.head.appendChild(s);
-    }
-
-    // Link langsung — untuk keperluan testing. Set SHOW_CHECKIN_LINK = false saat prod.
-    if (SHOW_CHECKIN_LINK) {
-      const linkWrap = document.createElement('p');
-      linkWrap.style.cssText = 'margin-top:.75rem;font-size:.72rem;word-break:break-all';
-      linkWrap.innerHTML = `<a href="${checkinUrl}" target="_blank"
-        style="color:var(--orange);opacity:.8;text-decoration:underline">${checkinUrl}</a>`;
-      qrWrap.appendChild(linkWrap);
-    }
-  }
 }
 
 function applyWatermark(name) {
@@ -1657,7 +1622,8 @@ async function submitRsvp() {
   let countAkad = 0, countResepsi = 0;
   if (selVal === 'hadir-kampoeng') { countAkad = count; }
   else if (selVal === 'hadir-hotel') { countResepsi = count; }
-  else if (selVal === 'hadir-keduanya' || selVal === 'hadir') { countAkad = count; countResepsi = count; }
+  else if (selVal === 'hadir-keduanya') { countAkad = count; countResepsi = count; }
+  else if (selVal === 'hadir') { countResepsi = count; } // non-akad: resepsi only
   // tidak-hadir: tetap 0
 
   const btn = document.getElementById('rsvp-btn');
