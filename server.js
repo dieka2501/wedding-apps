@@ -21,8 +21,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ─── Config ───────────────────────────────────────────────────────────────────
 const CREDENTIAL_PATH = path.join(__dirname, 'credential.json');
 const SPREADSHEET_ID  = process.env.SPREADSHEET_ID || '';
-const SHEET_RSVP      = process.env.SHEET_NAME  || 'RSVP';
-const SHEET_TAMU      = process.env.SHEET_TAMU  || 'tamu';
+const SHEET_RSVP      = process.env.SHEET_NAME    || 'RSVP';
+const SHEET_TAMU      = process.env.SHEET_TAMU    || 'tamu';
+const SHEET_CHECKIN   = process.env.SHEET_CHECKIN || 'check-in';
 const BASE_URL        = process.env.BASE_URL    || `http://localhost:${PORT}`;
 const TOKEN_SECRET    = process.env.TOKEN_SECRET || 'ganti-dengan-secret-yang-kuat';
 
@@ -71,8 +72,9 @@ function wa5(wa) {
 }
 
 // ─── Local File Store ─────────────────────────────────────────────────────────
-const guestsFile = path.join(__dirname, 'guests.json');
-const rsvpFile   = path.join(__dirname, 'rsvp.json');
+const guestsFile  = path.join(__dirname, 'guests.json');
+const rsvpFile    = path.join(__dirname, 'rsvp.json');
+const checkinFile = path.join(__dirname, 'checkin.json');
 const load = f      => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
 const save = (f, d) => fs.writeFileSync(f, JSON.stringify(d, null, 2));
 
@@ -566,6 +568,87 @@ app.post('/api/admin/reset', adminAuth, (req, res) => {
   save(rsvpFile, {});
   console.log(`[Reset] ${guestCount} tamu dan ${rsvpCount} RSVP direset`);
   res.json({ success: true, message: `Reset selesai. ${guestCount} tamu dan ${rsvpCount} RSVP dihapus.` });
+});
+
+// ─── Sync check-in → sheet check-in ──────────────────────────────────────────
+async function syncCheckinToSheets(data) {
+  if (!canSync()) return;
+  try {
+    const sheets = await getSheetsClient();
+    const hdr = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID, range: `${SHEET_CHECKIN}!A1:C1`,
+    });
+    const hasHeader = hdr.data.values?.[0]?.[0] === 'Token';
+    if (!hasHeader) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SPREADSHEET_ID, range: `${SHEET_CHECKIN}!A1`,
+        valueInputOption: 'RAW',
+        requestBody: { values: [['Token', 'Nama Undangan', 'Date time check in']] },
+      });
+    }
+    const col    = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: `${SHEET_CHECKIN}!A:A` });
+    const tokens = col.data.values || [];
+    let rowIdx   = -1;
+    for (let i = 1; i < tokens.length; i++) {
+      if (tokens[i]?.[0] === data.token) { rowIdx = i + 1; break; }
+    }
+    const row = [
+      data.token, data.name,
+      new Date(data.checkinAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }),
+    ];
+    if (rowIdx > 0) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SPREADSHEET_ID, range: `${SHEET_CHECKIN}!A${rowIdx}`,
+        valueInputOption: 'RAW', requestBody: { values: [row] },
+      });
+    } else {
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SPREADSHEET_ID, range: `${SHEET_CHECKIN}!A1`,
+        valueInputOption: 'RAW', insertDataOption: 'INSERT_ROWS',
+        requestBody: { values: [row] },
+      });
+    }
+    console.log(`[Sheets] Check-in synced: ${data.name}`);
+  } catch (e) {
+    console.error(`[Sheets] Check-in sync GAGAL untuk ${data.name}:`, e.message);
+  }
+}
+
+// ── Halaman check-in (untuk petugas) ─────────────────────────────────────────
+app.get('/check-in', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'checkin.html'));
+});
+
+// ── API check-in ─────────────────────────────────────────────────────────────
+app.post('/api/checkin', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ success: false, message: 'Token diperlukan' });
+
+  const result = verifyToken(token);
+  if (!result.valid) return res.status(403).json({ success: false, message: 'Token tidak valid' });
+
+  const guests  = load(guestsFile);
+  const name    = guests[token]?.name || 'Tamu Undangan';
+  const checkins = load(checkinFile);
+
+  if (checkins[token]) {
+    return res.json({
+      success: true,
+      alreadyCheckedIn: true,
+      name,
+      checkinAt: checkins[token].checkinAt,
+    });
+  }
+
+  // First check-in
+  const checkinAt = new Date().toISOString();
+  checkins[token] = { name, checkinAt };
+  save(checkinFile, checkins);
+
+  syncCheckinToSheets({ token, name, checkinAt })
+    .catch(e => console.error('[Checkin] Unhandled sync error:', e.message));
+
+  res.json({ success: true, alreadyCheckedIn: false, name, checkinAt });
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));

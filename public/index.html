@@ -80,8 +80,8 @@
       inset:0;
       background-color:transparent;
       background-image:var(--cover-photo, none);
-      background-size:min(62vw, 56rem) auto;
-      background-position:right 28%;
+      background-size:50vw auto;
+      background-position:right 15%;
       background-repeat:no-repeat;
       z-index:2;
     }
@@ -89,8 +89,7 @@
       filter:saturate(1.02) contrast(1.03) brightness(.96);
     }
 
-    /* Gradient overlay — warna tepat sama dengan background #151d45 = rgb(21,29,69)
-       Foto kiri edge ≈ 38vw dari kiri (100% - 62vw), gradient fade habis di 36% */
+    /* Gradient overlay — foto pakai cover (full section), gradient ciptakan area teks kiri */
     #first-section::after{
       content:'';
       position:absolute;
@@ -98,17 +97,16 @@
       background:
         linear-gradient(90deg,
           rgba(21,29,69,1)    0%,
-          rgba(21,29,69,1)   24%,
-          rgba(21,29,69,.7)  32%,
-          rgba(21,29,69,.3)  38%,
-          rgba(21,29,69,.08) 43%,
-          rgba(21,29,69,0)   48%,
-          rgba(21,29,69,0)   88%,
-          rgba(21,29,69,.4)  100%),
+          rgba(21,29,69,1)   54%,
+          rgba(21,29,69,.75) 59%,
+          rgba(21,29,69,.25) 64%,
+          rgba(21,29,69,0)   69%,
+          rgba(21,29,69,0)   86%,
+          rgba(21,29,69,.38) 100%),
         linear-gradient(180deg,
-          rgba(21,29,69,.18) 0%,
+          rgba(21,29,69,.25) 0%,
           rgba(21,29,69,0)   18%,
-          rgba(21,29,69,.18) 100%);
+          rgba(21,29,69,.25) 100%);
       z-index:3;
     }
     
@@ -856,6 +854,30 @@
     .reveal.visible{opacity:1;transform:translateY(0)}
 
     /* ── RESPONSIVE ──────────────────────────────────────────────────── */
+
+    /* Tablet / iPad: foto fill full height, gradient solid sampai batas teks */
+    @media(min-width:769px) and (max-width:1100px){
+      #first-section::before{
+        background-size:auto 100%;
+        background-position:right center;
+      }
+      #first-section::after{
+        background:
+          linear-gradient(90deg,
+            rgba(21,29,69,1)    0%,
+            rgba(21,29,69,1)   4%,
+            rgba(21,29,69,.7)  40%,
+            rgba(21,29,69,.2)  46%,
+            rgba(21,29,69,0)   52%,
+            rgba(21,29,69,0)   86%,
+            rgba(21,29,69,.35) 100%),
+          linear-gradient(180deg,
+            rgba(21,29,69,.2)  0%,
+            rgba(21,29,69,0)   15%,
+            rgba(21,29,69,.2)  100%);
+      }
+    }
+
     @media(max-width:680px){
       .photo-split{grid-template-columns:1fr}
       .photo-split-img{min-height:65vw}
@@ -1362,6 +1384,7 @@
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
 
+
 const FONT_CONFIG = {
   script: { file: "font/regina.otf", family: 'Regina-script' },
   serif:  { file: "font/poppins.semibold.ttf", family: 'poppins-semibold-serif' },
@@ -1510,18 +1533,21 @@ async function submitAuth() {
 function showSuccess(response) {
   const tidakHadir = response === 'tidak-hadir';
   const labelMap = {
-    'hadir':           'Hadir',
-    'hadir-kampoeng':  'Hadir di Kampoeng Percik (Prosesi)',
-    'hadir-hotel':     'Hadir di Hotel Wahid Prime (Resepsi)',
-    'hadir-keduanya':  'Hadir di Kedua Acara',
-    'tidak-hadir':     'Tidak Dapat Hadir',
+    'hadir':           '🏨 Hadir di Hotel Wahid Prime (Resepsi)',
+    'hadir-kampoeng':  '📍 Hadir di Kampoeng Percik (Prosesi)',
+    'hadir-hotel':     '🏨 Hadir di Hotel Wahid Prime (Resepsi)',
+    'hadir-keduanya':  '✨ Hadir di Kedua Acara',
+    'tidak-hadir':     '🙁 Tidak Dapat Hadir',
   };
+  const label = labelMap[response] || response;
+
   document.getElementById('rsvp-desc').style.display = 'none';
   document.getElementById('rsvp-body').style.display = 'none';
   document.getElementById('rsvp-ok-icon').textContent = tidakHadir ? '🙁' : '💌';
   document.getElementById('rsvp-ok-msg').innerHTML = tidakHadir
     ? 'Terima kasih telah melakukan konfirmasi.<br>Sayang sekali Anda tidak dapat hadir di hari spesial kami.<br>Doa dan restu Anda sangat berarti untuk kami.'
-    : `Terima kasih telah melakukan konfirmasi dan memilih untuk<br><strong>${labelMap[response] || response}</strong>.<br>Kami sangat menantikan kehadiran Anda!`;
+    : `Terima kasih telah melakukan konfirmasi kehadiran.<br>Kami sangat menantikan Anda!
+       <br><span style="display:inline-block;margin-top:.75rem;padding:.4rem 1.1rem;background:var(--orange);color:#fff;border-radius:99px;font-size:.75rem;font-weight:500;letter-spacing:.05em">${label}</span>`;
   document.getElementById('rsvp-ok').classList.add('active');
 }
 
@@ -1577,7 +1603,7 @@ function buildRsvpOpts(akad) {
     {v:'hadir-keduanya', l:'✨ Hadir di Kedua Acara'},
     {v:'tidak-hadir',   l:'🙁 Tidak Dapat Hadir'},
   ] : [
-    {v:'hadir',        l:'🎉 Hadir'},
+    {v:'hadir',        l:'🏨 Hadir di Hotel Wahid Prime (Resepsi)'},
     {v:'tidak-hadir', l:'🙁 Tidak Dapat Hadir'},
   ];
   const sel = document.getElementById('rsvp-opts');
@@ -1617,7 +1643,8 @@ async function submitRsvp() {
   let countAkad = 0, countResepsi = 0;
   if (selVal === 'hadir-kampoeng') { countAkad = count; }
   else if (selVal === 'hadir-hotel') { countResepsi = count; }
-  else if (selVal === 'hadir-keduanya' || selVal === 'hadir') { countAkad = count; countResepsi = count; }
+  else if (selVal === 'hadir-keduanya') { countAkad = count; countResepsi = count; }
+  else if (selVal === 'hadir') { countResepsi = count; } // non-akad: resepsi only
   // tidak-hadir: tetap 0
 
   const btn = document.getElementById('rsvp-btn');
