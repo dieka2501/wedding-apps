@@ -392,7 +392,8 @@ app.post('/api/validate', async (req, res) => {
     return res.status(403).json({ valid: false, reason: 'wrong_wa' });
   }
 
-  res.json({ valid: true, name: guest.name, akad: result.akad });
+  // Akad diambil dari guests.json (bukan token) agar perubahan di sheet langsung berlaku
+  res.json({ valid: true, name: guest.name, akad: guest.akad });
 });
 
 // ── Cek status RSVP tamu (sudah submit atau belum) ───────────────────────────
@@ -419,7 +420,8 @@ app.post('/api/rsvp', async (req, res) => {
 
   const guests = load(guestsFile);
   const name   = guests[token]?.name || 'Tamu Undangan';
-  const akad   = result.akad;
+  // Akad dari guests.json agar perubahan di sheet (via import) langsung berlaku
+  const akad   = guests[token]?.akad ?? result.akad;
 
   // Dukung format lama (count) dan format baru (count_akad + count_resepsi)
   const cAkad    = parseInt(count_akad)    || 0;
