@@ -305,7 +305,11 @@ async function importTamu() {
         <div class="imp-stat"><div class="n" style="color:#e07b00">${d.updated}</div><div class="l">Diupdate</div></div>
         <div class="imp-stat"><div class="n" style="color:#6a0dad">${d.noWa}</div><div class="l">Belum Ada WA</div></div>
       </div>
-      <p style="font-size:.8rem;color:#666;margin-bottom:.75rem">✅ Token sudah ditulis ke kolom D. Link (kolom E) hanya untuk tamu yang sudah ada No WA.</p>
+      <p style="font-size:.8rem;color:${d.writeBackOk===false?'#b00020':'#666'};margin-bottom:.75rem">${
+        d.writeBackOk===false
+          ? '⚠️ Token/link gagal ditulis ke sheet — coba import ulang. Data lokal (.json) sudah terupdate.'
+          : '✅ Token sudah ditulis ke kolom D. Link (kolom E) hanya untuk tamu yang sudah ada No WA.'
+      }</p>
       <div style="overflow-x:auto"><table class="imp-table">
         <thead><tr><th>#</th><th>Nama</th><th>Akses</th><th>Status</th><th>Link</th></tr></thead>
         <tbody>${rows}</tbody>

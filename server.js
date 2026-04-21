@@ -242,27 +242,31 @@ async function importFromTamuSheet() {
 
   save(guestsFile, guests);
 
-  // Tulis balik ke Sheets (background)
+  // Tulis balik ke Sheets — AWAIT agar tidak race condition dengan import berikutnya
   const toWrite = updates.filter(u => u.writeD || u.writeE);
+  let writeBackOk = true;
   if (toWrite.length > 0) {
     const batchData = [];
     toWrite.forEach(u => {
       if (u.writeD && u.writeE) {
         batchData.push({ range: `${SHEET_TAMU}!D${u.rowNum}:E${u.rowNum}`, values: [[u.token, u.url]] });
       } else if (u.writeD) {
-        // Token tanpa link (belum ada WA)
         batchData.push({ range: `${SHEET_TAMU}!D${u.rowNum}`, values: [[u.token]] });
       } else if (u.writeE) {
         batchData.push({ range: `${SHEET_TAMU}!E${u.rowNum}`, values: [[u.url]] });
       }
     });
 
-    sheets.spreadsheets.values.batchUpdate({
-      spreadsheetId: SPREADSHEET_ID,
-      requestBody: { valueInputOption: 'RAW', data: batchData },
-    })
-    .then(() => console.log(`[Sheets] Tulis balik ${toWrite.length} baris selesai`))
-    .catch(e  => console.error('[Sheets] Tulis balik GAGAL:', e.message));
+    try {
+      await sheets.spreadsheets.values.batchUpdate({
+        spreadsheetId: SPREADSHEET_ID,
+        requestBody: { valueInputOption: 'RAW', data: batchData },
+      });
+      console.log(`[Sheets] Tulis balik ${toWrite.length} baris selesai`);
+    } catch (e) {
+      writeBackOk = false;
+      console.error('[Sheets] Tulis balik GAGAL:', e.message);
+    }
   }
 
   const newCount      = updates.filter(u => u.status === 'new').length;
@@ -273,6 +277,7 @@ async function importFromTamuSheet() {
   return {
     total: updates.length,
     new: newCount, updated: updatedCount, existing: existingCount, noWa: noWaCount,
+    writeBackOk,
     guests: updates.map(u => ({
       token: u.token, url: u.url, status: u.status, hasWa: u.hasWa,
       name: guests[u.token]?.name,
@@ -387,7 +392,8 @@ app.post('/api/validate', async (req, res) => {
     return res.status(403).json({ valid: false, reason: 'wrong_wa' });
   }
 
-  res.json({ valid: true, name: guest.name, akad: result.akad });
+  // Akad diambil dari guests.json (bukan token) agar perubahan di sheet langsung berlaku
+  res.json({ valid: true, name: guest.name, akad: guest.akad });
 });
 
 // ── Cek status RSVP tamu (sudah submit atau belum) ───────────────────────────
@@ -414,7 +420,8 @@ app.post('/api/rsvp', async (req, res) => {
 
   const guests = load(guestsFile);
   const name   = guests[token]?.name || 'Tamu Undangan';
-  const akad   = result.akad;
+  // Akad dari guests.json agar perubahan di sheet (via import) langsung berlaku
+  const akad   = guests[token]?.akad ?? result.akad;
 
   // Dukung format lama (count) dan format baru (count_akad + count_resepsi)
   const cAkad    = parseInt(count_akad)    || 0;
